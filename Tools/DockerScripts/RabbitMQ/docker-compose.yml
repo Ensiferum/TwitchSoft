@@ -1,0 +1,22 @@
+version: '3.4'  
+  
+services:  
+  rabbitmq:  
+    image: rabbitmq:latest
+    hostname: my-rabbitmq
+    container_name: Rabbit
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=unique-erlang-cookie
+      - RABBITMQ_DEFAULT_USER=twitchsoftuser
+      - RABBITMQ_DEFAULT_PASS=password 
+      - RABBITMQ_DEFAULT_VHOST=twitchsoft
+    # volumes:
+    #   - ./data/mnesia:/var/lib/rabbitmq/mnesia
+    #   - ./data/logs:/var/log/rabbitmq
+    ports:  
+      - "15672:15672"
+      - "5672:5672"
+    expose:  
+      - 15672
+      - 5672

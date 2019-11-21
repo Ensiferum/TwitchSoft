@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+
+service TwitchBotGrpc {
+  rpc JoinChannel (JoinChannelRequest) returns (Empty);
+  rpc RefreshChannels (Empty) returns (Empty);
+}
+
+message JoinChannelRequest {
+  string channelname = 1;
+}
+
+message Empty {
+}

@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "TwitchSoft.Bot": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

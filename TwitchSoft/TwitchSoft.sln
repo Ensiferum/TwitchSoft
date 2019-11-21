@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.Shared", "TwitchSoft.Shared\TwitchSoft.Shared.csproj", "{35F3AED9-A724-4F84-B7B8-5935A4C86D7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.TwitchBot", "TwitchSoft.TwitchBot\TwitchSoft.TwitchBot.csproj", "{A21DE931-285A-4E45-B344-565C9AA70288}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F206715D-FCB5-44E7-BFCD-375C9984BDDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.TelegramBot", "TwitchSoft.TelegramBot\TwitchSoft.TelegramBot.csproj", "{B3BBCC3E-B6E3-4B8B-9A44-5E9294D6F6D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.ServiceBusProcessor", "TwitchSoft.ServiceBusProcessor\TwitchSoft.ServiceBusProcessor.csproj", "{F8174AD6-B711-4973-B2D0-1B0375EF65EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchSoft.Maintenance", "TwitchSoft.Maintenance\TwitchSoft.Maintenance.csproj", "{D4C80634-2373-4CF2-8545-E2E2F698712A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35F3AED9-A724-4F84-B7B8-5935A4C86D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35F3AED9-A724-4F84-B7B8-5935A4C86D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35F3AED9-A724-4F84-B7B8-5935A4C86D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35F3AED9-A724-4F84-B7B8-5935A4C86D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A21DE931-285A-4E45-B344-565C9AA70288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A21DE931-285A-4E45-B344-565C9AA70288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A21DE931-285A-4E45-B344-565C9AA70288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A21DE931-285A-4E45-B344-565C9AA70288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F206715D-FCB5-44E7-BFCD-375C9984BDDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F206715D-FCB5-44E7-BFCD-375C9984BDDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F206715D-FCB5-44E7-BFCD-375C9984BDDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F206715D-FCB5-44E7-BFCD-375C9984BDDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3BBCC3E-B6E3-4B8B-9A44-5E9294D6F6D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3BBCC3E-B6E3-4B8B-9A44-5E9294D6F6D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3BBCC3E-B6E3-4B8B-9A44-5E9294D6F6D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3BBCC3E-B6E3-4B8B-9A44-5E9294D6F6D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8174AD6-B711-4973-B2D0-1B0375EF65EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8174AD6-B711-4973-B2D0-1B0375EF65EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8174AD6-B711-4973-B2D0-1B0375EF65EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8174AD6-B711-4973-B2D0-1B0375EF65EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C201858E-266D-4CC5-A0E8-D261D5E52F13}
+	EndGlobalSection
+EndGlobal

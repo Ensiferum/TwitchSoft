@@ -1,0 +1,18 @@
+version: '3.4'  
+  
+services:  
+  sqlserverservice:  
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu 
+    hostname: 'sqlserver'  
+    container_name: MSSQLSERVER
+    restart: unless-stopped
+    environment:  
+      ACCEPT_EULA: Y  
+      SA_PASSWORD: "BigPassw0rd"  
+    volumes:  
+      - C:/db/data/mssql:/var/opt/mssql/data
+      - C:/db/data/logs:/var/opt/mssql/log
+    ports:  
+      - '1433:1433'  
+    expose:  
+      - 1433
