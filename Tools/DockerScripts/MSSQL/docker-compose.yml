@@ -1,8 +1,8 @@
-version: '3.4'  
+version: '3.7'  
   
 services:  
   sqlserverservice:  
-    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu 
+    image: mcr.microsoft.com/mssql/server:2019-latest
     hostname: 'sqlserver'  
     container_name: MSSQLSERVER
     restart: unless-stopped

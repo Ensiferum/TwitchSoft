@@ -1,11 +1,11 @@
-version: '3.4'  
+version: '3.7'  
   
 services:  
-  rabbitmq:  
-    image: rabbitmq:latest
+  rabbitmq:
     hostname: my-rabbitmq
     container_name: Rabbit
     restart: unless-stopped
+    build: .
     environment:
       - RABBITMQ_ERLANG_COOKIE=unique-erlang-cookie
       - RABBITMQ_DEFAULT_USER=twitchsoftuser
