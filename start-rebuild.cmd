@@ -1,1 +1,1 @@
-docker-compose -f .\TwitchSoft\docker-compose.yml -f .\TwitchSoft\docker-compose.override.yml up --build -d
+docker-compose -f .\TwitchSoft\docker-compose.yml -f .\TwitchSoft\docker-compose.override.yml up --build -d --pull
