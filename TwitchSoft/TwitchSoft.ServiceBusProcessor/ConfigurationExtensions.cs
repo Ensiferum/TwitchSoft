@@ -5,6 +5,7 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
+using Serilog;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -28,6 +29,12 @@ namespace TwitchSoft.ServiceBusProcessor
                         hostConfigurator.Username(serviceBusSettings.Username);
                         hostConfigurator.Password(serviceBusSettings.Password);
                     });
+
+                    //var logger = new LoggerConfiguration()
+                    //    .ReadFrom.Configuration(Configuration)
+                    //    .CreateLogger();
+
+                    //cfg.UseSerilog(logger);
 
                     cfg.ReceiveEndpoint("add-twitch-message", ep =>
                     {

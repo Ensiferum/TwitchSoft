@@ -39,10 +39,6 @@ namespace TwitchSoft.TwitchBot
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
 
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(Configuration)
-                        .CreateLogger();
-
                     services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
                     services.AddSingleton<TwitchBot>();
@@ -69,6 +65,12 @@ namespace TwitchSoft.TwitchBot
                                 hostConfigurator.Username(serviceBusSettings.Username);
                                 hostConfigurator.Password(serviceBusSettings.Password);
                             });
+
+                            //var logger = new LoggerConfiguration()
+                            //    .ReadFrom.Configuration(Configuration)
+                            //    .CreateLogger();
+
+                            //cfg.UseSerilog(logger);
 
                             cfg.ReceiveEndpoint("add-twitch-message", ep =>
                             {

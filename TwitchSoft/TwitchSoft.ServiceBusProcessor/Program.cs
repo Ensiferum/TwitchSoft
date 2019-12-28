@@ -31,10 +31,6 @@ namespace TwitchSoft.ServiceBusProcessor
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
 
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(Configuration)
-                        .CreateLogger();
-
                     services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
 
