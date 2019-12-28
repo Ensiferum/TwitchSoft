@@ -70,22 +70,22 @@ namespace TwitchSoft.TwitchBot
                                 hostConfigurator.Password(serviceBusSettings.Password);
                             });
 
-                            cfg.ReceiveEndpoint(host, "add-twitch-message", ep =>
+                            cfg.ReceiveEndpoint("add-twitch-message", ep =>
                             {
                                 EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
                             });
 
-                            cfg.ReceiveEndpoint(host, "add-twitch-subscriber", ep =>
+                            cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
                             {
                                 EndpointConvention.Map<NewSubscriber>(ep.InputAddress);
                             });
 
-                            cfg.ReceiveEndpoint(host, "add-twitch-community-subscription", ep =>
+                            cfg.ReceiveEndpoint("add-twitch-community-subscription", ep =>
                             {
                                 EndpointConvention.Map<NewCommunitySubscription>(ep.InputAddress);
                             });
 
-                            cfg.ReceiveEndpoint(host, "add-twitch-user-ban", ep =>
+                            cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
                             {
                                 EndpointConvention.Map<NewBan>(ep.InputAddress);
                             });
