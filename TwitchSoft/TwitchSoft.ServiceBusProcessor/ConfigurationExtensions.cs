@@ -71,8 +71,6 @@ namespace TwitchSoft.ServiceBusProcessor
                         ep.ConfigureConsumer<NewBanConsumer>(provider);
                         EndpointConvention.Map<NewBan>(ep.InputAddress);
                     });
-
-                    cfg.UseSerilog();
                 }));
             });
 

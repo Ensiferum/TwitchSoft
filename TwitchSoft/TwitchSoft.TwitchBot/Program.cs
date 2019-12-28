@@ -91,8 +91,6 @@ namespace TwitchSoft.TwitchBot
                             {
                                 EndpointConvention.Map<NewBan>(ep.InputAddress);
                             });
-
-                            cfg.UseSerilog();
                         }));
                     });
 
