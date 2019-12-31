@@ -5,7 +5,6 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
-using Serilog;
 
 namespace TwitchSoft.ServiceBusProcessor
 {

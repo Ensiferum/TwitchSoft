@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using MassTransit;
 using TwitchSoft.Shared.ServiceBus.Models;
@@ -10,7 +9,6 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.ServiceBus.Configuration;
 using TwitchSoft.Shared.Services.Repository;
-using Microsoft.Extensions.Logging;
 using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.TwitchApi;
 using Microsoft.AspNetCore.Hosting;
@@ -31,8 +29,7 @@ namespace TwitchSoft.TwitchBot
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(loggerFactory =>
                 {
-                    loggerFactory.ClearProviders();
-                    loggerFactory.AddSerilog();
+                    //loggerFactory.ClearProviders();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -65,12 +62,6 @@ namespace TwitchSoft.TwitchBot
                                 hostConfigurator.Username(serviceBusSettings.Username);
                                 hostConfigurator.Password(serviceBusSettings.Password);
                             });
-
-                            //var logger = new LoggerConfiguration()
-                            //    .ReadFrom.Configuration(Configuration)
-                            //    .CreateLogger();
-
-                            //cfg.UseSerilog(logger);
 
                             cfg.ReceiveEndpoint("add-twitch-message", ep =>
                             {

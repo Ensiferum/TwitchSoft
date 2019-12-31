@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using TwitchSoft.Maintenance.Jobs;
 using TwitchSoft.Shared.Database;
 using TwitchSoft.Shared.Services.Models.Twitch;
@@ -41,17 +39,12 @@ namespace TwitchSoft.Maintenance
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(loggerFactory =>
                 {
-                    loggerFactory.ClearProviders();
-                    loggerFactory.AddSerilog();
+                    //loggerFactory.ClearProviders();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
-
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(Configuration)
-                        .CreateLogger();
 
                     services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();

@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using TwitchSoft.Shared.Database;
 using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
@@ -23,8 +21,7 @@ namespace TwitchSoft.ServiceBusProcessor
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(loggerFactory =>
                 {
-                    loggerFactory.ClearProviders();
-                    loggerFactory.AddSerilog();
+                    //loggerFactory.ClearProviders();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {

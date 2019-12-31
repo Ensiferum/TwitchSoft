@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.Repository;
@@ -9,7 +8,6 @@ using TwitchSoft.Shared.Services.Models.Telegram;
 using TwitchSoft.Shared.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TwitchSoft.Shared.Services.Helpers;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -24,17 +22,12 @@ namespace TwitchSoft.TelegramBot
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(loggerFactory =>
                 {
-                    loggerFactory.ClearProviders();
-                    loggerFactory.AddSerilog();
+                    //loggerFactory.ClearProviders();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
-
-                    Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(Configuration)
-                        .CreateLogger();
 
                     services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
