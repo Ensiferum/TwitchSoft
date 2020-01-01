@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using TwitchSoft.Shared.Services.Models;
+using TwitchSoft.Shared.Services.Helpers;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -13,13 +14,14 @@ namespace TwitchSoft.TelegramBot
             var messagesFormatted = messages.OrderBy(_ => _.PostedTime)
                     .Select(_ =>
                     {
-                        var dateFormat = _.PostedTime.Year == DateTime.Today.Year ? "dd/MM HH:mm:ss" : "dd/MM/yyyy HH:mm:ss";
-                        if (_.PostedTime.Date == DateTime.Today)
+                        var postedTime = _.PostedTime.ConvertToMyTimezone();
+                        var dateFormat = postedTime.Year == postedTime.Year ? "dd/MM HH:mm:ss" : "dd/MM/yyyy HH:mm:ss";
+                        if (postedTime.Date == DateTime.Today)
                         {
                             dateFormat = "HH:mm:ss";
                         }
                         return $@"
-{_.PostedTime.ToString(dateFormat)}: Channel: <b>{_.Channel}</b>
+{postedTime.ToString(dateFormat)}: Channel: <b>{_.Channel}</b>
 <b>{_.UserName}</b>: {HttpUtility.HtmlEncode(_.Message)}";
                     });
 

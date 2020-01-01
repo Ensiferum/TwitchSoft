@@ -14,6 +14,7 @@ using User = TwitchSoft.Shared.Database.Models.User;
 using static TwitchBotGrpc;
 using System;
 using System.Linq;
+using TwitchSoft.Shared.Services.Helpers;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -186,13 +187,15 @@ Usage:
                     }
                 };
 
+                var dateFormat = "MMMM dd";
+                var from = DateTime.UtcNow.AddMonths(-1).ConvertToMyTimezone().ToString(dateFormat);
+                var to = DateTime.UtcNow.ConvertToMyTimezone().ToString(dateFormat);
+
                 if (string.IsNullOrWhiteSpace(channel))
                 {
                     var channelSubs = await repository.GetTopChannelsBySubscribers(skip, count);
 
-                    var dateFormat = "MMMM dd";
-                    var messageHeader = $"Top Month Subscriptions count {DateTime.UtcNow.AddMonths(-1).ToString(dateFormat)} - {DateTime.UtcNow.ToString(dateFormat)}";
-
+                    var messageHeader = $"Top Month Subscriptions count {from} - {to}";
                     var messageBody = string.Join("\r\n", channelSubs.Select(_ => $"{_.SubsCount} subs on <b>{_.Channel}</b>"));
 
                     await telegramBotClient.SendTextMessageAsync(
@@ -206,9 +209,7 @@ Usage:
                 {
                     var subsCount = await repository.GetSubscribersCountFor(channel);
 
-                    var dateFormat = "MMMM dd";
-                    var messageHeader = $"Subscriptions count {DateTime.UtcNow.AddMonths(-1).ToString(dateFormat)} - {DateTime.UtcNow.ToString(dateFormat)}";
-
+                    var messageHeader = $"Subscriptions count {from} - {to}";
 
                     await telegramBotClient.SendTextMessageAsync(
                                 chatId: chatId,
