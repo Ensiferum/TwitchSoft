@@ -17,7 +17,15 @@ namespace TwitchSoft.Shared.Services.Helpers
 
         public static DateTime ConvertToMyTimezone(this DateTime date)
         {
-            var timeZoneId = "Belarus Standard Time";
+            string timeZoneId;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                timeZoneId = "Europe/Minsk";
+            }
+            else
+            {
+                timeZoneId = "Belarus Standard Time";
+            }
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
             return TimeZoneInfo.ConvertTimeFromUtc(date, timeZone);
         }
