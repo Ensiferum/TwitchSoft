@@ -1,13 +1,11 @@
 ﻿syntax = "proto3";
+import "google/protobuf/empty.proto";
 
 service TwitchBotGrpc {
-  rpc JoinChannel (JoinChannelRequest) returns (Empty);
-  rpc RefreshChannels (Empty) returns (Empty);
+  rpc JoinChannel (JoinChannelRequest) returns (google.protobuf.Empty);
+  rpc RefreshChannels (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 message JoinChannelRequest {
   string channelname = 1;
-}
-
-message Empty {
 }

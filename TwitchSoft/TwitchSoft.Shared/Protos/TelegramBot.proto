@@ -1,0 +1,10 @@
+﻿syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+service TelegramBotGrpc {
+  rpc SentDayDigest (DigestInfoRequest) returns (google.protobuf.Empty);
+}
+
+message DigestInfoRequest {
+  string chatId = 1;
+}

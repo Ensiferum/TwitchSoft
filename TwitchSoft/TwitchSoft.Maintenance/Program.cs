@@ -30,6 +30,10 @@ namespace TwitchSoft.Maintenance
                 scheduler
                     .Schedule<EnsthorFollowsJoin>()
                     .EveryFifteenMinutes();
+
+                scheduler
+                    .Schedule<SentDailyMessageDigest>()
+                    .DailyAtHour(10);
             });
 
             host.Run();

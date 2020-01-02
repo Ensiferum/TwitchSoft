@@ -1,4 +1,5 @@
 ﻿using Coravel.Invocable;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
