@@ -17,6 +17,7 @@ namespace TwitchSoft.TelegramBot
         private readonly ILogger<TelegramBot> logger;
         private readonly IServiceScopeFactory scopeFactory;
         private readonly BotSettings BotSettings;
+
         private TelegramBotClient telegramBotClient;
         private TelegramBotCommandProcessor telegramBotCommandProcessor;
         private readonly ConcurrentDictionary<string, BotState> usersState = new ConcurrentDictionary<string, BotState>();
@@ -69,6 +70,11 @@ namespace TwitchSoft.TelegramBot
             telegramBotClient.OnCallbackQuery += Bot_OnCallbackQuery;
             telegramBotClient.OnInlineQuery += Bot_OnInlineQuery;
             telegramBotClient.OnReceiveError += Bot_OnReceiveError;
+        }
+
+        public Task SentDigest(DigestInfoRequest digestInfo)
+        {
+            return telegramBotCommandProcessor.ProcessUserMessagesCommand(digestInfo.ChatId, digestInfo.Username);
         }
 
         private void Bot_OnReceiveError(object sender, ReceiveErrorEventArgs e)

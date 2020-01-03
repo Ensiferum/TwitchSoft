@@ -8,6 +8,7 @@ using TwitchSoft.Shared.Services.Models.Telegram;
 using TwitchSoft.Shared.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TwitchSoft.TelegramBot.Grpc;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -32,6 +33,7 @@ namespace TwitchSoft.TelegramBot
                     services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
                     services.AddSingleton<TelegramBot>();
+                    services.AddTransient<TelegramBotGrpcService>();
 
                     services
                         .Configure<BotSettings>(Configuration.GetSection($"Telegram:{nameof(BotSettings)}"))
@@ -42,6 +44,7 @@ namespace TwitchSoft.TelegramBot
                         options => options.UseSqlServer(Configuration.GetConnectionString(nameof(TwitchDbContext))));
 
                     services.AddHostedService<TelegramBotService>();
+                    services.AddHostedService<TelegramBotGrpcServer>();
                 });
     }
 }

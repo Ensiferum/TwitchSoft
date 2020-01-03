@@ -7,4 +7,5 @@ service TelegramBotGrpc {
 
 message DigestInfoRequest {
   string chatId = 1;
+  string username = 2;
 }

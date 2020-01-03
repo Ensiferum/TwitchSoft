@@ -29,6 +29,7 @@ namespace TwitchSoft.Maintenance.Jobs
             await client.SentDayDigestAsync(new DigestInfoRequest
             {
                 ChatId = rootUserChatId,
+                Username = "honeymad",
             });
             logger.LogInformation($"End executing job: {nameof(SentDailyMessageDigest)}");
         }
