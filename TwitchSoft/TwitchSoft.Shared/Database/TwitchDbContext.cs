@@ -61,7 +61,8 @@ namespace TwitchSoft.Shared.Database
                 .HasKey(u => u.Id);
 
             modelBuilder.Entity<ChatMessage>()
-                .HasIndex(u => new { u.UserId, u.PostedTime });
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(u => new { u.PostedTime });
 
             modelBuilder.Entity<ChatMessage>()
                 .Property(u => u.Id)
@@ -94,7 +95,8 @@ namespace TwitchSoft.Shared.Database
                 .ValueGeneratedNever();
 
             modelBuilder.Entity<Subscription>()
-                .HasIndex(u => new { u.UserId, u.SubscribedTime });
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(u => new { u.SubscribedTime });
 
             modelBuilder.Entity<UserBan>()
                 .HasOne(u => u.User)
@@ -114,7 +116,8 @@ namespace TwitchSoft.Shared.Database
                 .HasKey(u => new { u.UserId, u.BannedTime });
 
             modelBuilder.Entity<UserBan>()
-                .HasIndex(u => new { u.UserId, u.BannedTime });
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(u => new { u.BannedTime });
 
             modelBuilder.Entity<CommunitySubscription>()
                 .HasOne(u => u.User)
@@ -134,7 +137,8 @@ namespace TwitchSoft.Shared.Database
                 .HasKey(u => u.Id);
 
             modelBuilder.Entity<CommunitySubscription>()
-                .HasIndex(u => new { u.UserId, u.Date });
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(s => new { s.Date });
 
         }
     }
