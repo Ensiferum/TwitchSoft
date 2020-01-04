@@ -41,10 +41,6 @@ namespace TwitchSoft.Maintenance
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(loggerFactory =>
-                {
-                    //loggerFactory.ClearProviders();
-                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings
