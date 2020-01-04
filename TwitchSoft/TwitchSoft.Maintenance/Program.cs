@@ -33,7 +33,7 @@ namespace TwitchSoft.Maintenance
 
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
-                    .DailyAtHour(10);
+                    .DailyAtHour(7);
             });
 
             host.Run();
@@ -66,6 +66,7 @@ namespace TwitchSoft.Maintenance
                     services.AddTransient<HoneymadFollowsJoin>();
                     services.AddTransient<EnsthorFollowsJoin>();
                     services.AddTransient<TopChannelsJoin>();
+                    services.AddTransient<SentDailyMessageDigest>();
                 });
     }
 }
