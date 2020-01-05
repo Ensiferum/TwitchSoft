@@ -57,10 +57,7 @@ namespace TwitchSoft.Maintenance.Jobs
             }));
             await twitchDbContext.SaveChangesAsync();
 
-            Channel grpcChannel = new Channel("twitchbot", 80, ChannelCredentials.Insecure);
-            var client = new TwitchBotGrpcClient(grpcChannel);
-            await client.RefreshChannelsAsync(new Empty());
-            logger.LogInformation($"End executing job: {nameof(HoneymadFollowsJoin)}");
+            logger.LogInformation($"End executing job: {nameof(EnsthorFollowsJoin)}");
         }
     }
 }

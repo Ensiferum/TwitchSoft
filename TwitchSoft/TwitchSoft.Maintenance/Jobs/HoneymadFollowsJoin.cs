@@ -1,5 +1,4 @@
 ﻿using Coravel.Invocable;
-using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database;
 using TwitchSoft.Shared.Services.TwitchApi;
-using static TwitchBotGrpc;
 using User = TwitchSoft.Shared.Database.Models.User;
 
 namespace TwitchSoft.Maintenance.Jobs
@@ -56,9 +54,6 @@ namespace TwitchSoft.Maintenance.Jobs
             }));
             await twitchDbContext.SaveChangesAsync();
 
-            //Channel grpcChannel = new Channel("twitchbot", 80, ChannelCredentials.Insecure);
-            //var client = new TwitchBotGrpcClient(grpcChannel);
-            //await client.RefreshChannelsAsync(new Empty());
             logger.LogInformation($"End executing job: {nameof(HoneymadFollowsJoin)}");
         }
     }

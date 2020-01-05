@@ -32,6 +32,10 @@ namespace TwitchSoft.Maintenance
                     .EveryFifteenMinutes();
 
                 scheduler
+                    .Schedule<ChannelsRefresher>()
+                    .EveryFifteenMinutes();
+
+                scheduler
                     .Schedule<SentDailyMessageDigest>()
                     .DailyAtHour(7);
             });
@@ -63,6 +67,7 @@ namespace TwitchSoft.Maintenance
                     services.AddTransient<EnsthorFollowsJoin>();
                     services.AddTransient<TopChannelsJoin>();
                     services.AddTransient<SentDailyMessageDigest>();
+                    services.AddTransient<ChannelsRefresher>();
                 });
     }
 }
