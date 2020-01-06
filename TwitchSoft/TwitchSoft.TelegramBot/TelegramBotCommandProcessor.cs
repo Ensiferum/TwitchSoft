@@ -15,6 +15,7 @@ using static TwitchBotGrpc;
 using System;
 using System.Linq;
 using TwitchSoft.Shared.Services.Helpers;
+using ServiceStack.Redis;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -44,6 +45,39 @@ Usage:
             await telegramBotClient.SendTextMessageAsync(
                 chatId,
                 usage);
+        }
+
+        public async Task ProcessUserMessagesDigest(ChatId chatId, string userName)
+        {
+            await scopeFactory.RunInScope(async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var redisClient = scope.ServiceProvider.GetService<IRedisClient>();
+
+                var typedClient = redisClient.As<DateTime?>();
+                var lastDateTime = typedClient.GetValue(chatId) ?? DateTime.UtcNow.Date;
+                typedClient.SetValue(chatId, DateTime.UtcNow);
+
+                var userId = await repository.GetUserId(userName);
+
+                var count = 50;
+                var messages = await repository.GetMessages(userId, lastDateTime, count);
+
+                var replyMessages = messages.GenerateReplyMessages();
+                for (var i = 0; i < replyMessages.Count; i++)
+                {
+                    var replyMessage = replyMessages[i];
+                    await telegramBotClient.SendTextMessageAsync(
+                        chatId,
+                        replyMessage,
+                        parseMode: ParseMode.Html,
+                        disableWebPagePreview: true,
+                        replyMarkup: i == replyMessages.Count - 1
+                        ? Utils.GenerateNavigationMarkup(BotCommands.UserMessages, userName, count, 0, messages.Count)
+                        : null
+                    );
+                }
+            });
         }
 
         public async Task ProcessUserMessagesCommand(ChatId chatId, string userName, string skipString = null)

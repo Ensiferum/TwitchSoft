@@ -74,7 +74,7 @@ namespace TwitchSoft.TelegramBot
 
         public Task SentDigest(DigestInfoRequest digestInfo)
         {
-            return telegramBotCommandProcessor.ProcessUserMessagesCommand(digestInfo.ChatId, digestInfo.Username);
+            return telegramBotCommandProcessor.ProcessUserMessagesDigest(digestInfo.ChatId, digestInfo.Username);
         }
 
         private void Bot_OnReceiveError(object sender, ReceiveErrorEventArgs e)

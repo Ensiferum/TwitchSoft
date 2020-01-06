@@ -58,6 +58,23 @@ namespace TwitchSoft.Shared.Services.Repository
                 .ToListAsync();
         }
 
+        public Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, DateTime from, int count = 25)
+        {
+            return twitchDbContext.ChatMessages
+                .Where(_ => _.UserId == userId)
+                .Where(_ => _.PostedTime >= from)
+                .OrderByDescending(_ => _.PostedTime)
+                .Take(count)
+                .Select(_ => new ChatMessageModelForDisplaying()
+                {
+                    UserName = _.User.Username,
+                    Message = _.Message,
+                    PostedTime = _.PostedTime,
+                    Channel = _.Channel.Username
+                })
+                .ToListAsync();
+        }
+
         public Task<List<User>> SearchUsers(string userNamePart, int count = 10)
         {
             return twitchDbContext.Users.Where(_ => _.Username.Contains(userNamePart)).Take(count).ToListAsync();

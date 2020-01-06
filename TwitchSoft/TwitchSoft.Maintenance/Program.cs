@@ -38,6 +38,14 @@ namespace TwitchSoft.Maintenance
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
                     .DailyAtHour(7);
+
+                scheduler
+                    .Schedule<SentDailyMessageDigest>()
+                    .DailyAtHour(13);
+
+                scheduler
+                    .Schedule<SentDailyMessageDigest>()
+                    .DailyAtHour(19);
             });
 
             host.Run();
