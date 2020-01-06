@@ -10,9 +10,10 @@ namespace TwitchSoft.Shared.Redis
         public static void AddLocalRedisCache(this IServiceCollection services, IConfiguration configuration)
         {
             var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString");
-            services.AddSingleton<IRedisClientsManager>(c => new RedisManagerPool(redisConnectionString));
-            services.AddSingleton(c => c.GetService<IRedisClientsManager>().GetCacheClient());
-            services.AddSingleton(c => c.GetService<IRedisClientsManager>().GetClient());
+            var manager = new RedisManagerPool(redisConnectionString);
+            services.AddSingleton<IRedisClientsManager>(c => manager);
+            services.AddSingleton(c => manager.GetCacheClient());
+            services.AddSingleton(c => manager.GetClient());
             services.AddSingleton<IChannelsCache, ChannelsCache>();
         }
     }

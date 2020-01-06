@@ -5,6 +5,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd
+      - Redis__ConnectionString=host.docker.internal
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
