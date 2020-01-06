@@ -10,7 +10,14 @@ namespace TwitchSoft.Shared.Services.Extensions
         {
             using(var scope = scopeFactory.CreateScope())
             {
-                await action(scope);
+                try
+                {
+                    await action(scope);
+                }
+                catch
+                {
+                    throw;
+                } 
             }
         }
     }
