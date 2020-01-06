@@ -21,6 +21,8 @@ namespace TwitchSoft.ServiceBusProcessor
                 x.AddConsumer<NewCommunitySubscriptionConsumer>();
                 x.AddConsumer<NewBanConsumer>();
 
+                ushort prefetchCount = 10;
+
                 x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
                     var host = cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
@@ -37,8 +39,8 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-message", ep =>
                     {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseRetry(r => r.Interval(5, 1000));
 
                         ep.ConfigureConsumer<NewTwitchChannelMessageConsumer>(provider);
                         EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
@@ -46,8 +48,8 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
                     {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseMessageRetry(r => r.Interval(5, 1000));
 
                         ep.ConfigureConsumer<NewSubscriberConsumer>(provider);
                         EndpointConvention.Map<NewSubscriber>(ep.InputAddress);
@@ -55,8 +57,8 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-community-subscription", ep =>
                     {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseMessageRetry(r => r.Interval(5, 1000));
 
                         ep.ConfigureConsumer<NewCommunitySubscriptionConsumer>(provider);
                         EndpointConvention.Map<NewCommunitySubscription>(ep.InputAddress);
@@ -64,8 +66,8 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
                     {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseMessageRetry(r => r.Interval(5, 1000));
 
                         ep.ConfigureConsumer<NewBanConsumer>(provider);
                         EndpointConvention.Map<NewBan>(ep.InputAddress);
