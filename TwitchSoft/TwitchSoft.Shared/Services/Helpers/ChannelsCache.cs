@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ServiceStack.Caching;
+using ServiceStack.Redis;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.Services.Extensions;
@@ -15,17 +14,19 @@ namespace TwitchSoft.Shared.Services.Helpers
 {
     public class ChannelsCache : IChannelsCache
     {
-        private readonly string Key = "ChannelsCache";
-        private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
         private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<ChannelsCache> logger;
-        private readonly ConcurrentDictionary<object, SemaphoreSlim> _locks = new ConcurrentDictionary<object, SemaphoreSlim>();
+        private readonly ICacheClient cacheClient;
 
-        public ChannelsCache(IServiceScopeFactory scopeFactory, ILogger<ChannelsCache> logger)
+        public ChannelsCache(IServiceScopeFactory scopeFactory, ILogger<ChannelsCache> logger, ICacheClient cacheClient)
         {
             this.scopeFactory = scopeFactory;
             this.logger = logger;
+            this.cacheClient = cacheClient;
         }
+
+        private string GetIdKey(uint channelId) => $"[id]{channelId}";
+        private string GetNameKey(string channelName) => $"[name]{channelName}";
 
         public Task<List<User>> GetTrackedChannels()
         {
@@ -34,20 +35,25 @@ namespace TwitchSoft.Shared.Services.Helpers
 
         public async Task<User> GetChannelById(uint channelId)
         {
-            var channels = await GetCachedChannels();
-            return channels.FirstOrDefault(_ => _.Id == channelId);
+            var result = cacheClient.Get<User>(GetIdKey(channelId));
+            if (result == null)
+            {
+                var channels = await GetCachedChannels();
+                return channels.FirstOrDefault(_ => _.Id == channelId);
+            }
+            return result;
         }
 
         public async Task<User> GetChannelByName(string channelName)
         {
-            var channels = await GetCachedChannels();
-            return channels.FirstOrDefault(_ => string.Equals(_.Username, channelName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public void InvalidateCache()
-        {
-            logger.LogInformation("Cache invalidated");
-            _cache.Remove(Key);
+            var channel = channelName.ToLower();
+            var result = cacheClient.Get<User>(GetNameKey(channel));
+            if (result == null)
+            {
+                var channels = await GetCachedChannels();
+                return channels.FirstOrDefault(_ => string.Equals(_.Username, channel));
+            }
+            return result;
         }
 
         private Task<List<User>> GetCachedChannels()
@@ -69,26 +75,14 @@ namespace TwitchSoft.Shared.Services.Helpers
 
         private async Task<List<User>> GetOrCreate(Func<Task<List<User>>> createItem)
         {
-            List<User> cacheEntry;
-            if (!_cache.TryGetValue(Key, out cacheEntry))// Look for cache key.
+            List<User> cacheEntry = await createItem();
+            var cacheItems = new Dictionary<string, User>();
+            cacheEntry.ForEach(user =>
             {
-                SemaphoreSlim mylock = _locks.GetOrAdd(Key, k => new SemaphoreSlim(1, 1));
-
-                await mylock.WaitAsync();
-                try
-                {
-                    if (!_cache.TryGetValue(Key, out cacheEntry))
-                    {
-                        // Key not in cache, so get data.
-                        cacheEntry = await createItem();
-                        _cache.Set(Key, cacheEntry);
-                    }
-                }
-                finally
-                {
-                    mylock.Release();
-                }
-            }
+                cacheItems.Add(GetIdKey(user.Id), user);
+                cacheItems.Add(GetNameKey(user.Username.ToLower()), user);
+            });
+            cacheClient.SetAll<User>(cacheItems);
             return cacheEntry;
         }
     }

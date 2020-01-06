@@ -9,6 +9,5 @@ namespace TwitchSoft.Shared.Services.Helpers
         Task<List<User>> GetTrackedChannels();
         Task<User> GetChannelById(uint channelId);
         Task<User> GetChannelByName(string channelName);
-        void InvalidateCache();
     }
 }

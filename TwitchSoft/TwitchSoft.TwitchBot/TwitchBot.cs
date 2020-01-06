@@ -65,7 +65,6 @@ namespace TwitchSoft.TwitchBot
         public void JoinChannel(string channel)
         {
             logger.LogInformation($"JoinChannel {channel} triggered");
-            channelsCache.InvalidateCache();
             twitchClient.JoinChannel(channel);
         }
 
@@ -378,7 +377,6 @@ namespace TwitchSoft.TwitchBot
 
         public async Task RefreshJoinedChannels()
         {
-            channelsCache.InvalidateCache();
             var channels = await channelsCache.GetTrackedChannels();
             var joinedChannels = twitchClient.JoinedChannels;
             foreach (var chan in channels)

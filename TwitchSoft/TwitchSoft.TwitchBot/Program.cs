@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using TwitchSoft.TwitchBot.Grpc;
 using TwitchSoft.TwitchBot.ChatPlugins;
+using TwitchSoft.Shared.Redis;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -86,7 +87,7 @@ namespace TwitchSoft.TwitchBot
                     });
 
                     services.AddSingleton<ISendEndpointProvider>(provider => provider.GetRequiredService<IBusControl>());
-                    services.AddSingleton<IChannelsCache, ChannelsCache>();
+                    services.AddLocalRedisCache(Configuration);
                     services.AddTransient<TwitchBotGrpcService>();
 
                     services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
