@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
+using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using User = TwitchSoft.Shared.Database.Models.User;
 
@@ -10,10 +11,12 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
     {
         private readonly IRepository repository;
+        private readonly IChannelsCache channelsCache;
 
-        public NewTwitchChannelMessageConsumer(IRepository repository)
+        public NewTwitchChannelMessageConsumer(IRepository repository, IChannelsCache channelsCache)
         {
             this.repository = repository;
+            this.channelsCache = channelsCache;
         }
 
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
@@ -27,7 +30,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             await repository.SaveMessagesAsync(new ChatMessage
             {
                 Id = chatMessage.Id,
-                ChannelId = chatMessage.Channel.UserId,
+                ChannelId = await channelsCache.GetChannelIdByName(chatMessage.Channel),
                 UserId = chatMessage.User.UserId,
                 IsBroadcaster = chatMessage.IsBroadcaster,
                 IsModerator = chatMessage.IsModerator,

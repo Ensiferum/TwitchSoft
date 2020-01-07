@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TwitchSoft.Shared.Database;
+using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.TwitchApi;
@@ -35,6 +36,8 @@ namespace TwitchSoft.ServiceBusProcessor
                         options => options.UseSqlServer(Configuration.GetConnectionString(nameof(TwitchDbContext))));
 
                     services.AddServiceBusProcessors(Configuration);
+
+                    services.AddLocalRedisCache(Configuration);
                 });
     }
 }

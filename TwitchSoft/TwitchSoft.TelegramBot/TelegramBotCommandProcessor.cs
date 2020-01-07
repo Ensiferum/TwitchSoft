@@ -15,7 +15,7 @@ using static TwitchBotGrpc;
 using System;
 using System.Linq;
 using TwitchSoft.Shared.Services.Helpers;
-using ServiceStack.Redis;
+using StackExchange.Redis;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -52,11 +52,14 @@ Usage:
             await scopeFactory.RunInScope(async (scope) =>
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-                var redisClient = scope.ServiceProvider.GetService<IRedisClient>();
+                var redisClient = scope.ServiceProvider.GetService<ConnectionMultiplexer>();
 
-                var typedClient = redisClient.As<DateTime?>();
-                var lastDateTime = typedClient.GetValue(chatId) ?? DateTime.UtcNow.Date;
-                typedClient.SetValue(chatId, DateTime.UtcNow);
+                var db = redisClient.GetDatabase(2);
+
+                var chatIdentifier = chatId.Identifier.ToString();
+                var dateValue = db.StringGet(chatIdentifier);
+                var lastDateTime = dateValue.HasValue ? DateTime.Parse(dateValue) : DateTime.UtcNow.Date;
+                db.StringSet(chatIdentifier, DateTime.UtcNow.ToString());
 
                 var userId = await repository.GetUserId(userName);
 

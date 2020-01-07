@@ -6,7 +6,7 @@ namespace TwitchSoft.Shared.ServiceBus.Models
     public class NewCommunitySubscription
     {
         public Guid Id { get; set; }
-        public User Channel { get; set; }
+        public string Channel { get; set; }
         public uint UserId { get; set; }
         public DateTime Date { get; set; }
         public int GiftCount { get; set; }

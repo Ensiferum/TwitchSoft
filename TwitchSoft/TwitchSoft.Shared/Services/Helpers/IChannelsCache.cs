@@ -7,7 +7,7 @@ namespace TwitchSoft.Shared.Services.Helpers
     public interface IChannelsCache
     {
         Task<List<User>> GetTrackedChannels();
-        Task<User> GetChannelById(uint channelId);
-        Task<User> GetChannelByName(string channelName);
+        Task<string> GetChannelNameById(uint channelId);
+        Task<uint> GetChannelIdByName(string channelName);
     }
 }

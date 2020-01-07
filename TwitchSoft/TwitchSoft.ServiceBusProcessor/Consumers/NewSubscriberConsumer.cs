@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
+using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using User = TwitchSoft.Shared.Database.Models.User;
 
@@ -10,10 +11,12 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     public class NewSubscriberConsumer : IConsumer<NewSubscriber>
     {
         private readonly IRepository repository;
+        private readonly IChannelsCache channelsCache;
 
-        public NewSubscriberConsumer(IRepository repository)
+        public NewSubscriberConsumer(IRepository repository, IChannelsCache channelsCache)
         {
             this.repository = repository;
+            this.channelsCache = channelsCache;
         }
 
         public async Task Consume(ConsumeContext<NewSubscriber> context)
@@ -35,7 +38,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             await repository.SaveSubscriberAsync(new Subscription
             {
                 Id = subInfo.Id,
-                ChannelId = subInfo.Channel.UserId,
+                ChannelId = await channelsCache.GetChannelIdByName(subInfo.Channel),
                 UserId = subInfo.User.UserId,
                 Months = subInfo.Months,
                 SubscribedTime = subInfo.SubscribedTime,

@@ -5,7 +5,7 @@ namespace TwitchSoft.Shared.ServiceBus.Models
 {
     public class NewBan
     {
-        public User Channel { get; set; }
+        public string Channel { get; set; }
         public string Reason { get; set; }
         public int? Duration { get; set; }
         public DateTime BannedTime { get; set; }

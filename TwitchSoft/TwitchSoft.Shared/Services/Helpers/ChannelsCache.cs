@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ServiceStack.Caching;
-using ServiceStack.Redis;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +15,15 @@ namespace TwitchSoft.Shared.Services.Helpers
     {
         private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<ChannelsCache> logger;
-        private readonly ICacheClient cacheClient;
+        private readonly IDatabase redisKeyDb;
+        private readonly IDatabase redisNamesDb;
 
-        public ChannelsCache(IServiceScopeFactory scopeFactory, ILogger<ChannelsCache> logger, ICacheClient cacheClient)
+        public ChannelsCache(IServiceScopeFactory scopeFactory, ILogger<ChannelsCache> logger, ConnectionMultiplexer redisClient)
         {
             this.scopeFactory = scopeFactory;
             this.logger = logger;
-            this.cacheClient = cacheClient;
+            redisKeyDb = redisClient.GetDatabase(0);
+            redisNamesDb = redisClient.GetDatabase(1);
         }
 
         private string GetIdKey(uint channelId) => $"[id]{channelId}";
@@ -33,27 +34,27 @@ namespace TwitchSoft.Shared.Services.Helpers
             return GetCachedChannels();
         }
 
-        public async Task<User> GetChannelById(uint channelId)
+        public async Task<string> GetChannelNameById(uint channelId)
         {
-            var result = cacheClient.Get<User>(GetIdKey(channelId));
-            if (result == null)
+            var result = redisNamesDb.StringGet(GetIdKey(channelId));
+            if (result.IsNull)
             {
                 var channels = await GetCachedChannels();
-                return channels.FirstOrDefault(_ => _.Id == channelId);
+                return channels.First(_ => _.Id == channelId).Username;
             }
             return result;
         }
 
-        public async Task<User> GetChannelByName(string channelName)
+        public async Task<uint> GetChannelIdByName(string channelName)
         {
             var channel = channelName.ToLower();
-            var result = cacheClient.Get<User>(GetNameKey(channel));
-            if (result == null)
+            var result = redisKeyDb.StringGet(GetNameKey(channel));
+            if (result.IsNull)
             {
                 var channels = await GetCachedChannels();
-                return channels.FirstOrDefault(_ => string.Equals(_.Username, channel));
+                return channels.First(_ => string.Equals(_.Username, channel)).Id;
             }
-            return result;
+            return uint.Parse(result);
         }
 
         private Task<List<User>> GetCachedChannels()
@@ -76,13 +77,18 @@ namespace TwitchSoft.Shared.Services.Helpers
         private async Task<List<User>> GetOrCreate(Func<Task<List<User>>> createItem)
         {
             List<User> cacheEntry = await createItem();
-            var cacheItems = new Dictionary<string, User>();
+            var cacheItems = new Dictionary<string, string>();
+            var tasks = new List<Task>();
+            var keysBatch = redisKeyDb.CreateBatch();
+            var namesBatch = redisNamesDb.CreateBatch();
             cacheEntry.ForEach(user =>
             {
-                cacheItems.Add(GetIdKey(user.Id), user);
-                cacheItems.Add(GetNameKey(user.Username.ToLower()), user);
+                tasks.Add(keysBatch.StringSetAsync(GetIdKey(user.Id), user.Username));
+                tasks.Add(namesBatch.StringSetAsync(GetNameKey(user.Username.ToLower()), user.Id));
             });
-            cacheClient.SetAll<User>(cacheItems);
+            keysBatch.Execute();
+            namesBatch.Execute();
+            await Task.WhenAll(tasks);
             return cacheEntry;
         }
     }

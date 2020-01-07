@@ -211,27 +211,23 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            var channel = await channelsCache.GetChannelByName(e.ChatMessage.Channel);
-            if (channel.TrackMessages == true)
+            var chatMessage = new NewTwitchChannelMessage()
             {
-                var chatMessage = new NewTwitchChannelMessage()
+                Id = Guid.Parse(e.ChatMessage.Id),
+                Channel = e.ChatMessage.Channel,
+                Message = e.ChatMessage.Message,
+                User = new User
                 {
-                    Id = Guid.Parse(e.ChatMessage.Id),
-                    Channel = User.FromDbUser(channel),
-                    Message = e.ChatMessage.Message,
-                    User = new User
-                    {
-                        UserId = uint.Parse(e.ChatMessage.UserId),
-                        UserName = e.ChatMessage.Username,
-                    },
-                    IsBroadcaster = e.ChatMessage.IsBroadcaster,
-                    IsModerator = e.ChatMessage.IsModerator,
-                    IsSubscriber = e.ChatMessage.IsSubscriber,
-                    PostedTime = DateTime.UtcNow,
-                    UserType = Enum.Parse<UserType>(e.ChatMessage.UserType.ToString())
-                };
-                await bus.Send(chatMessage);
-            }
+                    UserId = uint.Parse(e.ChatMessage.UserId),
+                    UserName = e.ChatMessage.Username,
+                },
+                IsBroadcaster = e.ChatMessage.IsBroadcaster,
+                IsModerator = e.ChatMessage.IsModerator,
+                IsSubscriber = e.ChatMessage.IsSubscriber,
+                PostedTime = DateTime.UtcNow,
+                UserType = Enum.Parse<UserType>(e.ChatMessage.UserType.ToString())
+            };
+            await bus.Send(chatMessage);
 
             foreach (var plugin in chatPlugins)
             {
@@ -244,7 +240,7 @@ namespace TwitchSoft.TwitchBot
             var subInfo = e.Subscriber;
             var newSub = new NewSubscriber
             {
-                Channel = User.FromDbUser(await channelsCache.GetChannelByName(e.Channel)),
+                Channel = e.Channel,
                 Id = Guid.Parse(subInfo.Id),
                 SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
                 Months = 0,
@@ -266,7 +262,7 @@ namespace TwitchSoft.TwitchBot
             var subInfo = e.ReSubscriber;
             var newSub = new NewSubscriber
             {
-                Channel = User.FromDbUser(await channelsCache.GetChannelByName(e.Channel)),
+                Channel = e.Channel,
                 Id = Guid.Parse(subInfo.Id),
                 SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
                 Months = int.Parse(subInfo.MsgParamCumulativeMonths),
@@ -287,7 +283,7 @@ namespace TwitchSoft.TwitchBot
             var subInfo = e.GiftedSubscription;
             var newSub = new NewSubscriber
             {
-                Channel = User.FromDbUser(await channelsCache.GetChannelByName(e.Channel)),
+                Channel = e.Channel,
                 Id = Guid.Parse(subInfo.Id),
                 SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
                 Months = subInfo.MsgParamCumulativeMonths != null ? int.Parse(subInfo.MsgParamCumulativeMonths) : 0,
@@ -312,7 +308,7 @@ namespace TwitchSoft.TwitchBot
             var comSubInfo = e.GiftedSubscription;
             var newSub = new NewCommunitySubscription
             {
-                Channel = User.FromDbUser(await channelsCache.GetChannelByName(e.Channel)),
+                Channel = e.Channel,
                 Id = Guid.Parse(comSubInfo.Id),
                 Date = DateTimeHelper.FromUnixTimeToUTC(comSubInfo.TmiSentTs),
                 SubscriptionPlan = (SubscriptionPlan)comSubInfo.MsgParamSubPlan,
@@ -329,50 +325,42 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
         {
-            var channel = await channelsCache.GetChannelByName(e.UserBan.Channel);
-            if (channel.TrackMessages == true)
+            var banInfo = e.UserBan;
+            var newBan = new NewBan
             {
-                var banInfo = e.UserBan;
-                var newBan = new NewBan
+                Channel = banInfo.Channel,
+                Reason = banInfo.BanReason,
+                BannedTime = DateTime.UtcNow,
+                BanType = BanType.Ban,
+                User = new User
                 {
-                    Channel = User.FromDbUser(await channelsCache.GetChannelByName(banInfo.Channel)),
-                    Reason = banInfo.BanReason,
-                    BannedTime = DateTime.UtcNow,
-                    BanType = BanType.Ban,
-                    User = new User
-                    {
-                        // we have no userId here
-                        UserName = banInfo.Username,
-                    },
-                };
+                    // we have no userId here
+                    UserName = banInfo.Username,
+                },
+            };
 
-                await bus.Send(newBan);
-            }
+            await bus.Send(newBan);
         }
 
 
         private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
         {
-            var channel = await channelsCache.GetChannelByName(e.UserTimeout.Channel);
-            if (channel.TrackMessages == true)
+            var banInfo = e.UserTimeout;
+            var newBan = new NewBan
             {
-                var banInfo = e.UserTimeout;
-                var newBan = new NewBan
+                Channel = banInfo.Channel,
+                Reason = banInfo.TimeoutReason,
+                BannedTime = DateTime.UtcNow,
+                BanType = BanType.Timeout,
+                Duration = banInfo.TimeoutDuration,
+                User = new User
                 {
-                    Channel = User.FromDbUser(await channelsCache.GetChannelByName(banInfo.Channel)),
-                    Reason = banInfo.TimeoutReason,
-                    BannedTime = DateTime.UtcNow,
-                    BanType = BanType.Timeout,
-                    Duration = banInfo.TimeoutDuration,
-                    User = new User
-                    {
-                        // we have no userId here
-                        UserName = banInfo.Username,
-                    },
-                };
+                    // we have no userId here
+                    UserName = banInfo.Username,
+                },
+            };
 
-                await bus.Send(newBan);
-            }
+            await bus.Send(newBan);
         }
 
         public async Task RefreshJoinedChannels()
