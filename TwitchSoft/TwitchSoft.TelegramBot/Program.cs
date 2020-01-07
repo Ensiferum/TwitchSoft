@@ -7,7 +7,6 @@ using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.Shared.Services.Models.Telegram;
 using TwitchSoft.Shared.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using TwitchSoft.TelegramBot.Grpc;
 using TwitchSoft.Shared.Redis;
 
@@ -46,6 +45,8 @@ namespace TwitchSoft.TelegramBot
 
                     services.AddHostedService<TelegramBotService>();
                     services.AddHostedService<TelegramBotGrpcServer>();
+
+                    services.AddLocalRedisCache(Configuration);
                 });
     }
 }
