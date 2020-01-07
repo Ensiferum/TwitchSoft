@@ -51,13 +51,10 @@ namespace TwitchSoft.Shared.ElasticSearch
                                          .Match(m => m
                                             .Field(c => c.UserId)
                                             .Query(userId.ToString())
-                                         )
-                                    )
-                                    .Query(q => q
-                                        .DateRange(d => d
+                                         ) && q.DateRange(d => d
                                             .Field(c => c.PostedTime)
                                             .GreaterThanOrEquals(from)
-                                        )
+                                         )
                                     )
                                     .Sort(s => s
                                         .Descending(_ => _.PostedTime)
