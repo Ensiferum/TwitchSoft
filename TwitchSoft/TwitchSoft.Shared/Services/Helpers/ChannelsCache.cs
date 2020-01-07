@@ -36,7 +36,7 @@ namespace TwitchSoft.Shared.Services.Helpers
 
         public async Task<string> GetChannelNameById(uint channelId)
         {
-            var result = redisNamesDb.StringGet(GetIdKey(channelId));
+            var result = redisKeyDb.StringGet(GetIdKey(channelId));
             if (result.IsNull)
             {
                 var channels = await GetCachedChannels();
@@ -48,7 +48,7 @@ namespace TwitchSoft.Shared.Services.Helpers
         public async Task<uint> GetChannelIdByName(string channelName)
         {
             var channel = channelName.ToLower();
-            var result = redisKeyDb.StringGet(GetNameKey(channel));
+            var result = redisNamesDb.StringGet(GetNameKey(channel));
             if (result.IsNull)
             {
                 var channels = await GetCachedChannels();
