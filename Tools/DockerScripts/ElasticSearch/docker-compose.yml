@@ -9,7 +9,7 @@ services:
             - "9200:9200"
             - "9300:9300"
         volumes:
-            - esdata:/usr/share/elasticsearch/data
+            - C:/elastic/data:/usr/share/elasticsearch/data
         networks:
             - esnetwork
     kibana:

@@ -15,8 +15,6 @@ namespace TwitchSoft.Shared.Database
             //optionsBuilder.EnableSensitiveDataLogging(true);
             base.OnConfiguring(optionsBuilder);
         }
-
-        public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserBan> UserBans { get; set; }
@@ -36,35 +34,6 @@ namespace TwitchSoft.Shared.Database
                 .HasMaxLength(60);
 
             modelBuilder.Entity<User>()
-                .Property(u => u.Id)
-                .ValueGeneratedNever();
-
-            modelBuilder.Entity<ChatMessage>()
-                .HasOne(u => u.User)
-                .WithMany(u => u.UserChatMessages)
-                .HasForeignKey(c => c.UserId);
-
-            modelBuilder.Entity<ChatMessage>()
-                .HasOne(u => u.Channel)
-                .WithMany(u => u.ChannelChatMessages)
-                .HasForeignKey(c => c.ChannelId);
-
-            modelBuilder.Entity<ChatMessage>()
-                .Property(u => u.Message)
-                .HasMaxLength(1024);
-
-            modelBuilder.Entity<ChatMessage>()
-                .HasIndex(u => u.Id)
-                .IsUnique();
-
-            modelBuilder.Entity<ChatMessage>()
-                .HasKey(u => u.Id);
-
-            modelBuilder.Entity<ChatMessage>()
-                .HasIndex(u => new { u.UserId })
-                .IncludeProperties(u => new { u.PostedTime });
-
-            modelBuilder.Entity<ChatMessage>()
                 .Property(u => u.Id)
                 .ValueGeneratedNever();
 

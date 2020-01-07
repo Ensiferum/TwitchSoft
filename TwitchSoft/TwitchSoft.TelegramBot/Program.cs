@@ -9,6 +9,7 @@ using TwitchSoft.Shared.Database;
 using Microsoft.EntityFrameworkCore;
 using TwitchSoft.TelegramBot.Grpc;
 using TwitchSoft.Shared.Redis;
+using TwitchSoft.Shared.ElasticSearch;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -47,6 +48,7 @@ namespace TwitchSoft.TelegramBot
                     services.AddHostedService<TelegramBotGrpcServer>();
 
                     services.AddLocalRedisCache(Configuration);
+                    services.AddElasticSearch(Configuration);
                 });
     }
 }

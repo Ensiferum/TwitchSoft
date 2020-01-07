@@ -26,7 +26,7 @@ namespace TwitchSoft.Maintenance.Jobs
         public async Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(OldMessagesCleaner)}");
-            await repository.RemoveMessagesPriorTo(DateTime.UtcNow.AddDays(-OldDaysInterval));
+            //await repository.RemoveMessagesPriorTo(DateTime.UtcNow.AddDays(-OldDaysInterval));
             logger.LogInformation($"End executing job: {nameof(OldMessagesCleaner)}");
         }
     }

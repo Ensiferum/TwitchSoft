@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using TwitchSoft.Shared.Services.Helpers;
 using StackExchange.Redis;
+using TwitchSoft.Shared.ElasticSearch.Interfaces;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -53,6 +54,7 @@ Usage:
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
                 var redisClient = scope.ServiceProvider.GetService<ConnectionMultiplexer>();
+                var esClient = scope.ServiceProvider.GetService<IESService>();
 
                 var db = redisClient.GetDatabase(2);
 
@@ -64,7 +66,7 @@ Usage:
                 var userId = await repository.GetUserId(userName);
 
                 var count = 50;
-                var messages = await repository.GetMessages(userId, lastDateTime, count);
+                var messages = await esClient.GetMessages(userId, lastDateTime, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 for (var i = 0; i < replyMessages.Count; i++)
@@ -88,6 +90,7 @@ Usage:
             await scopeFactory.RunInScope(async (scope) =>
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var esClient = scope.ServiceProvider.GetService<IESService>();
                 var userId = await repository.GetUserId(userName);
                 if (userId == default)
                 {
@@ -105,7 +108,7 @@ Usage:
                 {
                     skip = int.Parse(skipString);
                 };
-                var messages = await repository.GetMessages(userId, skip, count);
+                var messages = await esClient.GetMessages(userId, skip, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 for (var i = 0; i < replyMessages.Count; i++)

@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using System;
-using TwitchSoft.Shared.Database.Models;
+using TwitchSoft.Shared.ElasticSearch.Interfaces;
+using TwitchSoft.Shared.ElasticSearch.Models;
 
 namespace TwitchSoft.Shared.ElasticSearch
 {
@@ -10,19 +11,19 @@ namespace TwitchSoft.Shared.ElasticSearch
     {
         public static void AddElasticSearch(this IServiceCollection services, IConfiguration configuration)
         {
-            var url = configuration["elasticsearch:url"];
-            var defaultIndex = configuration["elasticsearch:index"];
+            var url = configuration["Elasticsearch:Url"];
+            var defaultIndex = configuration["Elasticsearch:Index"];
 
-            //var settings = new ConnectionSettings(new Uri(url))
-            //    .DefaultIndex(defaultIndex)
-            //    .DefaultMappingFor<ChatMessage>(m => m
-            //        .Ignore(p => p.IsPublished)
-            //        .PropertyName(p => p.UserId, "id")
-            //    );
+            var settings = new ConnectionSettings(new Uri(url))
+                .DefaultIndex(defaultIndex)
+                .DefaultMappingFor<ChatMessage>(m => m
+                    .IdProperty(_ => _.Id)
+                );
 
-            //var client = new ElasticClient(settings);
+            var client = new ElasticClient(settings);
 
-            //services.AddSingleton<IElasticClient>(client);
+            services.AddSingleton<IElasticClient>(client);
+            services.AddScoped<IESService, ESService>();
         }
     }
 }

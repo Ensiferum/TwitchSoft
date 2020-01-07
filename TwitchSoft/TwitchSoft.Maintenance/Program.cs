@@ -19,9 +19,9 @@ namespace TwitchSoft.Maintenance
             var host = CreateHostBuilder(args).Build();
             host.Services.UseScheduler(scheduler =>
             {
-                scheduler
-                    .Schedule<OldMessagesCleaner>()
-                    .Hourly();
+                //scheduler
+                //    .Schedule<OldMessagesCleaner>()
+                //    .Hourly();
 
                 scheduler
                     .Schedule<HoneymadFollowsJoin>()

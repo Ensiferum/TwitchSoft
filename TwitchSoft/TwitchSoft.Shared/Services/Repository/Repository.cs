@@ -24,55 +24,10 @@ namespace TwitchSoft.Shared.Services.Repository
             this.twitchDbContext = twitchDbContext;
             this.logger = logger;
         }
-        public async Task SaveMessagesAsync(params ChatMessage[] chatMessages)
-        {
-            try
-            {
-                twitchDbContext.ChatMessages.AddRange(chatMessages);
-                await twitchDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while saving");
-            }
-        }
 
         public Task<uint> GetUserId(string userName)
         {
             return twitchDbContext.Users.Where(_ => _.Username == userName).Select(_ => _.Id).FirstOrDefaultAsync();
-        }
-
-        public Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, int skip = default, int count = 25)
-        {
-            return twitchDbContext.ChatMessages
-                .Where(_ => _.UserId == userId)
-                .OrderByDescending(_ => _.PostedTime)
-                .Skip(skip)
-                .Take(count)
-                .Select(_ => new ChatMessageModelForDisplaying() {
-                    UserName = _.User.Username,
-                    Message = _.Message,
-                    PostedTime = _.PostedTime,
-                    Channel = _.Channel.Username
-                })
-                .ToListAsync();
-        }
-
-        public Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, DateTime from, int count = 25)
-        {
-            return twitchDbContext.ChatMessages
-                .Where(_ => _.UserId == userId)
-                .Where(_ => _.PostedTime >= from)
-                .OrderByDescending(_ => _.PostedTime)
-                .Take(count)
-                .Select(_ => new ChatMessageModelForDisplaying()
-                {
-                    UserName = _.User.Username,
-                    Message = _.Message,
-                    PostedTime = _.PostedTime,
-                    Channel = _.Channel.Username
-                })
-                .ToListAsync();
         }
 
         public Task<List<User>> SearchUsers(string userNamePart, int count = 10)
@@ -163,11 +118,6 @@ namespace TwitchSoft.Shared.Services.Repository
             }
             await twitchDbContext.SaveChangesAsync();
             return userIsTracking;
-        }
-
-        public Task RemoveMessagesPriorTo(DateTime dateTime)
-        {
-            return twitchDbContext.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ChatMessages WHERE PostedTime <= {dateTime}");
         }
 
         public Task<List<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count)
