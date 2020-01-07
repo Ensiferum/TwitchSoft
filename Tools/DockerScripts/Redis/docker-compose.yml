@@ -3,12 +3,16 @@ version: '3.7'
 services:  
   redis:  
     image: redis:latest
-    command: ["redis-server", "--appendonly", "yes"]
+    # command: ["redis-server", "--appendonly", "yes"]
     container_name: Redis
     restart: unless-stopped
     volumes:
       - C:/redis/:/data
     ports:
       - "6379:6379"
-    expose:  
-      - 6379
+    networks:
+      - twitchsoft
+
+networks:
+    twitchsoft:
+        external: true

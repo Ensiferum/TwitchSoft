@@ -4,34 +4,34 @@ services:
   twitchsoft.telegrambot:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
-      - Redis__ConnectionString=host.docker.internal
-      - Elasticsearch__Url=http://host.docker.internal:9200/
+      - ConnectionStrings__TwitchDbContext=Server=sqlserverservice;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
+      - Redis__ConnectionString=redis
+      - Elasticsearch__Url=http://elasticsearch:9200/
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
   twitchsoft.twitchbot:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
-      - ServiceBusSettings__Host=host.docker.internal
-      - Redis__ConnectionString=host.docker.internal
+      - ConnectionStrings__TwitchDbContext=Server=sqlserverservice;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
+      - ServiceBusSettings__Host=rabbitmq
+      - Redis__ConnectionString=redis
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
   twitchsoft.servicebusprocessor:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
-      - ServiceBusSettings__Host=host.docker.internal
-      - Redis__ConnectionString=host.docker.internal
-      - Elasticsearch__Url=http://host.docker.internal:9200/
+      - ConnectionStrings__TwitchDbContext=Server=sqlserverservice;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
+      - ServiceBusSettings__Host=rabbitmq
+      - Redis__ConnectionString=redis
+      - Elasticsearch__Url=http://elasticsearch:9200/
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
   twitchsoft.maintenance:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
+      - ConnectionStrings__TwitchDbContext=Server=sqlserverservice;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

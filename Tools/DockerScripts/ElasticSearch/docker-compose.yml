@@ -11,19 +11,19 @@ services:
         volumes:
             - C:/elastic/data:/usr/share/elasticsearch/data
         networks:
-            - esnetwork
+            - twitchsoft
     kibana:
         image: docker.elastic.co/kibana/kibana:7.5.1
         restart: unless-stopped
         ports:
             - "5601:5601"
         networks:
-            - esnetwork
+            - twitchsoft
         depends_on:
             - elasticsearch
 volumes:
     esdata:
         driver: local
 networks:
-    esnetwork:
-        driver: bridge
+    twitchsoft:
+        external: true

@@ -3,7 +3,6 @@ version: '3.7'
 services:  
   sqlserverservice:  
     image: mcr.microsoft.com/mssql/server:2019-latest
-    hostname: 'sqlserver'  
     container_name: MSSQLSERVER
     restart: unless-stopped
     environment:  
@@ -13,6 +12,10 @@ services:
       - C:/db/data/mssql:/var/opt/mssql/data
       - C:/db/data/logs:/var/opt/mssql/log
     ports:  
-      - '1433:1433'  
-    expose:  
-      - 1433
+      - '1433:1433'
+    networks:
+      - twitchsoft
+
+networks:
+    twitchsoft:
+        external: true

@@ -3,20 +3,18 @@ version: '3.7'
 services:
   twitchsoft.telegrambot:
     image: ${DOCKER_REGISTRY-}twitchsofttelegrambot
-    hostname: telegrambot
     build:
       context: .
       dockerfile: TwitchSoft.TelegramBot/Dockerfile
     restart: unless-stopped
     networks: 
-      twitch-network:
+      twitchsoft:
         aliases:
           - telegrambot
 
 
   twitchsoft.twitchbot:
     image: ${DOCKER_REGISTRY-}twitchsofttwitchbot
-    hostname: twitchbot
     build:
       context: .
       dockerfile: TwitchSoft.TwitchBot/Dockerfile
@@ -24,34 +22,32 @@ services:
      - "80"
     restart: unless-stopped
     networks: 
-      twitch-network:
+      twitchsoft:
         aliases:
           - twitchbot
 
   twitchsoft.servicebusprocessor:
     image: ${DOCKER_REGISTRY-}twitchsoftservicebusprocessor
-    hostname: servicebusprocessor
     build:
       context: .
       dockerfile: TwitchSoft.ServiceBusProcessor/Dockerfile
     restart: unless-stopped
     networks: 
-      twitch-network:
+      twitchsoft:
         aliases:
           - servicebusprocessor
 
   twitchsoft.maintenance:
     image: ${DOCKER_REGISTRY-}twitchsoftmaintenance
-    hostname: maintenance
     build:
       context: .
       dockerfile: TwitchSoft.Maintenance/Dockerfile
     restart: unless-stopped
     networks: 
-      twitch-network:
+      twitchsoft:
         aliases:
           - maintenance
 
 networks: 
-  twitch-network: 
-    driver: "bridge"
+  twitchsoft: 
+    external: true
