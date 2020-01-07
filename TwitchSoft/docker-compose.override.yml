@@ -4,7 +4,7 @@ services:
   twitchsoft.telegrambot:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd
+      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
       - Redis__ConnectionString=host.docker.internal
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -12,7 +12,7 @@ services:
   twitchsoft.twitchbot:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd
+      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
       - ServiceBusSettings__Host=host.docker.internal
       - Redis__ConnectionString=host.docker.internal
     volumes:
@@ -21,7 +21,7 @@ services:
   twitchsoft.servicebusprocessor:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd
+      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
       - ServiceBusSettings__Host=host.docker.internal
       - Redis__ConnectionString=host.docker.internal
     volumes:
@@ -30,6 +30,6 @@ services:
   twitchsoft.maintenance:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd
+      - ConnectionStrings__TwitchDbContext=Server=host.docker.internal;Database=TwitchDb;User Id=sa;Password=BigPassw0rd;Connection Timeout=120
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
