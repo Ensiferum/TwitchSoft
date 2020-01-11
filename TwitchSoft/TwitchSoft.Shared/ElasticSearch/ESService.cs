@@ -73,12 +73,26 @@ namespace TwitchSoft.Shared.ElasticSearch
         public async Task<List<ChatMessageModelForDisplaying>> SearchMessages(string searchText, int skip, int count)
         {
             var searchResponse = await elasticClient.SearchAsync<ChatMessage>(s => s
-                                    .Size(count)
-                                    .Query(q => q
-                                         .Wildcard(m => m
-                                            .Field(c => c.Message)
-                                            .Value(searchText)
-                                         )
+                                    .Query(query => query
+                                        .Bool(b => b
+                                            .Must(q => q
+                                                .Wildcard(m => m
+                                                    .Field(c => c.Message)
+                                                    .Value(searchText)
+                                                    )
+                                                )
+                                            .MustNot(q => 
+                                                q.Wildcard(m => m
+                                                    .Field(c => c.UserName)
+                                                    .Value("*bot"))
+                                                || q.Match(m => m
+                                                    .Field(c => c.UserName)
+                                                    .Query("streamelements"))
+                                                || q.Match(m => m
+                                                    .Field(c => c.UserName)
+                                                    .Query("streamlabs"))
+                                            )
+                                        )
                                     )
                                     .From(skip)
                                     .Size(count)
