@@ -69,5 +69,31 @@ namespace TwitchSoft.Shared.ElasticSearch
                 Channel = _.ChannelName
             }).ToList();
         }
+
+        public async Task<List<ChatMessageModelForDisplaying>> SearchMessages(string searchText, int skip, int count)
+        {
+            var searchResponse = await elasticClient.SearchAsync<ChatMessage>(s => s
+                                    .Size(count)
+                                    .Query(q => q
+                                         .Wildcard(m => m
+                                            .Field(c => c.Message)
+                                            .Value(searchText)
+                                         )
+                                    )
+                                    .From(skip)
+                                    .Size(count)
+                                    .Sort(s => s
+                                        .Descending(_ => _.PostedTime)
+                                    )
+                                );
+
+            return searchResponse.Documents.Select(_ => new ChatMessageModelForDisplaying()
+            {
+                UserName = _.UserName,
+                Message = _.Message,
+                PostedTime = _.PostedTime,
+                Channel = _.ChannelName
+            }).ToList();
+        }
     }
 }

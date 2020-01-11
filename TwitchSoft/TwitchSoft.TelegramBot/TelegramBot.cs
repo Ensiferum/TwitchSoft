@@ -160,6 +160,9 @@ namespace TwitchSoft.TelegramBot
                 case BotCommands.Subscribers:
                     await telegramBotCommandProcessor.ProcessSubscribersCommand(chatId, messageSplitted.ElementAtOrDefault(1));
                     break;
+                case BotCommands.SearchText:
+                    await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
+                    break;
                 default:
                     logger.LogWarning($"Received unknown command: {message} from: {e.CallbackQuery.From.Username}.");
                     break;
@@ -201,6 +204,19 @@ namespace TwitchSoft.TelegramBot
                 case BotCommands.Subscribers:
                     await telegramBotCommandProcessor.ProcessSubscribersCommand(chatId);
                     break;
+                case BotCommands.SearchText:
+                    var searchText = messageSplitted.ElementAtOrDefault(1);
+                    if (string.IsNullOrEmpty(searchText))
+                    {
+                        usersState[chatId] = BotState.WaitingForMessage;
+                        await telegramBotClient.SendTextMessageAsync(
+                            chatId: chatId,
+                            text: "Enter search text please"
+                        );
+                        return;
+                    }
+                    await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, searchText);
+                    break;
                 default:
                     await telegramBotCommandProcessor.ProcessUnknownCommand(chatId);
 
@@ -209,7 +225,6 @@ namespace TwitchSoft.TelegramBot
 
             }
             //add following commands
-            //search by text
             //online, etc
         }
 
@@ -228,6 +243,8 @@ namespace TwitchSoft.TelegramBot
                         await telegramBotCommandProcessor.ProcessNewChannelCommand(chatId, channelName);
                         break;
                     case BotState.WaitingForMessage:
+                        var searchText = message.Text;
+                        await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, searchText);
                         break;
                 }
                 _ = usersState.TryRemove(chatId, out _);

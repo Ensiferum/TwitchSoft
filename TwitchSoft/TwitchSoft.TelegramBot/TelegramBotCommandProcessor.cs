@@ -41,7 +41,8 @@ namespace TwitchSoft.TelegramBot
 Usage:
 {BotCommands.UserMessages} [username] - покажет сообщения для пользователя
 {BotCommands.AddChannel} [channel] - добавляет канал для отслеживания
-{BotCommands.Subscribers} - выводит топ 100 каналов по кол-ву сабов";
+{BotCommands.Subscribers} - выводит топ 100 каналов по кол-ву сабов
+{BotCommands.SearchText} [text] - поиск по тексту сообщений";
 
             await telegramBotClient.SendTextMessageAsync(
                 chatId,
@@ -111,6 +112,13 @@ Usage:
                 var messages = await esClient.GetMessages(userId, skip, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
+                if (!replyMessages.Any())
+                {
+                    await telegramBotClient.SendTextMessageAsync(
+                        chatId,
+                        "No messages were found."
+                    );
+                }
                 for (var i = 0; i < replyMessages.Count; i++)
                 {
                     var replyMessage = replyMessages[i];
@@ -207,6 +215,45 @@ Usage:
                             text: $"Channel '{channelName}' successfully added.",
                             parseMode: ParseMode.Html
                         );
+                }
+            });
+        }
+
+        public async Task ProcessSearchTextCommand(ChatId chatId, string searchText, string skipString = null)
+        {
+            await scopeFactory.RunInScope(async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var esClient = scope.ServiceProvider.GetService<IESService>();
+
+                var count = 50;
+                var skip = 0;
+                if (!string.IsNullOrWhiteSpace(skipString))
+                {
+                    skip = int.Parse(skipString);
+                };
+                var messages = await esClient.SearchMessages(searchText, skip, count);
+
+                var replyMessages = messages.GenerateReplyMessages();
+                if (!replyMessages.Any())
+                {
+                    await telegramBotClient.SendTextMessageAsync(
+                        chatId,
+                        "No messages were found."
+                    );
+                }
+                for (var i = 0; i < replyMessages.Count; i++)
+                {
+                    var replyMessage = replyMessages[i];
+                    await telegramBotClient.SendTextMessageAsync(
+                        chatId,
+                        replyMessage,
+                        parseMode: ParseMode.Html,
+                        disableWebPagePreview: true,
+                        replyMarkup: i == replyMessages.Count - 1
+                        ? Utils.GenerateNavigationMarkup(BotCommands.SearchText, searchText, count, skip, messages.Count)
+                        : null
+                    );
                 }
             });
         }
