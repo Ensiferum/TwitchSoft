@@ -49,7 +49,7 @@ namespace TwitchSoft.Shared.Services.Repository
 CREATE TABLE #TempUsers (Id bigint, Name nvarchar(60)) 
 
 INSERT INTO #TempUsers VALUES
-{string.Join(",", users.Select(_ => $"({_.Id}, {_.Username})"))}
+{string.Join(",", users.Select(_ => $"({_.Id}, '{_.Username}')"))}
 
 MERGE Users us
 USING #TempUsers tus
