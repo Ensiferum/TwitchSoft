@@ -10,7 +10,7 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
-    public class NewBanConsumer : IConsumer<Batch<NewBan>>
+    public class NewBanConsumer : IConsumer<NewBan>
     {
         private readonly ILogger<NewBanConsumer> logger;
         private readonly IRepository repository;
@@ -23,11 +23,11 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             this.channelsCache = channelsCache;
         }
 
-        public async Task Consume(ConsumeContext<Batch<NewBan>> context)
+        public async Task Consume(ConsumeContext<NewBan> context)
         {
             var newBans = new List<UserBan>();
 
-            var newBanInfos = context.Message.Select(_ => _.Message);
+            var newBanInfos = new NewBan[] { context.Message };
             var userNamesToLoad = newBanInfos
                 .Select(_ => _.User.UserName)
                 .ToArray();

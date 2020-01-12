@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
-    public class NewTwitchChannelMessageConsumer : IConsumer<Batch<NewTwitchChannelMessage>>
+    public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
     {
         private readonly IRepository repository;
         private readonly IChannelsCache channelsCache;
@@ -26,9 +26,9 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             this.elasticClient = elasticClient;
         }
 
-        public async Task Consume(ConsumeContext<Batch<NewTwitchChannelMessage>> context)
+        public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
         {
-            var chatMessages = context.Message.Select(_ => _.Message);
+            var chatMessages = new NewTwitchChannelMessage[] { context.Message };
             await repository.CreateOrUpdateUsers(chatMessages.Select(chatMessage => new User
             {
                 Username = chatMessage.User.UserName,

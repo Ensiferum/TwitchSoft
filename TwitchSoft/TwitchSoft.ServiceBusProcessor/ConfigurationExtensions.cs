@@ -5,7 +5,6 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
-using System;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -13,12 +12,8 @@ namespace TwitchSoft.ServiceBusProcessor
     {
         public static void AddServiceBusProcessors(this IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddScoped<NewBanConsumer>();
-            services.AddScoped<NewTwitchChannelMessageConsumer>();
-
             services.AddMassTransit(x =>
             {
-
                 x.AddConsumer<NewTwitchChannelMessageConsumer>();
                 x.AddConsumer<NewSubscriberConsumer>();
                 x.AddConsumer<NewCommunitySubscriptionConsumer>();
@@ -28,7 +23,6 @@ namespace TwitchSoft.ServiceBusProcessor
             var serviceBusSettings = new ServiceBusSettings();
             Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
             ushort prefetchCount = 10;
-            ushort batchPrefetchCount = 200;
 
             services.AddSingleton(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
             {
@@ -38,24 +32,15 @@ namespace TwitchSoft.ServiceBusProcessor
                     hostConfigurator.Password(serviceBusSettings.Password);
                 });
 
-                //var logger = new LoggerConfiguration()
-                //    .ReadFrom.Configuration(Configuration)
-                //    .CreateLogger();
-
-                //cfg.UseSerilog(logger);
+                var serviceProvider = services.BuildServiceProvider();
 
                 cfg.ReceiveEndpoint("add-twitch-message", ep =>
                 {
-                    ep.PrefetchCount = batchPrefetchCount;
+                    ep.PrefetchCount = prefetchCount;
                     ep.UseRetry(r => r.Interval(5, 1000));
-                    ep.Batch<NewTwitchChannelMessage>(b =>
-                    {
-                        b.MessageLimit = 100;
 
-                        b.TimeLimit = TimeSpan.FromSeconds(1);
-
-                        b.Consumer(() => services.BuildServiceProvider().GetRequiredService<NewTwitchChannelMessageConsumer>());
-                    });
+                    ep.ConfigureConsumer<NewTwitchChannelMessageConsumer>(provider);
+                    EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
                 });
 
                 cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
@@ -78,17 +63,11 @@ namespace TwitchSoft.ServiceBusProcessor
 
                 cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
                 {
-                    ep.PrefetchCount = batchPrefetchCount;
+                    ep.PrefetchCount = prefetchCount;
                     ep.UseRetry(r => r.Interval(5, 1000));
 
-                    ep.Batch<NewBan>(b =>
-                    {
-                        b.MessageLimit = 100;
-
-                        b.TimeLimit = TimeSpan.FromSeconds(1);
-
-                        b.Consumer(() => services.BuildServiceProvider().GetRequiredService<NewBanConsumer>());
-                    });
+                    ep.ConfigureConsumer<NewBanConsumer>(provider);
+                    EndpointConvention.Map<NewBan>(ep.InputAddress);
                 });
             }));
 
