@@ -9,5 +9,6 @@ namespace TwitchSoft.Shared.Services.Helpers
         Task<List<User>> GetTrackedChannels();
         Task<string> GetChannelNameById(uint channelId);
         Task<uint> GetChannelIdByName(string channelName);
+        Task<Dictionary<string, uint>> GetChannelsByNames(params string[] channelNames);
     }
 }

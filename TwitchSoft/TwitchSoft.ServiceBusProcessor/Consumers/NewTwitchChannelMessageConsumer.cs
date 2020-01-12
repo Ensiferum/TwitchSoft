@@ -6,10 +6,11 @@ using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using User = TwitchSoft.Shared.Database.Models.User;
 using ChatMessageES = TwitchSoft.Shared.ElasticSearch.Models.ChatMessage;
+using System.Linq;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
-    public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
+    public class NewTwitchChannelMessageConsumer : IConsumer<Batch<NewTwitchChannelMessage>>
     {
         private readonly IRepository repository;
         private readonly IChannelsCache channelsCache;
@@ -25,21 +26,21 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             this.elasticClient = elasticClient;
         }
 
-        public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
+        public async Task Consume(ConsumeContext<Batch<NewTwitchChannelMessage>> context)
         {
-            var chatMessage = context.Message;
-            await repository.CreateOrUpdateUser(new User
+            var chatMessages = context.Message.Select(_ => _.Message);
+            await repository.CreateOrUpdateUsers(chatMessages.Select(chatMessage => new User
             {
                 Username = chatMessage.User.UserName,
                 Id = chatMessage.User.UserId
-            });
+            }).ToArray());
 
-            var channelId = await channelsCache.GetChannelIdByName(chatMessage.Channel);
+            var channels = await channelsCache.GetChannelsByNames(chatMessages.Select(_ => _.Channel).ToArray());
 
-            await elasticClient.IndexDocumentAsync(new ChatMessageES
+            var chatMessagesES = chatMessages.Select(chatMessage => new ChatMessageES
             {
                 Id = chatMessage.Id,
-                ChannelId = channelId,
+                ChannelId = channels[chatMessage.Channel],
                 ChannelName = chatMessage.Channel,
                 UserId = chatMessage.User.UserId,
                 UserName = chatMessage.User.UserName,
@@ -49,6 +50,8 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 Message = chatMessage.Message,
                 PostedTime = chatMessage.PostedTime,
             });
+
+            await elasticClient.IndexManyAsync(chatMessagesES);
         }
     }
 }

@@ -23,11 +23,12 @@ namespace TwitchSoft.Maintenance.Jobs
             this.logger = logger;
             this.repository = repository;
         }
-        public async Task Invoke()
+        public Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(OldMessagesCleaner)}");
             //await repository.RemoveMessagesPriorTo(DateTime.UtcNow.AddDays(-OldDaysInterval));
             logger.LogInformation($"End executing job: {nameof(OldMessagesCleaner)}");
+            return Task.CompletedTask;
         }
     }
 }

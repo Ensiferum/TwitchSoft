@@ -64,10 +64,10 @@ Usage:
                 var lastDateTime = dateValue.HasValue ? DateTime.Parse(dateValue) : DateTime.UtcNow.Date;
                 db.StringSet(chatIdentifier, DateTime.UtcNow.ToString());
 
-                var userId = await repository.GetUserId(userName);
+                var userIds = await repository.GetUserIds(userName);
 
                 var count = 50;
-                var messages = await esClient.GetMessages(userId, lastDateTime, count);
+                var messages = await esClient.GetMessages(userIds.First().Value, lastDateTime, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 for (var i = 0; i < replyMessages.Count; i++)
@@ -92,8 +92,8 @@ Usage:
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
-                var userId = await repository.GetUserId(userName);
-                if (userId == default)
+                var userIds = await repository.GetUserIds(userName);
+                if (!userIds.Any())
                 {
                     await telegramBotClient.SendTextMessageAsync(
                         chatId: chatId,
@@ -109,7 +109,7 @@ Usage:
                 {
                     skip = int.Parse(skipString);
                 };
-                var messages = await esClient.GetMessages(userId, skip, count);
+                var messages = await esClient.GetMessages(userIds.First().Value, skip, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 if (!replyMessages.Any())

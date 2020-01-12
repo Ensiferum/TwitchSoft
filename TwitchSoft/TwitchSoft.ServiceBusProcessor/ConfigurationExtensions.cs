@@ -5,6 +5,7 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
+using System;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -22,6 +23,7 @@ namespace TwitchSoft.ServiceBusProcessor
                 x.AddConsumer<NewBanConsumer>();
 
                 ushort prefetchCount = 10;
+                ushort batchPrefetchCount = 200;
 
                 x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
@@ -39,11 +41,17 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-message", ep =>
                     {
-                        ep.PrefetchCount = prefetchCount;
+                        ep.PrefetchCount = batchPrefetchCount;
                         ep.UseRetry(r => r.Interval(5, 1000));
 
-                        ep.ConfigureConsumer<NewTwitchChannelMessageConsumer>(provider);
-                        EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
+                        ep.Batch<NewTwitchChannelMessage>(b =>
+                        {
+                            b.MessageLimit = 100;
+
+                            b.TimeLimit = TimeSpan.FromSeconds(1);
+
+                            b.Consumer(() => provider.GetService<NewTwitchChannelMessageConsumer>());
+                        });
                     });
 
                     cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
@@ -66,11 +74,17 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
                     {
-                        ep.PrefetchCount = prefetchCount;
-                        ep.UseMessageRetry(r => r.Interval(5, 1000));
+                        ep.PrefetchCount = batchPrefetchCount;
+                        ep.UseRetry(r => r.Interval(5, 1000));
 
-                        ep.ConfigureConsumer<NewBanConsumer>(provider);
-                        EndpointConvention.Map<NewBan>(ep.InputAddress);
+                        ep.Batch<NewBan>(b =>
+                        {
+                            b.MessageLimit = 100;
+
+                            b.TimeLimit = TimeSpan.FromSeconds(1);
+
+                            b.Consumer(() => provider.GetService<NewBanConsumer>());
+                        });
                     });
                 }));
             });

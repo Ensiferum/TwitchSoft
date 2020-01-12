@@ -25,9 +25,12 @@ namespace TwitchSoft.Shared.Services.Repository
             this.logger = logger;
         }
 
-        public Task<uint> GetUserId(string userName)
+        public Task<Dictionary<string, uint>> GetUserIds(params string[] userNames)
         {
-            return twitchDbContext.Users.Where(_ => _.Username == userName).Select(_ => _.Id).FirstOrDefaultAsync();
+            return twitchDbContext.Users
+                .Where(_ => userNames.Contains(_.Username))
+                .Select(_ => new { _.Id, _.Username })
+                .ToDictionaryAsync(_ => _.Username, _ => _.Id);
         }
 
         public Task<List<User>> SearchUsers(string userNamePart, int count = 10)
@@ -35,21 +38,29 @@ namespace TwitchSoft.Shared.Services.Repository
             return twitchDbContext.Users.Where(_ => _.Username.Contains(userNamePart)).Take(count).ToListAsync();
         }
 
-        public Task CreateOrUpdateUser(User user)
+        public Task CreateOrUpdateUsers(params User[] users)
         {
-            return twitchDbContext.Database.ExecuteSqlRawAsync(@"MERGE INTO Users
-                USING 
-                (
-                   SELECT   {0} as Id,
-                            {1} AS Username
-                ) AS entity
-                ON  Users.Id = entity.Id
-                WHEN MATCHED THEN
-                    UPDATE 
-                    SET Username = {1}
-                WHEN NOT MATCHED THEN
-                    INSERT (Id, Username)
-                    VALUES ({0}, {1});", user.Id, user.Username);
+            if (!users.Any())
+            {
+                return Task.CompletedTask;
+            }
+
+            return twitchDbContext.Database.ExecuteSqlRawAsync(@$"
+CREATE TABLE #TempUsers (Id bigint, Name nvarchar(60)) 
+
+INSERT INTO #TempUsers VALUES
+{string.Join(",", users.Select(_ => $"({_.Id}, {_.Username})"))}
+
+MERGE Users us
+USING #TempUsers tus
+ON us.Id = tus.Id
+WHEN MATCHED THEN
+    UPDATE 
+    SET us.Username = tus.Name
+WHEN NOT MATCHED THEN
+    INSERT (Id, Username)
+    VALUES (tus.Id, tus.Name);
+");
         }
 
         public async Task SaveSubscriberAsync(params Subscription[] subscriptions)
@@ -78,11 +89,11 @@ namespace TwitchSoft.Shared.Services.Repository
             }
         }
 
-        public async Task SaveUserBanAsync(UserBan userBan)
+        public async Task SaveUserBansAsync(params UserBan[] userBans)
         {
             try
             {
-                twitchDbContext.UserBans.Add(userBan);
+                twitchDbContext.UserBans.AddRange(userBans);
                 await twitchDbContext.SaveChangesAsync();
             }
             catch (Exception ex)

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using TwitchSoft.Shared.Database.Models;
@@ -8,7 +10,7 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
-    public class NewBanConsumer : IConsumer<NewBan>
+    public class NewBanConsumer : IConsumer<Batch<NewBan>>
     {
         private readonly ILogger<NewBanConsumer> logger;
         private readonly IRepository repository;
@@ -21,27 +23,34 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             this.channelsCache = channelsCache;
         }
 
-        public async Task Consume(ConsumeContext<NewBan> context)
+        public async Task Consume(ConsumeContext<Batch<NewBan>> context)
         {
-            var newBanInfo = context.Message;
-            if (newBanInfo.User.UserId == 0)
+            var newBans = new List<UserBan>();
+
+            var newBanInfos = context.Message.Select(_ => _.Message);
+            var userNamesToLoad = newBanInfos
+                .Select(_ => _.User.UserName)
+                .ToArray();
+
+            var usersMap = await repository.GetUserIds(userNamesToLoad);
+
+            foreach (var newBanInfo in newBanInfos)
             {
-                newBanInfo.User.UserId = await repository.GetUserId(newBanInfo.User.UserName);
-                if (newBanInfo.User.UserId == 0)
+                if (usersMap.TryGetValue(newBanInfo.User.UserName, out var userId))
                 {
-                    logger.LogInformation($"User: {newBanInfo.User.UserName} was not found in db");
-                    return;
+                    newBans.Add(new UserBan
+                    {
+                        ChannelId = await channelsCache.GetChannelIdByName(newBanInfo.Channel),
+                        BannedTime = newBanInfo.BannedTime,
+                        BanType = newBanInfo.BanType,
+                        Duration = newBanInfo.Duration,
+                        Reason = newBanInfo.Reason,
+                        UserId = userId,
+                    });
                 }
             }
-            await repository.SaveUserBanAsync(new UserBan
-            {
-                ChannelId = await channelsCache.GetChannelIdByName(newBanInfo.Channel),
-                BannedTime = newBanInfo.BannedTime,
-                BanType = newBanInfo.BanType,
-                Duration = newBanInfo.Duration,
-                Reason = newBanInfo.Reason,
-                UserId = newBanInfo.User.UserId,
-            });
+
+            await repository.SaveUserBansAsync(newBans.ToArray());
         }
     }
 }

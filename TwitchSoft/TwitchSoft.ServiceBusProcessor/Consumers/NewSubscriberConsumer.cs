@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
@@ -22,19 +23,21 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
         public async Task Consume(ConsumeContext<NewSubscriber> context)
         {
             var subInfo = context.Message;
-            await repository.CreateOrUpdateUser(new User
+            var users = new List<User>() { new User
             {
                 Username = subInfo.User.UserName,
                 Id = subInfo.User.UserId
-            });
+            }};
+            
             if (subInfo.GiftedBy != null)
             {
-                await repository.CreateOrUpdateUser(new User
+                users.Add(new User
                 {
                     Username = subInfo.GiftedBy.UserName,
                     Id = subInfo.GiftedBy.UserId
                 });
             }
+            await repository.CreateOrUpdateUsers(users.ToArray());
             await repository.SaveSubscriberAsync(new Subscription
             {
                 Id = subInfo.Id,

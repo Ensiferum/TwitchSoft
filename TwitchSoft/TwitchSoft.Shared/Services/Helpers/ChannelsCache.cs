@@ -26,8 +26,8 @@ namespace TwitchSoft.Shared.Services.Helpers
             redisNamesDb = redisClient.GetDatabase(1);
         }
 
-        private string GetIdKey(uint channelId) => $"[id]{channelId}";
-        private string GetNameKey(string channelName) => $"[name]{channelName}";
+        private string GetIdKey(uint channelId) => $"{channelId}";
+        private string GetNameKey(string channelName) => $"{channelName}";
 
         public Task<List<User>> GetTrackedChannels()
         {
@@ -55,6 +55,28 @@ namespace TwitchSoft.Shared.Services.Helpers
                 return channels.First(_ => string.Equals(_.Username, channel)).Id;
             }
             return uint.Parse(result);
+        }
+
+        public async Task<Dictionary<string, uint>> GetChannelsByNames(params string[] channelNames)
+        {
+            var batch = redisNamesDb.CreateBatch();
+            var tasks = new Dictionary<string, Task<RedisValue>>();
+
+            Array.ForEach(channelNames, channelName =>
+            {
+                var channel = channelName.ToLower();
+                tasks.Add(channel, batch.StringGetAsync(GetNameKey(channel)));
+            });
+
+            batch.Execute();
+            var results = await Task.WhenAll(tasks.Values);
+
+            if (results.Contains(RedisValue.Null)) {
+                var channels = await GetCachedChannels();
+                return channels.ToDictionary(_ => _.Username, _ => _.Id);
+            }
+
+            return tasks.ToDictionary(_ => _.Key, _ => uint.Parse(_.Value.Result));
         }
 
         private Task<List<User>> GetCachedChannels()

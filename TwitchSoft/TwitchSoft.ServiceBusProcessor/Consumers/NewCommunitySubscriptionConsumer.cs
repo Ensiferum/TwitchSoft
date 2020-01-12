@@ -28,7 +28,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
         public async Task Consume(ConsumeContext<NewCommunitySubscription> context)
         {
             var comSubInfo = context.Message;
-            await repository.CreateOrUpdateUser(new User
+            await repository.CreateOrUpdateUsers(new User
             {
                 Username = comSubInfo.User.UserName,
                 Id = comSubInfo.User.UserId
