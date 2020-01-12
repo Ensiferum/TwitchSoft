@@ -32,8 +32,6 @@ namespace TwitchSoft.ServiceBusProcessor
                     hostConfigurator.Password(serviceBusSettings.Password);
                 });
 
-                var serviceProvider = services.BuildServiceProvider();
-
                 cfg.ReceiveEndpoint("add-twitch-message", ep =>
                 {
                     ep.PrefetchCount = prefetchCount;
