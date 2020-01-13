@@ -32,7 +32,7 @@ namespace TwitchSoft.ServiceBusProcessor
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
 
                     services.AddDbContext<TwitchDbContext>(
-                        options => options.UseSqlServer(Configuration.GetConnectionString(nameof(TwitchDbContext))));
+                        options => options.UseSqlServer(Configuration.GetConnectionString("TwitchDb")));
 
                     services.AddServiceBusProcessors(Configuration);
 

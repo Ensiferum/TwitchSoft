@@ -17,7 +17,7 @@ namespace TwitchSoft.Shared.Database
 
             // Get connection string
             var optionsBuilder = new DbContextOptionsBuilder<TwitchDbContext>();
-            var connectionString = config.GetConnectionString(nameof(TwitchDbContext));
+            var connectionString = config.GetConnectionString("TwitchDb");
             optionsBuilder.UseSqlServer(connectionString);
 
             return new TwitchDbContext(optionsBuilder.Options);

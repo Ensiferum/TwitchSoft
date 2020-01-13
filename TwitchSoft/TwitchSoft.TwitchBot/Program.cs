@@ -43,7 +43,7 @@ namespace TwitchSoft.TwitchBot
                         .AddOptions();
 
                     services.AddDbContext<TwitchDbContext>(
-                        options => options.UseSqlServer(Configuration.GetConnectionString(nameof(TwitchDbContext))));
+                        options => options.UseSqlServer(Configuration.GetConnectionString("TwitchDb")));
 
                     services.AddHostedService<TwitchBotService>();
                     services.AddHostedService<TwitchBotGrpcServer>();
