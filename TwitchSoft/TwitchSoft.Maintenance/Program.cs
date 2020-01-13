@@ -62,10 +62,10 @@ namespace TwitchSoft.Maintenance
 
                     services.AddScheduler();
 
-                    services.AddTransient<OldMessagesCleaner>();
+                    //services.AddTransient<OldMessagesCleaner>();
                     services.AddTransient<HoneymadFollowsJoin>();
                     services.AddTransient<EnsthorFollowsJoin>();
-                    services.AddTransient<TopChannelsJoin>();
+                    //services.AddTransient<TopChannelsJoin>();
                     services.AddTransient<SentDailyMessageDigest>();
                     services.AddTransient<ChannelsRefresher>();
                 });
