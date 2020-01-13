@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using TwitchSoft.TelegramBot.Grpc;
 using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.ElasticSearch;
+using TwitchSoft.Shared.Logging;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -22,10 +23,7 @@ namespace TwitchSoft.TelegramBot
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(loggerFactory =>
-                {
-                    //loggerFactory.ClearProviders();
-                })
+                .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings

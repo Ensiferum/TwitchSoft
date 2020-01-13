@@ -9,13 +9,13 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.ServiceBus.Configuration;
 using TwitchSoft.Shared.Services.Repository;
-using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.TwitchApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using TwitchSoft.TwitchBot.Grpc;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using TwitchSoft.Shared.Redis;
+using TwitchSoft.Shared.Logging;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -28,10 +28,7 @@ namespace TwitchSoft.TwitchBot
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(loggerFactory =>
-                {
-                    //loggerFactory.ClearProviders();
-                })
+                .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TwitchSoft.Shared.Database;
 using TwitchSoft.Shared.ElasticSearch;
+using TwitchSoft.Shared.Logging;
 using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
@@ -21,10 +22,7 @@ namespace TwitchSoft.ServiceBusProcessor
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(loggerFactory =>
-                {
-                    //loggerFactory.ClearProviders();
-                })
+                .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings

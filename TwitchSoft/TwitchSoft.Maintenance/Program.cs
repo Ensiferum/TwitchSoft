@@ -9,6 +9,7 @@ using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.TwitchApi;
+using TwitchSoft.Shared.Logging;
 
 namespace TwitchSoft.Maintenance
 {
@@ -45,6 +46,7 @@ namespace TwitchSoft.Maintenance
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Set up the objects we need to get to configuration settings
