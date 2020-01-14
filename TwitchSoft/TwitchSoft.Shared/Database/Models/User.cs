@@ -6,6 +6,7 @@ namespace TwitchSoft.Shared.Database.Models
     [Table("Users")]
     public class User
     {
+        [ExplicitKey]
         public uint Id { get; set; }
         public string Username { get; set; }
         public bool JoinChannel { get; set; }

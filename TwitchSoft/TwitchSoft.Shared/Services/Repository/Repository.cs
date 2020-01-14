@@ -112,17 +112,32 @@ WHEN NOT MATCHED THEN
 
         public async Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            try
             {
-                await connection.InsertAsync(communitySubscription);
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.InsertAsync(communitySubscription);
+                }
             }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, $"Error while saving {nameof(CommunitySubscription)}");
+            }
+            
         }
 
         public async Task SaveUserBansAsync(params UserBan[] userBans)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            try
             {
-                await connection.InsertAsync(userBans);
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.InsertAsync(userBans);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error while saving {nameof(UserBan)}");
             }
         }
 
@@ -141,7 +156,7 @@ WHERE JoinChannel = 1
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
-                var user = await connection.GetAsync<User>(uint.Parse(channel.Id));
+                var user = await connection.GetAsync<User>(Int64.Parse(channel.Id));
                 var userIsTracking = user?.JoinChannel == true;
                 if (user == null)
                 {
