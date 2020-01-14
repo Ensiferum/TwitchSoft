@@ -5,6 +5,7 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
+using MassTransit.Context;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -19,6 +20,8 @@ namespace TwitchSoft.ServiceBusProcessor
                 x.AddConsumer<NewCommunitySubscriptionConsumer>();
                 x.AddConsumer<NewBanConsumer>();
             });
+
+            LogContext.ConfigureCurrentLogContext();
 
             var serviceBusSettings = new ServiceBusSettings();
             Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);

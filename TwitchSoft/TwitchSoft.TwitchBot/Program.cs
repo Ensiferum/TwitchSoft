@@ -3,12 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MassTransit;
 using TwitchSoft.Shared.ServiceBus.Models;
-using Microsoft.EntityFrameworkCore;
-using TwitchSoft.Shared.Database;
-using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.ServiceBus.Configuration;
-using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.TwitchApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -16,6 +12,8 @@ using TwitchSoft.TwitchBot.Grpc;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.Logging;
+using MassTransit.Context;
+using TwitchSoft.Shared;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -31,10 +29,10 @@ namespace TwitchSoft.TwitchBot
                 .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.ConfigureShared();
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
 
-                    services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
                     services.AddSingleton<TwitchBot>();
 
@@ -42,14 +40,13 @@ namespace TwitchSoft.TwitchBot
                         .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
                         .AddOptions();
 
-                    services.AddDbContext<TwitchDbContext>(
-                        options => options.UseSqlServer(Configuration.GetConnectionString("TwitchDb")));
-
                     services.AddHostedService<TwitchBotService>();
                     services.AddHostedService<TwitchBotGrpcServer>();
 
                     services.AddMassTransit(x =>
                     {
+                        LogContext.ConfigureCurrentLogContext();
+
                         var serviceBusSettings = new ServiceBusSettings();
                         Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
 

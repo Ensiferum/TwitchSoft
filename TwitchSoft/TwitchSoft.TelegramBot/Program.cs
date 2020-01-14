@@ -1,16 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TwitchSoft.Shared.Services.Repository.Interfaces;
-using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.Shared.Services.Models.Telegram;
-using TwitchSoft.Shared.Database;
-using Microsoft.EntityFrameworkCore;
 using TwitchSoft.TelegramBot.Grpc;
 using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.ElasticSearch;
 using TwitchSoft.Shared.Logging;
+using TwitchSoft.Shared;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -26,10 +22,10 @@ namespace TwitchSoft.TelegramBot
                 .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.ConfigureShared();
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
 
-                    services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
                     services.AddSingleton<TelegramBot>();
                     services.AddTransient<TelegramBotGrpcService>();
@@ -38,9 +34,6 @@ namespace TwitchSoft.TelegramBot
                         .Configure<BotSettings>(Configuration.GetSection($"Telegram:{nameof(BotSettings)}"))
                         .Configure<Shared.Services.Models.Twitch.BotSettings>(Configuration.GetSection($"Twitch:{nameof(Shared.Services.Models.Twitch.BotSettings)}"))
                         .AddOptions();
-
-                    services.AddDbContext<TwitchDbContext>(
-                        options => options.UseSqlServer(Configuration.GetConnectionString("TwitchDb")));
 
                     services.AddHostedService<TelegramBotService>();
                     services.AddHostedService<TelegramBotGrpcServer>();

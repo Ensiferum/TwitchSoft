@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TwitchSoft.Shared.Database;
+using TwitchSoft.Shared;
 using TwitchSoft.Shared.ElasticSearch;
 using TwitchSoft.Shared.Logging;
 using TwitchSoft.Shared.Redis;
-using TwitchSoft.Shared.Services.Repository;
-using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.TwitchApi;
 
 namespace TwitchSoft.ServiceBusProcessor
@@ -25,14 +21,11 @@ namespace TwitchSoft.ServiceBusProcessor
                 .ConfigureLogger()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.ConfigureShared();
                     // Set up the objects we need to get to configuration settings
                     var Configuration = hostContext.Configuration;
 
-                    services.AddScoped<IRepository, Repository>();
                     services.AddScoped<ITwitchApiService, TwitchApiService>();
-
-                    services.AddDbContext<TwitchDbContext>(
-                        options => options.UseSqlServer(Configuration.GetConnectionString("TwitchDb")));
 
                     services.AddServiceBusProcessors(Configuration);
 

@@ -137,7 +137,7 @@ Usage:
 
         public async Task ProcessInlineQueryCommand(string inlineQueryId, string queryText)
         {
-            List<User> users = null;
+            IEnumerable<(uint Id, string Username)> users = null;
             await scopeFactory.RunInScope(async (scope) =>
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
@@ -289,7 +289,7 @@ Usage:
                                 chatId: chatId,
                                 text: $"{messageHeader}\r\n{messageBody}",
                                 parseMode: ParseMode.Html,
-                                replyMarkup: Utils.GenerateNavigationMarkup(BotCommands.Subscribers, string.Empty, count, skip, channelSubs.Count)
+                                replyMarkup: Utils.GenerateNavigationMarkup(BotCommands.Subscribers, string.Empty, count, skip, channelSubs.Count())
                             );
                 }
                 else

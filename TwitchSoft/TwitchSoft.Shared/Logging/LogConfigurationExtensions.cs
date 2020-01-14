@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Hosting;
-using NLog.Extensions.Logging;
 
 namespace TwitchSoft.Shared.Logging
 {
@@ -9,10 +8,10 @@ namespace TwitchSoft.Shared.Logging
     {
         public static IHostBuilder ConfigureLogger(this IHostBuilder hostBuilder)
         {
-            return hostBuilder.ConfigureLogging(logging =>
+            return hostBuilder.ConfigureLogging(loggerFactory =>
              {
-                 logging.ClearProviders();
-                 logging.SetMinimumLevel(LogLevel.Trace);
+                 loggerFactory.ClearProviders();
+                 loggerFactory.SetMinimumLevel(LogLevel.Trace);
              })
             .UseNLog();
         }

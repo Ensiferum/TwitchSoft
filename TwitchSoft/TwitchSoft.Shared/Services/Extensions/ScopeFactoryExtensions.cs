@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -14,8 +15,10 @@ namespace TwitchSoft.Shared.Services.Extensions
                 {
                     await action(scope);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    var logger = scope.ServiceProvider.GetService<ILogger>();
+                    logger.LogError(ex, "Error in RunInScope ocured");
                     throw;
                 } 
             }

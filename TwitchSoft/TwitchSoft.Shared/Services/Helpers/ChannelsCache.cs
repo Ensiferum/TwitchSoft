@@ -29,7 +29,7 @@ namespace TwitchSoft.Shared.Services.Helpers
         private string GetIdKey(uint channelId) => $"{channelId}";
         private string GetNameKey(string channelName) => $"{channelName}";
 
-        public Task<List<User>> GetTrackedChannels()
+        public Task<IEnumerable<User>> GetTrackedChannels()
         {
             return GetCachedChannels();
         }
@@ -79,14 +79,14 @@ namespace TwitchSoft.Shared.Services.Helpers
             return tasks.ToDictionary(_ => _.Key, _ => uint.Parse(_.Value.Result));
         }
 
-        private Task<List<User>> GetCachedChannels()
+        private Task<IEnumerable<User>> GetCachedChannels()
         {
             return GetOrCreate(() => GetChannels());
         }
 
-        private async Task<List<User>> GetChannels()
+        private async Task<IEnumerable<User>> GetChannels()
         {
-            List<User> channels = null;
+            IEnumerable<User> channels = null;
             await scopeFactory.RunInScope(async (scope) =>
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
@@ -96,14 +96,14 @@ namespace TwitchSoft.Shared.Services.Helpers
             return channels;
         }
 
-        private async Task<List<User>> GetOrCreate(Func<Task<List<User>>> createItem)
+        private async Task<IEnumerable<User>> GetOrCreate(Func<Task<IEnumerable<User>>> createItem)
         {
-            List<User> cacheEntry = await createItem();
+            IEnumerable<User> cacheEntry = await createItem();
             var cacheItems = new Dictionary<string, string>();
             var tasks = new List<Task>();
             var keysBatch = redisKeyDb.CreateBatch();
             var namesBatch = redisNamesDb.CreateBatch();
-            cacheEntry.ForEach(user =>
+            Array.ForEach(cacheEntry.ToArray(), user =>
             {
                 tasks.Add(keysBatch.StringSetAsync(GetIdKey(user.Id), user.Username));
                 tasks.Add(namesBatch.StringSetAsync(GetNameKey(user.Username.ToLower()), user.Id));

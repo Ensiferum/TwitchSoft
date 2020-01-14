@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Dapper.Contrib.Extensions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using TwitchSoft.Shared.Database;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.Services.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
@@ -14,145 +18,174 @@ namespace TwitchSoft.Shared.Services.Repository
 {
     public class Repository : IRepository
     {
-        private readonly TwitchDbContext twitchDbContext;
+        private readonly IConfiguration configuration;
         private readonly ILogger<Repository> logger;
 
+        private string ConnectionString => configuration.GetConnectionString("TwitchDb");
+
         public Repository(
-            TwitchDbContext twitchDbContext, 
+            IConfiguration configuration, 
             ILogger<Repository> logger)
         {
-            this.twitchDbContext = twitchDbContext;
+            this.configuration = configuration;
             this.logger = logger;
         }
 
-        public Task<Dictionary<string, uint>> GetUserIds(params string[] userNames)
+        public async Task<Dictionary<string, uint>> GetUserIds(params string[] userNames)
         {
-            return twitchDbContext.Users
-                .Where(_ => userNames.Contains(_.Username))
-                .Select(_ => new { _.Id, _.Username })
-                .ToDictionaryAsync(_ => _.Username, _ => _.Id);
+            using(var connection = new SqlConnection(ConnectionString))
+            {
+                var result = await connection.QueryAsync<(uint Id, string Username)>(@"
+SELECT Id, Username FROM Users
+WHERE Username IN @userNames", new { userNames });
+
+                return result.ToDictionary(_ => _.Username, _ => _.Id);
+            }
         }
 
-        public Task<List<User>> SearchUsers(string userNamePart, int count = 10)
+        public async Task<IEnumerable<(uint Id, string Username)>> SearchUsers(string userNamePart, int count = 10)
         {
-            return twitchDbContext.Users.Where(_ => _.Username.Contains(userNamePart)).Take(count).ToListAsync();
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryAsync<(uint Id, string Username)>(@"
+SELECT TOP (@count) Id, Username FROM Users
+WHERE Username LIKE @userNamePart
+ORDER BY Id", new { userNamePart = $"%{userNamePart}%", count });
+            }
         }
 
-        public Task CreateOrUpdateUsers(params User[] users)
+        public async Task<IEnumerable<User>> GetUsersByIds(IEnumerable<uint> ids)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryAsync<User>(@"
+SELECT * FROM Users
+WHERE Id IN @ids", new { ids });
+            }
+        }
+
+        public async Task CreateOrUpdateUsers(params User[] users)
         {
             if (!users.Any())
             {
-                return Task.CompletedTask;
+                return;
             }
 
-            return twitchDbContext.Database.ExecuteSqlRawAsync(@$"
-CREATE TABLE #TempUsers (Id bigint, Name nvarchar(60)) 
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                await connection.OpenAsync();
+                SqlTransaction trans = connection.BeginTransaction();
 
-INSERT INTO #TempUsers VALUES
-{string.Join(",", users.Select(_ => $"({_.Id}, '{_.Username}')"))}
+                await connection.ExecuteAsync(@$"
+CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit, TrackMessages bit) 
+
+INSERT INTO #TempUsers (Id, Username, JoinChannel, TrackMessages) VALUES (@Id, @Username, @JoinChannel, @TrackMessages)
 
 MERGE Users us
 USING #TempUsers tus
 ON us.Id = tus.Id
 WHEN MATCHED THEN
     UPDATE 
-    SET us.Username = tus.Name
+    SET us.Username = tus.Username, 
+        us.JoinChannel = tus.JoinChannel, 
+        us.TrackMessages = tus.TrackMessages
 WHEN NOT MATCHED THEN
-    INSERT (Id, Username)
-    VALUES (tus.Id, tus.Name);
-");
+    INSERT (Id, Username, JoinChannel, TrackMessages)
+    VALUES (tus.Id, tus.Username, tus.JoinChannel, tus.TrackMessages);
+", users, trans);
+
+                await trans.CommitAsync();
+            }
         }
 
         public async Task SaveSubscriberAsync(params Subscription[] subscriptions)
         {
-            try
+            using (var connection = new SqlConnection(ConnectionString))
             {
-                twitchDbContext.Subscriptions.AddRange(subscriptions);
-                await twitchDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while saving");
+                await connection.InsertAsync(subscriptions);
             }
         }
 
         public async Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription)
         {
-            try
+            using (var connection = new SqlConnection(ConnectionString))
             {
-                twitchDbContext.CommunitySubscriptions.Add(communitySubscription);
-                await twitchDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while saving");
+                await connection.InsertAsync(communitySubscription);
             }
         }
 
         public async Task SaveUserBansAsync(params UserBan[] userBans)
         {
-            try
+            using (var connection = new SqlConnection(ConnectionString))
             {
-                twitchDbContext.UserBans.AddRange(userBans);
-                await twitchDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error while saving");
+                await connection.InsertAsync(userBans);
             }
         }
 
-        public async Task<List<User>> GetChannelsToTrack()
+        public async Task<IEnumerable<User>> GetChannelsToTrack()
         {
-            return await twitchDbContext.Users.Where(_ => _.JoinChannel).ToListAsync();
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryAsync<User>(@"
+SELECT * FROM Users
+WHERE JoinChannel = 1
+");
+            }
         }
 
         public async Task<bool> AddChannelToTrack(UserTwitch channel)
         {
-            var user = await twitchDbContext.Users.FirstOrDefaultAsync(_ => _.Id == uint.Parse(channel.Id));
-            var userIsTracking = user?.JoinChannel == true;
-            if (user == null)
+            using (var connection = new SqlConnection(ConnectionString))
             {
-                twitchDbContext.Users.Add(new User
+                var user = await connection.GetAsync<User>(uint.Parse(channel.Id));
+                var userIsTracking = user?.JoinChannel == true;
+                if (user == null)
                 {
-                    Id = uint.Parse(channel.Id),
-                    Username = channel.Login,
-                    JoinChannel = true,
-                    TrackMessages = true,
-                });
+                    await connection.InsertAsync(new User
+                    {
+                        Id = uint.Parse(channel.Id),
+                        Username = channel.Login,
+                        JoinChannel = true,
+                        TrackMessages = true,
+                    });
+                }
+                else
+                {
+                    
+                    user.JoinChannel = true;
+                    user.TrackMessages = true;
+                    await connection.UpdateAsync(user);
+                }
+                return userIsTracking;
             }
-            else
-            {
-                user.JoinChannel = true;
-                user.TrackMessages = true;
-                twitchDbContext.Users.Update(user);
-            }
-            await twitchDbContext.SaveChangesAsync();
-            return userIsTracking;
         }
 
-        public Task<List<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count)
+        public async Task<IEnumerable<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count)
         {
-            return twitchDbContext.Subscriptions
-                .Where(_ => _.SubscribedTime >= DateTime.UtcNow.AddMonths(-1))
-                .GroupBy(_ => _.Channel.Username)
-                .OrderByDescending(g => g.Count())
-                .Select(g => new ChannelSubs
-                {
-                    Channel = g.Key,
-                    SubsCount = g.Count()
-                })
-                .Skip(skip)
-                .Take(count)
-                .ToListAsync();
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryAsync<ChannelSubs>(@"
+SELECT us.Username as Channel, COUNT(*) AS SubsCount FROM Subscriptions sub
+JOIN Users us ON sub.ChannelId = us.Id
+WHERE sub.SubscribedTime >= @date
+GROUP BY us.Username
+ORDER BY SubsCount DESC
+OFFSET @skip ROWS
+FETCH NEXT @count ROWS ONLY
+", new { count, skip, date = DateTime.UtcNow.AddMonths(-1) });
+            }
         }
 
-        public Task<int> GetSubscribersCountFor(string channel)
+        public async Task<int> GetSubscribersCountFor(string channel)
         {
-            return twitchDbContext.Subscriptions
-                .Where(_ => _.SubscribedTime >= DateTime.UtcNow.AddMonths(-1))
-                .Where(_ => _.Channel.Username == channel)
-                .CountAsync();
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.ExecuteScalarAsync<int>(@"
+SELECT COUNT(*) FROM Subscriptions sub
+JOIN Users us ON sub.ChannelId = us.Id
+WHERE us.Username = @channel AND sub.SubscribedTime >= @date
+", new { channel, date = DateTime.UtcNow.AddMonths(-1) });
+            }
         }
     }
 }

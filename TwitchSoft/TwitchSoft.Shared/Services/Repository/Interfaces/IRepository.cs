@@ -11,13 +11,14 @@ namespace TwitchSoft.Shared.Services.Repository.Interfaces
     {
         Task<Dictionary<string, uint>> GetUserIds(params string[] userNames);
         Task CreateOrUpdateUsers(params User[] users);
-        Task<List<User>> SearchUsers(string userNamePart, int count = 10);
+        Task<IEnumerable<(uint Id, string Username)>> SearchUsers(string userNamePart, int count = 10);
         Task SaveSubscriberAsync(params Subscription[] subscription);
         Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription);
         Task SaveUserBansAsync(params UserBan[] userBans);
-        Task<List<User>> GetChannelsToTrack();
+        Task<IEnumerable<User>> GetChannelsToTrack();
         Task<bool> AddChannelToTrack(UserTwitch channel);
-        Task<List<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count);
+        Task<IEnumerable<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count);
         Task<int> GetSubscribersCountFor(string channel);
+        Task<IEnumerable<User>> GetUsersByIds(IEnumerable<uint> ids);
     }
 }
