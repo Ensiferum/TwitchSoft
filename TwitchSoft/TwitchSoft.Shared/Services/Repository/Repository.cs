@@ -78,9 +78,13 @@ WHERE Id IN @ids", new { ids });
 
                 await connection.ExecuteAsync(@$"
 CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit, TrackMessages bit) 
+", transaction: trans);
 
+                await connection.ExecuteAsync(@$"
 INSERT INTO #TempUsers (Id, Username, JoinChannel, TrackMessages) VALUES (@Id, @Username, @JoinChannel, @TrackMessages)
+", users, trans);
 
+                await connection.ExecuteAsync(@$"
 MERGE Users us
 USING #TempUsers tus
 ON us.Id = tus.Id
@@ -92,7 +96,7 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (Id, Username, JoinChannel, TrackMessages)
     VALUES (tus.Id, tus.Username, tus.JoinChannel, tus.TrackMessages);
-", users, trans);
+", transaction: trans);
 
                 await trans.CommitAsync();
             }
