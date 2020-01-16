@@ -81,7 +81,7 @@ CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit)
 ", transaction: trans);
 
                 await connection.ExecuteAsync(@$"
-INSERT INTO #TempUsers (Id, Username, JoinChannel, TrackMessages) VALUES (@Id, @Username, @JoinChannel)
+INSERT INTO #TempUsers (Id, Username, JoinChannel) VALUES (@Id, @Username, @JoinChannel)
 ", users, trans);
 
                 await connection.ExecuteAsync(@$"
