@@ -77,11 +77,11 @@ WHERE Id IN @ids", new { ids });
                 SqlTransaction trans = connection.BeginTransaction();
 
                 await connection.ExecuteAsync(@$"
-CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit, TrackMessages bit) 
+CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit) 
 ", transaction: trans);
 
                 await connection.ExecuteAsync(@$"
-INSERT INTO #TempUsers (Id, Username, JoinChannel, TrackMessages) VALUES (@Id, @Username, @JoinChannel, @TrackMessages)
+INSERT INTO #TempUsers (Id, Username, JoinChannel, TrackMessages) VALUES (@Id, @Username, @JoinChannel)
 ", users, trans);
 
                 await connection.ExecuteAsync(@$"
@@ -91,11 +91,10 @@ ON us.Id = tus.Id
 WHEN MATCHED THEN
     UPDATE 
     SET us.Username = tus.Username, 
-        us.JoinChannel = tus.JoinChannel, 
-        us.TrackMessages = tus.TrackMessages
+        us.JoinChannel = tus.JoinChannel
 WHEN NOT MATCHED THEN
-    INSERT (Id, Username, JoinChannel, TrackMessages)
-    VALUES (tus.Id, tus.Username, tus.JoinChannel, tus.TrackMessages);
+    INSERT (Id, Username, JoinChannel)
+    VALUES (tus.Id, tus.Username, tus.JoinChannel);
 ", transaction: trans);
 
                 await trans.CommitAsync();
@@ -165,14 +164,12 @@ WHERE JoinChannel = 1
                         Id = uint.Parse(channel.Id),
                         Username = channel.Login,
                         JoinChannel = true,
-                        TrackMessages = true,
                     });
                 }
                 else
                 {
                     
                     user.JoinChannel = true;
-                    user.TrackMessages = true;
                     await connection.UpdateAsync(user);
                 }
                 return userIsTracking;

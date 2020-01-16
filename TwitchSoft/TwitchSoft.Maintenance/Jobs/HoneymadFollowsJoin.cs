@@ -35,7 +35,6 @@ namespace TwitchSoft.Maintenance.Jobs
                 Id = uint.Parse(f.ToUserId),
                 Username = f.ToUserName.ToLower(),
                 JoinChannel = true,
-                TrackMessages = true,
             }).ToArray());
 
             logger.LogInformation($"End executing job: {nameof(HoneymadFollowsJoin)}");
