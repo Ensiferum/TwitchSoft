@@ -232,7 +232,7 @@ Usage:
                 {
                     skip = int.Parse(skipString);
                 };
-                var messages = await esClient.SearchMessages(searchText, skip, count);
+                var messages = await esClient.SearchMessages(searchText.ToLower(), skip, count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 if (!replyMessages.Any())

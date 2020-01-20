@@ -44,6 +44,7 @@ namespace TwitchSoft.TwitchBot
                     services.AddTransient<TwitchBotGrpcService>();
 
                     services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
+                    services.AddTransient<IChatPlugin, MaincastBotChatPlugin>();
                 });
     }
 }
