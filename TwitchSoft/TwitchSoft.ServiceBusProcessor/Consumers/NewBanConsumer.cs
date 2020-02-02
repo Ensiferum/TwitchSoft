@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -50,7 +51,14 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 }
             }
 
-            await repository.SaveUserBansAsync(newBans.ToArray());
+            try
+            {
+                await repository.SaveUserBansAsync(newBans.ToArray());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "NewBan saving failed");
+            }
         }
     }
 }
