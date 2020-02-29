@@ -142,8 +142,6 @@ namespace TwitchSoft.TwitchBot
 
             twitchClient.OnUserBanned += Client_OnUserBanned;
             twitchClient.OnUserTimedout += Client_OnUserTimedout;
-
-            
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
@@ -231,7 +229,7 @@ namespace TwitchSoft.TwitchBot
 
             foreach (var plugin in chatPlugins)
             {
-                plugin.ProcessMessage(e.ChatMessage, twitchClient);
+                await plugin.ProcessMessage(e.ChatMessage, twitchClient);
             }
         }
 

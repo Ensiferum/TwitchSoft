@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -13,7 +14,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
         {
             this.logger = logger;
         }
-        public void ProcessMessage(ChatMessage chatMessage, TwitchClient twitchClient)
+        public Task ProcessMessage(ChatMessage chatMessage, TwitchClient twitchClient)
         {
             if (chatMessage.Channel == "nl_kripp" &&
                 chatMessage.Username.Equals("streamlabs", StringComparison.OrdinalIgnoreCase) &&
@@ -27,6 +28,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                     twitchClient.SendMessage(chatMessage.Channel, "!bet under 100");
                 }
             }
+            return Task.CompletedTask;
         }
     }
 }
