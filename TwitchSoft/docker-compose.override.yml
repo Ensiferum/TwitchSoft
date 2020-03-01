@@ -12,7 +12,6 @@ services:
   twitchsoft.twitchbot:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ServiceBusSettings__Host=rabbitmq
       - Redis__ConnectionString=redis
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -20,7 +19,6 @@ services:
   twitchsoft.servicebusprocessor:
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - ServiceBusSettings__Host=rabbitmq
       - Redis__ConnectionString=redis
       - Elasticsearch__Url=http://elasticsearch:9200/
     volumes:

@@ -6,6 +6,7 @@ using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
 using MassTransit.Context;
+using MassTransit.Azure.ServiceBus.Core;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -27,13 +28,9 @@ namespace TwitchSoft.ServiceBusProcessor
             Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
             ushort prefetchCount = 10;
 
-            services.AddSingleton(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+            services.AddSingleton(provider => Bus.Factory.CreateUsingAzureServiceBus(cfg =>
             {
-                var host = cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
-                {
-                    hostConfigurator.Username(serviceBusSettings.Username);
-                    hostConfigurator.Password(serviceBusSettings.Password);
-                });
+                var host = cfg.Host(serviceBusSettings.ConnectionString);
 
                 cfg.ReceiveEndpoint("add-twitch-message", ep =>
                 {
