@@ -140,8 +140,8 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnGiftedSubscription += Client_OnGiftedSubscription;
             twitchClient.OnCommunitySubscription += Client_OnCommunitySubscription;
 
-            twitchClient.OnUserBanned += Client_OnUserBanned;
-            twitchClient.OnUserTimedout += Client_OnUserTimedout;
+            // twitchClient.OnUserBanned += Client_OnUserBanned;
+            // twitchClient.OnUserTimedout += Client_OnUserTimedout;
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
