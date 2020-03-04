@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit.AspNetCore" Version="6.2.1-develop.2445" />
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="6.2.1-develop.2445" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.1-develop.2456" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />

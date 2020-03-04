@@ -15,7 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MassTransit.AspNetCore" Version="6.2.1-develop.2445" />
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="6.2.1-develop.2445" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.1-develop.2456" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.2" />
