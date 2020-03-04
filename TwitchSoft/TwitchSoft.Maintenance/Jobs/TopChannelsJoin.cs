@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -15,17 +16,20 @@ namespace TwitchSoft.Maintenance.Jobs
     public class TopChannelsJoin : IInvocable
     {
         private readonly ILogger<TopChannelsJoin> logger;
-        private readonly ITwitchApiService twitchApiService;
         private readonly TwitchDbContext twitchDbContext;
+        private readonly ITwitchApiService twitchApiService;
+        private readonly string twitchBotHost;
 
         public TopChannelsJoin(
             ILogger<TopChannelsJoin> logger,
+            TwitchDbContext twitchDbContext,
             ITwitchApiService twitchApiService,
-            TwitchDbContext twitchDbContext)
+            IConfiguration config)
         {
             this.logger = logger;
-            this.twitchApiService = twitchApiService;
             this.twitchDbContext = twitchDbContext;
+            this.twitchApiService = twitchApiService;
+            twitchBotHost = config.GetValue<string>("Services:TwitchBot");
         }
         public async Task Invoke()
         {
@@ -54,7 +58,7 @@ namespace TwitchSoft.Maintenance.Jobs
             }));
             await twitchDbContext.SaveChangesAsync();
 
-            Channel grpcChannel = new Channel("twitchbot", 80, ChannelCredentials.Insecure);
+            Channel grpcChannel = new Channel(twitchBotHost, 80, ChannelCredentials.Insecure);
             var client = new TwitchBotGrpcClient(grpcChannel);
             await client.RefreshChannelsAsync(new Empty());
             logger.LogInformation($"End executing job: {nameof(TopChannelsJoin)}");

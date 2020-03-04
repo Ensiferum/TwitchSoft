@@ -17,6 +17,7 @@ using System.Linq;
 using TwitchSoft.Shared.Services.Helpers;
 using StackExchange.Redis;
 using TwitchSoft.Shared.ElasticSearch.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -205,8 +206,8 @@ Usage:
                 }
                 else
                 {
-
-                    Channel grpcChannel = new Channel("twitchbot", 80, ChannelCredentials.Insecure);
+                    var twitchBotHost = scope.ServiceProvider.GetRequiredService<IConfiguration>().GetValue<string>("Services:TwitchBot");
+                    Channel grpcChannel = new Channel(twitchBotHost, 80, ChannelCredentials.Insecure);
                     var client = new TwitchBotGrpcClient(grpcChannel);
                     await client.JoinChannelAsync(new JoinChannelRequest { Channelname = channelName });
 
