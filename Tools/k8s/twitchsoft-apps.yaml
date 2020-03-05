@@ -17,6 +17,7 @@ spec:
       containers:
       - name: ts-telegrambot
         image: twitchsoft.azurecr.io/twitchsofttelegrambot:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 150Mi
@@ -57,6 +58,7 @@ spec:
       containers:
       - name: ts-twitchbot
         image: twitchsoft.azurecr.io/twitchsofttwitchbot:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 1Gi
@@ -97,6 +99,7 @@ spec:
       containers:
       - name: ts-maintenance
         image: twitchsoft.azurecr.io/twitchsoftmaintenance:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 150Mi
@@ -127,6 +130,7 @@ spec:
       containers:
       - name: ts-servicebusprocessor
         image: twitchsoft.azurecr.io/twitchsoftservicebusprocessor:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 150Mi

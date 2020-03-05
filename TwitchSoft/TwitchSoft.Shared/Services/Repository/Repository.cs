@@ -71,6 +71,12 @@ WHERE Id IN @ids", new { ids });
                 return;
             }
 
+            if (users.Length == 1)
+            {
+                await CreateOrUpdateUser(users[0]);
+                return;
+            }
+
             using (var connection = new SqlConnection(ConnectionString))
             {
                 await connection.OpenAsync();
@@ -98,6 +104,26 @@ WHEN NOT MATCHED THEN
 ", transaction: trans);
 
                 await trans.CommitAsync();
+            }
+        }
+
+        public async Task CreateOrUpdateUser(User user)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                await connection.ExecuteAsync(@$"MERGE INTO Users
+                USING 
+                (
+                   SELECT   {user.Id} as Id,
+                            '{user.Username}' AS Username
+                ) AS entity
+                ON  Users.Id = entity.Id
+                WHEN MATCHED THEN
+                    UPDATE 
+                    SET Username = '{user.Username}'
+                WHEN NOT MATCHED THEN
+                    INSERT (Id, Username)
+                    VALUES ({user.Id}, '{user.Username}');");
             }
         }
 

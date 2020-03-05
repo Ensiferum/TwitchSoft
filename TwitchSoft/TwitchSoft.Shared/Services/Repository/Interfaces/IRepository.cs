@@ -11,6 +11,7 @@ namespace TwitchSoft.Shared.Services.Repository.Interfaces
     {
         Task<Dictionary<string, uint>> GetUserIds(params string[] userNames);
         Task CreateOrUpdateUsers(params User[] users);
+        Task CreateOrUpdateUser(User user);
         Task<IEnumerable<(uint Id, string Username)>> SearchUsers(string userNamePart, int count = 10);
         Task SaveSubscriberAsync(params Subscription[] subscription);
         Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription);
