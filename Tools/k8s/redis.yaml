@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: redis
+        image: redis:latest
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: "/data"
+          subPath: "redisdata"
+          name: redis-volume
+        ports:
+        - containerPort: 6379
+      volumes:
+      - name: redis-volume
+        azureFile:
+            secretName: azure-secret
+            shareName: aksshare
+            readOnly: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 6379
+  selector:
+    app: redis

@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-telegrambot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-telegrambot
+  template:
+    metadata:
+      labels:
+        app: ts-telegrambot
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: ts-telegrambot
+        image: twitchsoft.azurecr.io/twitchsofttelegrambot:latest
+        resources:
+          limits:
+            memory: 150Mi
+          requests:
+            memory: 50Mi
+        envFrom:
+          - secretRef:
+              name: ts-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-telegrambot
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: ts-telegrambot
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-twitchbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-twitchbot
+  template:
+    metadata:
+      labels:
+        app: ts-twitchbot
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: ts-twitchbot
+        image: twitchsoft.azurecr.io/twitchsofttwitchbot:latest
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 512Mi
+        envFrom:
+          - secretRef:
+              name: ts-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-twitchbot
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: ts-twitchbot
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-maintenance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-maintenance
+  template:
+    metadata:
+      labels:
+        app: ts-maintenance
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: ts-maintenance
+        image: twitchsoft.azurecr.io/twitchsoftmaintenance:latest
+        resources:
+          limits:
+            memory: 150Mi
+          requests:
+            memory: 50Mi
+        envFrom:
+          - secretRef:
+              name: ts-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-servicebusprocessor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-servicebusprocessor
+  template:
+    metadata:
+      labels:
+        app: ts-servicebusprocessor
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: ts-servicebusprocessor
+        image: twitchsoft.azurecr.io/twitchsoftservicebusprocessor:latest
+        resources:
+          limits:
+            memory: 150Mi
+          requests:
+            memory: 50Mi
+        envFrom:
+          - secretRef:
+              name: ts-secret
