@@ -25,6 +25,8 @@ spec:
         envFrom:
           - secretRef:
               name: ts-secret
+          - configMapRef:
+              name: log-config
 ---
 apiVersion: v1
 kind: Service
@@ -63,6 +65,8 @@ spec:
         envFrom:
           - secretRef:
               name: ts-secret
+          - configMapRef:
+              name: log-config
 ---
 apiVersion: v1
 kind: Service
@@ -101,6 +105,8 @@ spec:
         envFrom:
           - secretRef:
               name: ts-secret
+          - configMapRef:
+              name: log-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -129,3 +135,5 @@ spec:
         envFrom:
           - secretRef:
               name: ts-secret
+          - configMapRef:
+              name: log-config
