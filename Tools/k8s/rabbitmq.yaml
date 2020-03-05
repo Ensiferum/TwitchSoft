@@ -19,9 +19,9 @@ spec:
         image: twitchsoft.azurecr.io/ts-rabbitmq:latest
         resources:
           limits:
-            memory: 300Mi
+            memory: 700Mi
           requests:
-            memory: 100Mi
+            memory: 500Mi
         ports:
         - containerPort: 15672
         - containerPort: 5672

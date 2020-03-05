@@ -17,7 +17,7 @@ namespace TwitchSoft.Shared.Services.Extensions
                 }
                 catch (Exception ex)
                 {
-                    var logger = scope.ServiceProvider.GetService<ILogger>();
+                    var logger = scope.ServiceProvider.GetService<ILoggerFactory>().CreateLogger(typeof(ScopeFactoryExtensions));
                     logger.LogError(ex, "Error in RunInScope ocured");
                     throw;
                 } 
