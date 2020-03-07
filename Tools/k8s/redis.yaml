@@ -34,7 +34,7 @@ spec:
       - name: redis-volume
         azureFile:
             secretName: azure-secret
-            shareName: aksshare
+            shareName: ts-fileshare
             readOnly: false
 ---
 apiVersion: v1

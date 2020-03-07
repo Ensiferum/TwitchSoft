@@ -38,7 +38,7 @@ spec:
       - name: es-volume
         azureFile:
             secretName: azure-secret
-            shareName: aksshare
+            shareName: ts-fileshare
             readOnly: false
 ---
 apiVersion: v1
