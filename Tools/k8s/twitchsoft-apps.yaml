@@ -22,7 +22,7 @@ spec:
           limits:
             memory: 150Mi
           requests:
-            memory: 50Mi
+            memory: 80Mi
         envFrom:
           - secretRef:
               name: ts-secret
@@ -104,7 +104,7 @@ spec:
           limits:
             memory: 150Mi
           requests:
-            memory: 50Mi
+            memory: 80Mi
         envFrom:
           - secretRef:
               name: ts-secret
@@ -135,7 +135,7 @@ spec:
           limits:
             memory: 150Mi
           requests:
-            memory: 50Mi
+            memory: 80Mi
         envFrom:
           - secretRef:
               name: ts-secret
