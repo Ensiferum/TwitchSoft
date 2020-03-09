@@ -49,8 +49,8 @@ WHERE Username IN @userNames", new { userNames });
             {
                 return await connection.QueryAsync<(uint Id, string Username)>(@"
 SELECT TOP (@count) Id, Username FROM Users
-WHERE Username LIKE @userNamePart
-ORDER BY Id", new { userNamePart = $"%{userNamePart}%", count });
+WHERE Username = @userNamePart
+ORDER BY Id", new { userNamePart , count });
             }
         }
 
