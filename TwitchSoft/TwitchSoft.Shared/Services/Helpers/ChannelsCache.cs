@@ -1,117 +1,54 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using TwitchSoft.Shared.Database.Models;
-using TwitchSoft.Shared.Services.Extensions;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Shared.Services.Helpers
 {
     public class ChannelsCache : IChannelsCache
     {
-        private readonly IServiceScopeFactory scopeFactory;
         private readonly ILogger<ChannelsCache> logger;
-        private readonly IDatabase redisKeyDb;
-        private readonly IDatabase redisNamesDb;
+        private readonly IMemoryCache memoryCache;
+        private readonly IRepository repository;
 
-        public ChannelsCache(IServiceScopeFactory scopeFactory, ILogger<ChannelsCache> logger, ConnectionMultiplexer redisClient)
+        public ChannelsCache(
+            ILogger<ChannelsCache> logger,
+            IMemoryCache memoryCache,
+            IRepository repository)
         {
-            this.scopeFactory = scopeFactory;
             this.logger = logger;
-            redisKeyDb = redisClient.GetDatabase(0);
-            redisNamesDb = redisClient.GetDatabase(1);
-        }
-
-        private string GetIdKey(uint channelId) => $"{channelId}";
-        private string GetNameKey(string channelName) => $"{channelName}";
-
-        public Task<IEnumerable<User>> GetTrackedChannels()
-        {
-            return GetCachedChannels();
+            this.memoryCache = memoryCache;
+            this.repository = repository;
         }
 
         public async Task<string> GetChannelNameById(uint channelId)
         {
-            var result = redisKeyDb.StringGet(GetIdKey(channelId));
-            if (result.IsNull)
+            if (memoryCache.TryGetValue(channelId, out string value))
             {
-                var channels = await GetCachedChannels();
-                return channels.First(_ => _.Id == channelId).Username;
+                return value;
             }
-            return result;
+            else
+            {
+                logger.LogInformation("Missing channelId in cache", channelId);
+                var user = await repository.GetUserById(channelId);
+                memoryCache.Set(channelId, user.Username);
+                return user.Username;
+            }
         }
 
         public async Task<uint> GetChannelIdByName(string channelName)
         {
-            var channel = channelName.ToLower();
-            var result = redisNamesDb.StringGet(GetNameKey(channel));
-            if (result.IsNull)
+            if (memoryCache.TryGetValue(channelName, out uint value))
             {
-                var channels = await GetCachedChannels();
-                return channels.First(_ => string.Equals(_.Username, channel)).Id;
+                return value;
             }
-            return uint.Parse(result);
-        }
-
-        public async Task<Dictionary<string, uint>> GetChannelsByNames(params string[] channelNames)
-        {
-            var batch = redisNamesDb.CreateBatch();
-            var tasks = new Dictionary<string, Task<RedisValue>>();
-
-            Array.ForEach(channelNames, channelName =>
+            else
             {
-                var channel = channelName.ToLower();
-                tasks.Add(channel, batch.StringGetAsync(GetNameKey(channel)));
-            });
-
-            batch.Execute();
-            var results = await Task.WhenAll(tasks.Values);
-
-            if (results.Contains(RedisValue.Null)) {
-                var channels = await GetCachedChannels();
-                return channels.ToDictionary(_ => _.Username, _ => _.Id);
+                logger.LogInformation("Missing channelName in cache", channelName);
+                var user = await repository.GetUserByName(channelName);
+                memoryCache.Set(channelName, user.Id);
+                return user.Id;
             }
-
-            return tasks.ToDictionary(_ => _.Key, _ => uint.Parse(_.Value.Result));
-        }
-
-        private Task<IEnumerable<User>> GetCachedChannels()
-        {
-            return GetOrCreate(() => GetChannels());
-        }
-
-        private async Task<IEnumerable<User>> GetChannels()
-        {
-            IEnumerable<User> channels = null;
-            await scopeFactory.RunInScope(async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-                channels = await repository.GetChannelsToTrack();
-
-            });
-            return channels;
-        }
-
-        private async Task<IEnumerable<User>> GetOrCreate(Func<Task<IEnumerable<User>>> createItem)
-        {
-            IEnumerable<User> cacheEntry = await createItem();
-            var cacheItems = new Dictionary<string, string>();
-            var tasks = new List<Task>();
-            var keysBatch = redisKeyDb.CreateBatch();
-            var namesBatch = redisNamesDb.CreateBatch();
-            Array.ForEach(cacheEntry.ToArray(), user =>
-            {
-                tasks.Add(keysBatch.StringSetAsync(GetIdKey(user.Id), user.Username));
-                tasks.Add(namesBatch.StringSetAsync(GetNameKey(user.Username.ToLower()), user.Id));
-            });
-            keysBatch.Execute();
-            namesBatch.Execute();
-            await Task.WhenAll(tasks);
-            return cacheEntry;
         }
     }
 }

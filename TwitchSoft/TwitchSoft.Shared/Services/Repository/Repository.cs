@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
@@ -163,6 +162,28 @@ WHEN NOT MATCHED THEN
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Error while saving {nameof(UserBan)}");
+            }
+        }
+
+        public async Task<User> GetUserById(uint id) 
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryFirstOrDefaultAsync<User>(@"
+SELECT * FROM Users
+WHERE Id = @id
+", new { id });
+            }
+        }
+
+        public async Task<User> GetUserByName(string name)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryFirstOrDefaultAsync<User>(@"
+SELECT * FROM Users
+WHERE Username = @name
+", new { name });
             }
         }
 

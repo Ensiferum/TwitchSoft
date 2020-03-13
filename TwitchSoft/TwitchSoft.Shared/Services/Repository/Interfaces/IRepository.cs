@@ -17,6 +17,8 @@ namespace TwitchSoft.Shared.Services.Repository.Interfaces
         Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription);
         Task SaveUserBansAsync(params UserBan[] userBans);
         Task<IEnumerable<User>> GetChannelsToTrack();
+        Task<User> GetUserById(uint id);
+        Task<User> GetUserByName(string name);
         Task<bool> AddChannelToTrack(UserTwitch channel);
         Task<IEnumerable<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count);
         Task<int> GetSubscribersCountFor(string channel);

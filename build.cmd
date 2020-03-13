@@ -1,7 +1,5 @@
 docker-compose -f .\TwitchSoft\docker-compose.yml -f .\TwitchSoft\docker-compose.override.yml build
 
-az acr login --name twitchsoft
-
 docker tag twitchsoftmaintenance twitchsoft.azurecr.io/twitchsoftmaintenance:latest
 docker tag twitchsofttwitchbot twitchsoft.azurecr.io/twitchsofttwitchbot:latest
 docker tag twitchsofttelegrambot twitchsoft.azurecr.io/twitchsofttelegrambot:latest

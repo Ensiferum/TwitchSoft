@@ -40,7 +40,7 @@ namespace TwitchSoft.TwitchBot
 
                     services.AddServiceBusProcessors(Configuration);
 
-                    services.AddLocalRedisCache(Configuration);
+                    services.AddCache(Configuration);
                     services.AddTransient<TwitchBotGrpcService>();
 
                     services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();

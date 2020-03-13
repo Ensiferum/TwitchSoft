@@ -28,19 +28,19 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
         {
-            var chatMessages = new NewTwitchChannelMessage[] { context.Message };
-            await repository.CreateOrUpdateUsers(chatMessages.Select(chatMessage => new User
+            var chatMessage = context.Message;
+            await repository.CreateOrUpdateUsers(new User
             {
                 Username = chatMessage.User.UserName,
                 Id = chatMessage.User.UserId
-            }).ToArray());
+            });
 
-            var channels = await channelsCache.GetChannelsByNames(chatMessages.Select(_ => _.Channel).ToArray());
+            var channelId = await channelsCache.GetChannelIdByName(chatMessage.Channel);
 
-            var chatMessagesES = chatMessages.Select(chatMessage => new ChatMessageES
+            var chatMessageES = new ChatMessageES
             {
                 Id = chatMessage.Id,
-                ChannelId = channels[chatMessage.Channel],
+                ChannelId = channelId,
                 ChannelName = chatMessage.Channel,
                 UserId = chatMessage.User.UserId,
                 UserName = chatMessage.User.UserName,
@@ -49,9 +49,9 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 IsSubscriber = chatMessage.IsSubscriber,
                 Message = chatMessage.Message,
                 PostedTime = chatMessage.PostedTime,
-            });
+            };
 
-            await elasticClient.IndexManyAsync(chatMessagesES);
+            await elasticClient.IndexManyAsync(new[] { chatMessageES });
         }
     }
 }
