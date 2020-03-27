@@ -133,9 +133,9 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: 150Mi
+            memory: 250Mi
           requests:
-            memory: 80Mi
+            memory: 150Mi
         envFrom:
           - secretRef:
               name: ts-secret

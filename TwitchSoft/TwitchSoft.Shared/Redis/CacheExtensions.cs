@@ -9,10 +9,10 @@ namespace TwitchSoft.Shared.Redis
     {
         public static void AddCache(this IServiceCollection services, IConfiguration configuration)
         {
-            var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString");
+            //var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString");
 
-            var redis = ConnectionMultiplexer.Connect(redisConnectionString);
-            services.AddSingleton(redis);
+            //var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+            //services.AddSingleton(redis);
             services.AddMemoryCache();
             services.AddSingleton<IChannelsCache, ChannelsCache>();
         }

@@ -38,7 +38,5 @@ spec:
   ports:
   - port: 15672
     name: port-15672
-  - port: 5672
-    name: port-5672
   selector:
     app: rabbitmq
