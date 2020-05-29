@@ -20,7 +20,7 @@ spec:
         fsGroup: 2000
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
         resources:
           limits:
             memory: 2Gi
@@ -72,7 +72,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/kibana/kibana:7.6.0
+        image: docker.elastic.co/kibana/kibana:7.7.0
         resources:
           limits:
             memory: 1Gi
