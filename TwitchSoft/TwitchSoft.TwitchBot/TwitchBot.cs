@@ -285,7 +285,7 @@ namespace TwitchSoft.TwitchBot
                 Channel = e.Channel,
                 Id = Guid.Parse(subInfo.Id),
                 SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
-                Months = subInfo.MsgParamCumulativeMonths != null ? int.Parse(subInfo.MsgParamCumulativeMonths) : 0,
+                Months = subInfo.MsgParamMonths != null ? int.Parse(subInfo.MsgParamMonths) : 0,
                 SubscriptionPlan = (SubscriptionPlan)subInfo.MsgParamSubPlan,
                 User = new User
                 {

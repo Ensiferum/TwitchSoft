@@ -5,7 +5,6 @@ using TwitchSoft.ServiceBusProcessor.Consumers;
 using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
-using MassTransit.Context;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -13,70 +12,64 @@ namespace TwitchSoft.ServiceBusProcessor
     {
         public static void AddServiceBusProcessors(this IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddMassTransit(x =>
-            {
-                x.AddConsumer<NewTwitchChannelMessageConsumer>();
-                x.AddConsumer<NewSubscriberConsumer>();
-                x.AddConsumer<NewCommunitySubscriptionConsumer>();
-                x.AddConsumer<NewBanConsumer>();
-            });
-
-            LogContext.ConfigureCurrentLogContext();
-
             var serviceBusSettings = new ServiceBusSettings();
             Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
             ushort prefetchCount = 10;
 
-            services.AddSingleton(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+            services.AddMassTransit(conf =>
             {
-                var host = cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
+                conf.AddConsumer<NewTwitchChannelMessageConsumer>();
+                conf.AddConsumer<NewSubscriberConsumer>();
+                conf.AddConsumer<NewCommunitySubscriptionConsumer>();
+                conf.AddConsumer<NewBanConsumer>();
+
+                conf.AddBus(context => Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
-                    hostConfigurator.Username(serviceBusSettings.Username);
-                    hostConfigurator.Password(serviceBusSettings.Password);
-                });
+                    cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
+                    {
+                        hostConfigurator.Username(serviceBusSettings.Username);
+                        hostConfigurator.Password(serviceBusSettings.Password);
+                    });
 
-                cfg.ReceiveEndpoint("add-twitch-message", ep =>
-                {
-                    ep.PrefetchCount = prefetchCount;
-                    ep.UseRetry(r => r.Interval(5, 1000));
+                    cfg.ReceiveEndpoint("add-twitch-message", ep =>
+                    {
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseRetry(r => r.Interval(5, 1000));
 
-                    ep.ConfigureConsumer<NewTwitchChannelMessageConsumer>(provider);
-                    EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
-                });
+                        ep.ConfigureConsumer<NewTwitchChannelMessageConsumer>(context);
+                        EndpointConvention.Map<NewTwitchChannelMessage>(ep.InputAddress);
+                    });
 
-                cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
-                {
-                    ep.PrefetchCount = prefetchCount;
-                    ep.UseMessageRetry(r => r.Interval(5, 1000));
+                    cfg.ReceiveEndpoint("add-twitch-subscriber", ep =>
+                    {
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseMessageRetry(r => r.Interval(5, 1000));
 
-                    ep.ConfigureConsumer<NewSubscriberConsumer>(provider);
-                    EndpointConvention.Map<NewSubscriber>(ep.InputAddress);
-                });
+                        ep.ConfigureConsumer<NewSubscriberConsumer>(context);
+                        EndpointConvention.Map<NewSubscriber>(ep.InputAddress);
+                    });
 
-                cfg.ReceiveEndpoint("add-twitch-community-subscription", ep =>
-                {
-                    ep.PrefetchCount = prefetchCount;
-                    ep.UseMessageRetry(r => r.Interval(5, 1000));
+                    cfg.ReceiveEndpoint("add-twitch-community-subscription", ep =>
+                    {
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseMessageRetry(r => r.Interval(5, 1000));
 
-                    ep.ConfigureConsumer<NewCommunitySubscriptionConsumer>(provider);
-                    EndpointConvention.Map<NewCommunitySubscription>(ep.InputAddress);
-                });
+                        ep.ConfigureConsumer<NewCommunitySubscriptionConsumer>(context);
+                        EndpointConvention.Map<NewCommunitySubscription>(ep.InputAddress);
+                    });
 
-                cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
-                {
-                    ep.PrefetchCount = prefetchCount;
-                    ep.UseRetry(r => r.Interval(5, 1000));
+                    cfg.ReceiveEndpoint("add-twitch-user-ban", ep =>
+                    {
+                        ep.PrefetchCount = prefetchCount;
+                        ep.UseRetry(r => r.Interval(5, 1000));
 
-                    ep.ConfigureConsumer<NewBanConsumer>(provider);
-                    EndpointConvention.Map<NewBan>(ep.InputAddress);
-                });
-            }));
+                        ep.ConfigureConsumer<NewBanConsumer>(context);
+                        EndpointConvention.Map<NewBan>(ep.InputAddress);
+                    });
+                }));
+            });
 
-            services.AddSingleton<IPublishEndpoint>(provider => provider.GetRequiredService<IBusControl>());
-            services.AddSingleton<ISendEndpointProvider>(provider => provider.GetRequiredService<IBusControl>());
-            services.AddSingleton<IBus>(provider => provider.GetRequiredService<IBusControl>());
-
-            services.AddHostedService<BusService>();
+            services.AddMassTransitHostedService();
         }
     }
 }

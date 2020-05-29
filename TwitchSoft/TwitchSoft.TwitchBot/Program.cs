@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.Services.TwitchApi;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder;
 using TwitchSoft.TwitchBot.Grpc;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using TwitchSoft.Shared.Redis;

@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MassTransit;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
-using MassTransit.Context;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -13,14 +12,12 @@ namespace TwitchSoft.TwitchBot
         {
             services.AddMassTransit(x =>
             {
-                LogContext.ConfigureCurrentLogContext();
-
                 var serviceBusSettings = new ServiceBusSettings();
                 Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
 
-                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+                x.AddBus(context => Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
-                    var host = cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
+                    cfg.Host(serviceBusSettings.Host, serviceBusSettings.VirtualHost, hostConfigurator =>
                     {
                         hostConfigurator.Username(serviceBusSettings.Username);
                         hostConfigurator.Password(serviceBusSettings.Password);
@@ -47,8 +44,6 @@ namespace TwitchSoft.TwitchBot
                     });
                 }));
             });
-
-            services.AddSingleton<ISendEndpointProvider>(provider => provider.GetRequiredService<IBusControl>());
         }
     }
 }
