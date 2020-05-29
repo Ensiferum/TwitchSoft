@@ -30,7 +30,6 @@ kind: Service
 metadata:
   name: redis
 spec:
-  type: LoadBalancer
   ports:
   - port: 6379
   selector:

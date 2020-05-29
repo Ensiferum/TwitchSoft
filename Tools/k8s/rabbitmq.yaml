@@ -34,7 +34,6 @@ kind: Service
 metadata:
   name: rabbitmq
 spec:
-  type: LoadBalancer
   ports:
   - port: 15672
     name: port-15672

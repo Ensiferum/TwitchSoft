@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -62,7 +61,30 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 "!sub",
                 "!магазин",
                 "!настройки",
-                "!ak"
+                "!ak",
+                "!maps",
+                "!schedule",
+                "!video",
+                "!bracket",
+                "!tie",
+                "!bathroom",
+                "!primary",
+                "!fine",
+                "!spawn",
+                "!slot",
+                "!mouse",
+                "!sacrifice",
+                "!playlist",
+                "!sens",
+                "!drops",
+                "!ебальник",
+                "!drop",
+                "!lasthit",
+                "!iq",
+                "!time",
+                "!followagee",
+                "!mp7",
+                "!monitor"
             }
         );
 
@@ -80,7 +102,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 }
 
                 Random rand = new Random();
-                if (rand.Next(100) == 1)
+                if (rand.Next(300) == 1)
                 {
                     logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {chatMessage.Message}");
                     await Task.Run(async () =>

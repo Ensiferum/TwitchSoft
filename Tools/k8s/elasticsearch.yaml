@@ -38,10 +38,8 @@ spec:
             value: "single-node"
       volumes:
       - name: es-volume
-        azureDisk:
-            kind: Managed
-            diskName: ts-aks-es-disk
-            diskURI: /subscriptions/17526f5f-50b0-4af1-a4f7-6f367a2f7e8b/resourceGroups/MC_twitchsoft_ts-aks_northeurope/providers/Microsoft.Compute/disks/ts-aks-es-disk
+        persistentVolumeClaim:
+          claimName: azure-managed-disk-es
 ---
 apiVersion: v1
 kind: Service
@@ -88,8 +86,19 @@ kind: Service
 metadata:
   name: kibana
 spec:
-  type: LoadBalancer
   ports:
   - port: 5601
   selector:
     app: kibana
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk-es
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 120Gi
