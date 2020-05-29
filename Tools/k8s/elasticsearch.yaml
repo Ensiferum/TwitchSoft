@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            memory: 1.5Gi
+        volumeMounts:
+        - mountPath: "/usr/share/elasticsearch/data"
+          subPath: "es-data"
+          name: es-volume
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+        env:
+          - name: discovery.type
+            value: "single-node"
+      volumes:
+      - name: es-volume
+        azureDisk:
+            kind: Managed
+            diskName: ts-aks-es-disk
+            diskURI: /subscriptions/17526f5f-50b0-4af1-a4f7-6f367a2f7e8b/resourceGroups/MC_twitchsoft_ts-aks_northeurope/providers/Microsoft.Compute/disks/ts-aks-es-disk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+spec:
+  ports:
+  - port: 9200
+    name: port-9200
+  - port: 9300
+    name: port-9300
+  selector:
+    app: elasticsearch
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/kibana/kibana:7.6.0
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 600Mi
+        ports:
+        - containerPort: 5601
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5601
+  selector:
+    app: kibana

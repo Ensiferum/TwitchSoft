@@ -38,7 +38,7 @@ namespace TwitchSoft.TelegramBot
                     services.AddHostedService<TelegramBotService>();
                     services.AddHostedService<TelegramBotGrpcServer>();
 
-                    services.AddLocalRedisCache(Configuration);
+                    services.AddCache(Configuration);
                     services.AddElasticSearch(Configuration);
                 });
     }

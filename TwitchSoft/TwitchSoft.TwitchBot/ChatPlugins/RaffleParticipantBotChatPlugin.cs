@@ -13,7 +13,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
     {
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
 
-        private static readonly ReadOnlyCollection<string> BanCommands = new ReadOnlyCollection<string> (
+        private static readonly ReadOnlyCollection<string> IgnoreCommands = new ReadOnlyCollection<string> (
             new string[] {
                 "!discord", 
                 "!buy", 
@@ -49,7 +49,20 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 "!сан",
                 "!тргг",
                 "!rgg",
-                "!song"
+                "!song",
+                "!poll",
+                "!трек",
+                "!game",
+                "!гав",
+                "!fs",
+                "!val",
+                "!hk",
+                "!goty",
+                "!up",
+                "!sub",
+                "!магазин",
+                "!настройки",
+                "!ak"
             }
         );
 
@@ -61,7 +74,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
         {
             if (Regex.IsMatch(chatMessage.Message, "^[!#]\\w+$", RegexOptions.Compiled))
             {
-                if (BanCommands.Contains(chatMessage.Message.ToLower()))
+                if (IgnoreCommands.Contains(chatMessage.Message.ToLower()))
                 {
                     return;
                 }

@@ -27,6 +27,9 @@ namespace TwitchSoft.Shared.Database
                 .IsUnique(true);
 
             modelBuilder.Entity<User>()
+                .HasIndex(u => new { u.JoinChannel });
+
+            modelBuilder.Entity<User>()
                 .HasKey(u => u.Id);
 
             modelBuilder.Entity<User>()

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: rabbitmq
+        image: twitchsoft.azurecr.io/ts-rabbitmq:latest
+        resources:
+          limits:
+            memory: 700Mi
+          requests:
+            memory: 500Mi
+        ports:
+        - containerPort: 15672
+        - containerPort: 5672
+        envFrom:
+          - secretRef:
+              name: rabbitmq-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 15672
+    name: port-15672
+  - port: 5672
+    name: port-5672
+  selector:
+    app: rabbitmq

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
@@ -49,8 +48,8 @@ WHERE Username IN @userNames", new { userNames });
             {
                 return await connection.QueryAsync<(uint Id, string Username)>(@"
 SELECT TOP (@count) Id, Username FROM Users
-WHERE Username LIKE @userNamePart
-ORDER BY Id", new { userNamePart = $"%{userNamePart}%", count });
+WHERE Username = @userNamePart
+ORDER BY Id", new { userNamePart , count });
             }
         }
 
@@ -68,6 +67,12 @@ WHERE Id IN @ids", new { ids });
         {
             if (!users.Any())
             {
+                return;
+            }
+
+            if (users.Length == 1)
+            {
+                await CreateOrUpdateUser(users[0]);
                 return;
             }
 
@@ -98,6 +103,26 @@ WHEN NOT MATCHED THEN
 ", transaction: trans);
 
                 await trans.CommitAsync();
+            }
+        }
+
+        public async Task CreateOrUpdateUser(User user)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                await connection.ExecuteAsync(@$"MERGE INTO Users
+                USING 
+                (
+                   SELECT   {user.Id} as Id,
+                            '{user.Username}' AS Username
+                ) AS entity
+                ON  Users.Id = entity.Id
+                WHEN MATCHED THEN
+                    UPDATE 
+                    SET Username = '{user.Username}'
+                WHEN NOT MATCHED THEN
+                    INSERT (Id, Username)
+                    VALUES ({user.Id}, '{user.Username}');");
             }
         }
 
@@ -137,6 +162,28 @@ WHEN NOT MATCHED THEN
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Error while saving {nameof(UserBan)}");
+            }
+        }
+
+        public async Task<User> GetUserById(uint id) 
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryFirstOrDefaultAsync<User>(@"
+SELECT * FROM Users
+WHERE Id = @id
+", new { id });
+            }
+        }
+
+        public async Task<User> GetUserByName(string name)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                return await connection.QueryFirstOrDefaultAsync<User>(@"
+SELECT * FROM Users
+WHERE Username = @name
+", new { name });
             }
         }
 

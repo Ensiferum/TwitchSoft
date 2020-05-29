@@ -29,7 +29,7 @@ namespace TwitchSoft.ServiceBusProcessor
 
                     services.AddServiceBusProcessors(Configuration);
 
-                    services.AddLocalRedisCache(Configuration);
+                    services.AddCache(Configuration);
                     services.AddElasticSearch(Configuration);
                 });
     }

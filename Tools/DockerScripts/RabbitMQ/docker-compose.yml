@@ -2,7 +2,7 @@ version: '3.7'
   
 services:  
   rabbitmq:
-    container_name: Rabbit
+    container_name: Rabbitmq
     restart: unless-stopped
     build: .
     environment:

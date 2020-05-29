@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using System.Collections.Generic;
+using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -25,7 +26,7 @@ namespace TwitchSoft.TwitchBot
     {
         private readonly ILogger<TwitchBot> logger;
         private readonly ISendEndpointProvider bus;
-        private readonly IChannelsCache channelsCache;
+        private readonly IRepository repository;
         private readonly IEnumerable<IChatPlugin> chatPlugins;
 
         private BotSettings BotSettings { get; set; }
@@ -39,12 +40,12 @@ namespace TwitchSoft.TwitchBot
             ILogger<TwitchBot> logger, 
             IOptions<BotSettings> options,
             ISendEndpointProvider bus,
-            IChannelsCache channelsService,
+            IRepository repository,
             IEnumerable<IChatPlugin> chatPlugins)
         {
             this.logger = logger;
             this.bus = bus;
-            this.channelsCache = channelsService;
+            this.repository = repository;
             this.chatPlugins = chatPlugins;
             BotSettings = options.Value;
 
@@ -140,8 +141,8 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnGiftedSubscription += Client_OnGiftedSubscription;
             twitchClient.OnCommunitySubscription += Client_OnCommunitySubscription;
 
-            twitchClient.OnUserBanned += Client_OnUserBanned;
-            twitchClient.OnUserTimedout += Client_OnUserTimedout;
+            // twitchClient.OnUserBanned += Client_OnUserBanned;
+            // twitchClient.OnUserTimedout += Client_OnUserTimedout;
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
@@ -199,7 +200,7 @@ namespace TwitchSoft.TwitchBot
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
 
-            var channels = await channelsCache.GetTrackedChannels();
+            var channels = await repository.GetChannelsToTrack();
 
             foreach (var channel in channels)
             {
@@ -363,8 +364,21 @@ namespace TwitchSoft.TwitchBot
 
         public async Task RefreshJoinedChannels()
         {
-            var channels = await channelsCache.GetTrackedChannels();
+            var channels = await repository.GetChannelsToTrack();
             var joinedChannels = twitchClient.JoinedChannels;
+
+            foreach (var chan in joinedChannels)
+            {
+                if(channels.Any(_ => _.Username.Equals(chan.Channel, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+                else
+                {
+                    twitchClient.LeaveChannel(chan.Channel);
+                }
+            }
+
             foreach (var chan in channels)
             {
                 if (joinedChannels.Any(_ => _.Channel.Equals(chan.Username, StringComparison.OrdinalIgnoreCase)))
