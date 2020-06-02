@@ -32,5 +32,5 @@ jobs:
 
     # Build & Push image to ACR
     - run: |
-        docker build -f .\TwitchSoft\TwitchSoft.Maintenance\Dockerfile -t twitchsoft.azurecr.io/twitchsoftmaintenance:latest .\TwitchSoft\
+        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t twitchsoft.azurecr.io/twitchsoftmaintenance:latest TwitchSoft
         docker push twitchsoft.azurecr.io/twitchsoftmaintenance:latest
