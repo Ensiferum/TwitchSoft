@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   twitchsoft.telegrambot:
-    image: ${DOCKER_REGISTRY-}twitchsofttelegrambot
+    image: ${DOCKER_REGISTRY}twitchsofttelegrambot:latest
     build:
       context: .
       dockerfile: TwitchSoft.TelegramBot/Dockerfile
@@ -14,7 +14,7 @@ services:
 
 
   twitchsoft.twitchbot:
-    image: ${DOCKER_REGISTRY-}twitchsofttwitchbot
+    image: ${DOCKER_REGISTRY}twitchsofttwitchbot:latest
     build:
       context: .
       dockerfile: TwitchSoft.TwitchBot/Dockerfile
@@ -27,7 +27,7 @@ services:
           - twitchbot
 
   twitchsoft.servicebusprocessor:
-    image: ${DOCKER_REGISTRY-}twitchsoftservicebusprocessor
+    image: ${DOCKER_REGISTRY}twitchsoftservicebusprocessor:latest
     build:
       context: .
       dockerfile: TwitchSoft.ServiceBusProcessor/Dockerfile
@@ -38,7 +38,7 @@ services:
           - servicebusprocessor
 
   twitchsoft.maintenance:
-    image: ${DOCKER_REGISTRY-}twitchsoftmaintenance
+    image: ${DOCKER_REGISTRY}twitchsoftmaintenance:latest
     build:
       context: .
       dockerfile: TwitchSoft.Maintenance/Dockerfile
