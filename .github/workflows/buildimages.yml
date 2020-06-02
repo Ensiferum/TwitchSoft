@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Create Maintenance image
+name: Create and Push images
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -25,6 +25,8 @@ jobs:
     # Azure Container Registry login
     - name: ACR Login
       uses: Azure/docker-login@v1
+      env:
+        DOCKER_REGISTRY: 'twitchsoft.azurecr.io/'
       with:
         login-server: twitchsoft.azurecr.io
         username: ${{ secrets.ACR_USERNAME }}
@@ -32,5 +34,8 @@ jobs:
 
     # Build & Push image to ACR
     - run: |
-        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t twitchsoft.azurecr.io/twitchsoftmaintenance:latest TwitchSoft
-        docker push twitchsoft.azurecr.io/twitchsoftmaintenance:latest
+        docker-compose -f TwitchSoft/docker-compose.yml build
+        docker push ${{ DOCKER_REGISTRY }}twitchsoftmaintenance:latest
+        docker push ${{ DOCKER_REGISTRY }}twitchsoftservicebusprocessor:latest
+        docker push ${{ DOCKER_REGISTRY }}twitchsofttwitchbot:latest
+        docker push ${{ DOCKER_REGISTRY }}twitchsofttelegrambot:latest
