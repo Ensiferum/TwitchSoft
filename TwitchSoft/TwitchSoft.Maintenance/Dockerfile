@@ -8,10 +8,10 @@ COPY ["TwitchSoft.Shared/TwitchSoft.Shared.csproj", "TwitchSoft.Shared/"]
 RUN dotnet restore "TwitchSoft.Maintenance/TwitchSoft.Maintenance.csproj"
 COPY . .
 WORKDIR "/src/TwitchSoft.Maintenance"
-RUN dotnet build "TwitchSoft.Maintenance.csproj" -c Release -o /app/build
+RUN dotnet build "TwitchSoft.Maintenance.csproj" -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "TwitchSoft.Maintenance.csproj" -c Release -o /app/publish
+RUN dotnet publish "TwitchSoft.Maintenance.csproj" -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
