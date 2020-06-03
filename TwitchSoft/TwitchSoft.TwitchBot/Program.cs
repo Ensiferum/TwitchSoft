@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using TwitchSoft.Shared.Services.Models.Twitch;
-using TwitchSoft.Shared.Services.TwitchApi;
-using TwitchSoft.TwitchBot.Grpc;
-using TwitchSoft.TwitchBot.ChatPlugins;
-using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared.Logging;
-using TwitchSoft.Shared;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -20,29 +15,9 @@ namespace TwitchSoft.TwitchBot
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogger()
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    services.ConfigureShared();
-                    // Set up the objects we need to get to configuration settings
-                    var Configuration = hostContext.Configuration;
-
-                    services.AddScoped<ITwitchApiService, TwitchApiService>();
-                    services.AddSingleton<TwitchBot>();
-
-                    services
-                        .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
-                        .AddOptions();
-
-                    services.AddHostedService<TwitchBotService>();
-                    services.AddHostedService<TwitchBotGrpcServer>();
-
-                    services.AddServiceBusProcessors(Configuration);
-
-                    services.AddCache(Configuration);
-                    services.AddTransient<TwitchBotGrpcService>();
-
-                    services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
-                    services.AddTransient<IChatPlugin, RaffleParticipantBotChatPlugin>();
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
