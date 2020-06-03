@@ -28,10 +28,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsoftmaintenance:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:latest TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ DOCKER_REGISTRY }}/twitchsoftmaintenance:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:latest
   build-servicebusprocessor:
     name: ServiceBusProcessor service build
     env: 
@@ -53,10 +53,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.ServiceBusProcessor/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.ServiceBusProcessor/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest
   build-twitchbot:
     name: TwitchBot service build
     env: 
@@ -78,10 +78,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TwitchBot/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsofttwitchbot:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TwitchBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:latest TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ DOCKER_REGISTRY }}/twitchsofttwitchbot:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:latest
   build-telegrambot:
     name: TelegramBot service build
     env: 
@@ -103,8 +103,8 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TelegramBot/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsofttelegrambot:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TelegramBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:latest TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ DOCKER_REGISTRY }}/twitchsofttelegrambot:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:latest
         
