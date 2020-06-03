@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.0-develop.2741" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.0-develop.2741" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.0-develop.2766" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.0-develop.2766" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0-preview.4.20251.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-preview.4.20251.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />

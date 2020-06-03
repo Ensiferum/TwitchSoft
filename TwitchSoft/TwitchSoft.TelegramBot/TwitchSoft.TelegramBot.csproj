@@ -11,7 +11,7 @@
     <PackageReference Include="Grpc" Version="2.29.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0-preview.4.20251.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="Telegram.Bot" Version="15.5.1" />
+    <PackageReference Include="Telegram.Bot" Version="15.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.4.20251.6" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0-preview.4.20251.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-preview.4.20251.6" />
