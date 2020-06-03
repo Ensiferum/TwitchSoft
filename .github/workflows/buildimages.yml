@@ -1,23 +1,18 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Create and Push images
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-maitenance:
+    name: Maintenance service build
+    env: 
+      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
@@ -26,16 +21,90 @@ jobs:
     - name: ACR Login
       uses: Azure/docker-login@v1
       with:
-        login-server: twitchsoft.azurecr.io
+        login-server: ${{ DOCKER_REGISTRY }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
     # Build & Push image to ACR
-    - run: |
-        docker-compose -f TwitchSoft/docker-compose.yml build
-        docker push ${{ env.DOCKER_REGISTRY }}twitchsoftmaintenance:latest
-        docker push ${{ env.DOCKER_REGISTRY }}twitchsoftservicebusprocessor:latest
-        docker push ${{ env.DOCKER_REGISTRY }}twitchsofttwitchbot:latest
-        docker push ${{ env.DOCKER_REGISTRY }}twitchsofttelegrambot:latest
-      env:
-        DOCKER_REGISTRY: 'twitchsoft.azurecr.io/'
+    - name: Build image
+      run: |
+        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsoftmaintenance:latest TwitchSoft
+    - name: Push image
+      run: |
+        docker push ${{ DOCKER_REGISTRY }}/twitchsoftmaintenance:latest
+  build-servicebusprocessor:
+    name: ServiceBusProcessor service build
+    env: 
+      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Azure Container Registry login
+    - name: ACR Login
+      uses: Azure/docker-login@v1
+      with:
+        login-server: ${{ DOCKER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Build & Push image to ACR
+    - name: Build image
+      run: |
+        docker build -f TwitchSoft/TwitchSoft.ServiceBusProcessor/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest TwitchSoft
+    - name: Push image
+      run: |
+        docker push ${{ DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest
+  build-twitchbot:
+    name: TwitchBot service build
+    env: 
+      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Azure Container Registry login
+    - name: ACR Login
+      uses: Azure/docker-login@v1
+      with:
+        login-server: ${{ DOCKER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Build & Push image to ACR
+    - name: Build image
+      run: |
+        docker build -f TwitchSoft/TwitchSoft.TwitchBot/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsofttwitchbot:latest TwitchSoft
+    - name: Push image
+      run: |
+        docker push ${{ DOCKER_REGISTRY }}/twitchsofttwitchbot:latest
+  build-telegrambot:
+    name: TelegramBot service build
+    env: 
+      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Azure Container Registry login
+    - name: ACR Login
+      uses: Azure/docker-login@v1
+      with:
+        login-server: ${{ DOCKER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Build & Push image to ACR
+    - name: Build image
+      run: |
+        docker build -f TwitchSoft/TwitchSoft.TelegramBot/Dockerfile -t ${{ DOCKER_REGISTRY }}/twitchsofttelegrambot:latest TwitchSoft
+    - name: Push image
+      run: |
+        docker push ${{ DOCKER_REGISTRY }}/twitchsofttelegrambot:latest
+        
