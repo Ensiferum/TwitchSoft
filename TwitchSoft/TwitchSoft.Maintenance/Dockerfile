@@ -15,5 +15,5 @@ RUN dotnet publish "TwitchSoft.Maintenance.csproj" -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "TwitchSoft.Maintenance.dll"]
