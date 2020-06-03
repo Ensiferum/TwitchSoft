@@ -4,6 +4,7 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["TwitchSoft.Maintenance/TwitchSoft.Maintenance.csproj", "TwitchSoft.Maintenance/"]
+COPY ["TwitchSoft.Shared/TwitchSoft.Shared.csproj", "TwitchSoft.Shared/"]
 RUN dotnet restore "TwitchSoft.Maintenance/TwitchSoft.Maintenance.csproj"
 COPY . .
 WORKDIR "/src/TwitchSoft.Maintenance"

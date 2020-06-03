@@ -4,6 +4,7 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["TwitchSoft.ServiceBusProcessor/TwitchSoft.ServiceBusProcessor.csproj", "TwitchSoft.ServiceBusProcessor/"]
+COPY ["TwitchSoft.Shared/TwitchSoft.Shared.csproj", "TwitchSoft.Shared/"]
 RUN dotnet restore "TwitchSoft.ServiceBusProcessor/TwitchSoft.ServiceBusProcessor.csproj"
 COPY . .
 WORKDIR "/src/TwitchSoft.ServiceBusProcessor"
