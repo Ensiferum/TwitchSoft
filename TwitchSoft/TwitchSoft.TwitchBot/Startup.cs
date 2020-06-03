@@ -45,6 +45,8 @@ namespace TwitchSoft.TwitchBot
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseRouting();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<TwitchBotGrpcService>();
