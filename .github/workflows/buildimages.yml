@@ -21,7 +21,7 @@ jobs:
     - name: ACR Login
       uses: Azure/docker-login@v1
       with:
-        login-server: ${{ DOCKER_REGISTRY }}
+        login-server: ${{ env.DOCKER_REGISTRY }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
@@ -46,7 +46,7 @@ jobs:
     - name: ACR Login
       uses: Azure/docker-login@v1
       with:
-        login-server: ${{ DOCKER_REGISTRY }}
+        login-server: ${{ env.DOCKER_REGISTRY }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
@@ -71,7 +71,7 @@ jobs:
     - name: ACR Login
       uses: Azure/docker-login@v1
       with:
-        login-server: ${{ DOCKER_REGISTRY }}
+        login-server: ${{ env.DOCKER_REGISTRY }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
@@ -96,7 +96,7 @@ jobs:
     - name: ACR Login
       uses: Azure/docker-login@v1
       with:
-        login-server: ${{ DOCKER_REGISTRY }}
+        login-server: ${{ env.DOCKER_REGISTRY }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
