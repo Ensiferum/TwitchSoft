@@ -6,6 +6,8 @@ using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.Shared.Logging;
 using TwitchSoft.Shared;
+using Microsoft.Extensions.Logging;
+using Coravel.Scheduling.Schedule.Interfaces;
 
 namespace TwitchSoft.Maintenance
 {
@@ -35,7 +37,7 @@ namespace TwitchSoft.Maintenance
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
                     .Cron("00 7,13,19 * * *");
-            });
+            }).LogScheduledTaskProgress(host.Services.GetService<ILogger<IScheduler>>());
 
             host.Run();
         }
