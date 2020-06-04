@@ -9,6 +9,9 @@ using Coravel.Scheduling.Schedule.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using static TelegramBotGrpc;
+using System;
+using static TwitchBotGrpc;
 
 namespace TwitchSoft.Maintenance
 {
@@ -40,7 +43,15 @@ namespace TwitchSoft.Maintenance
             services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
 
+            services.AddGrpcClient<TelegramBotGrpcClient>(options =>
+            {
+                options.Address = new Uri($"https://{Configuration.GetValue<string>("Services:TelegramBot")}:80");
+            });
 
+            services.AddGrpcClient<TwitchBotGrpcClient>(options =>
+            {
+                options.Address = new Uri($"https://{Configuration.GetValue<string>("Services:TwitchBot")}:80");
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

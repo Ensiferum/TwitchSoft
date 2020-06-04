@@ -1,5 +1,4 @@
 ﻿using Coravel.Invocable;
-using Grpc.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -11,24 +10,23 @@ namespace TwitchSoft.Maintenance.Jobs
     {
         private readonly ILogger<SentDailyMessageDigest> logger;
         private readonly string rootUserChatId;
-        private readonly string telegramBotHost;
+        private readonly TelegramBotGrpcClient telegramBotClient;
 
         public SentDailyMessageDigest(
             ILogger<SentDailyMessageDigest> logger,
-            IConfiguration config)
+            IConfiguration config, 
+            TelegramBotGrpcClient telegramBotClient)
         {
             rootUserChatId = config.GetValue<string>("JobConfigs:RootUserChatId");
-            telegramBotHost = config.GetValue<string>("Services:TelegramBot");
             this.logger = logger;
+            this.telegramBotClient = telegramBotClient;
         }
 
         public async Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(SentDailyMessageDigest)}");
 
-            Channel grpcChannel = new Channel(telegramBotHost, 80, ChannelCredentials.Insecure);
-            var client = new TelegramBotGrpcClient(grpcChannel);
-            await client.SentDayDigestAsync(new DigestInfoRequest
+            await telegramBotClient.SentDayDigestAsync(new DigestInfoRequest
             {
                 ChatId = rootUserChatId,
                 Username = "honeymad",

@@ -6,7 +6,6 @@ using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using User = TwitchSoft.Shared.Database.Models.User;
 using ChatMessageES = TwitchSoft.Shared.ElasticSearch.Models.ChatMessage;
-using System.Linq;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
