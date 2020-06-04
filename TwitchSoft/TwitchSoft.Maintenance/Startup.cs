@@ -47,12 +47,12 @@ namespace TwitchSoft.Maintenance
 
             services.AddGrpcClient<TelegramBotGrpcClient>(options =>
             {
-                options.Address = new Uri($"https://{Configuration.GetValue<string>("Services:TelegramBot")}:5000");
+                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TelegramBot")}");
             });
 
             services.AddGrpcClient<TwitchBotGrpcClient>(options =>
             {
-                options.Address = new Uri($"https://{Configuration.GetValue<string>("Services:TwitchBot")}:5000");
+                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBot")}");
             });
         }
 

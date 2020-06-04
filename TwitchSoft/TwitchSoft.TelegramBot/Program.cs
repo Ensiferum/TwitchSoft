@@ -2,7 +2,7 @@
 using TwitchSoft.Shared.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -18,13 +18,14 @@ namespace TwitchSoft.TelegramBot
                 .ConfigureLogger()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureKestrel(options =>
-                    {
-                        // Setup a HTTP/2 endpoint without TLS.
-                        options.ListenAnyIP(5000, o => o.Protocols =
-                            HttpProtocols.Http2);
-                    });
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureKestrel(kestrel =>
+                    {
+                        kestrel.ConfigureHttpsDefaults(https =>
+                        {
+                            https.ServerCertificate = new X509Certificate2();
+                        });
+                    });
                 });
     }
 }
