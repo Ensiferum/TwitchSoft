@@ -5,5 +5,6 @@
         public string BotName { get; set; }
         public string BotOAuthToken { get; set; }
         public string ClientId { get; set; }
+        public string AccessToken { get; set; }
     }
 }

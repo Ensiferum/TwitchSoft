@@ -15,7 +15,7 @@ namespace TwitchSoft.Shared.Services.TwitchApi
         public TwitchApiService(IOptions<BotSettings> options)
         {
             api = new TwitchAPI();
-            //api.Settings.AccessToken = options.Value.BotOAuthToken.Split(':')[1];
+            api.Settings.AccessToken = options.Value.AccessToken;
             api.Settings.ClientId = options.Value.ClientId;
         }
 
