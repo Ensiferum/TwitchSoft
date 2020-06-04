@@ -16,6 +16,7 @@ namespace TwitchSoft.Shared.Services.TwitchApi
         {
             api = new TwitchAPI();
             api.Settings.AccessToken = options.Value.BotOAuthToken.Split(':')[1];
+            api.Settings.ClientId = options.Value.ClientId;
         }
 
         public async Task<User> GetChannelByName(string channelName)
