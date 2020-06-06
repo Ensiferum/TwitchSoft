@@ -54,20 +54,14 @@ Usage:
             await scopeFactory.RunInScope(async (scope) =>
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-                var redisClient = scope.ServiceProvider.GetService<ConnectionMultiplexer>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
 
-                var db = redisClient.GetDatabase(2);
-
                 var chatIdentifier = chatId.Identifier.ToString();
-                var dateValue = db.StringGet(chatIdentifier);
-                var lastDateTime = dateValue.HasValue ? DateTime.Parse(dateValue) : DateTime.UtcNow.Date;
-                db.StringSet(chatIdentifier, DateTime.UtcNow.ToString());
 
                 var userIds = await repository.GetUserIds(userName);
 
                 var count = 50;
-                var messages = await esClient.GetMessages(userIds.First().Value, lastDateTime, count);
+                var messages = await esClient.GetMessages(userIds.First().Value, DateTime.UtcNow.AddHours(-12), count);
 
                 var replyMessages = messages.GenerateReplyMessages();
                 for (var i = 0; i < replyMessages.Count; i++)

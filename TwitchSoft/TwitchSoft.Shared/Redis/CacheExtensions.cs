@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 using TwitchSoft.Shared.Services.Helpers;
 
 namespace TwitchSoft.Shared.Redis
