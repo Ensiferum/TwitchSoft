@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.TelegramBot", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.ServiceBusProcessor", "TwitchSoft.ServiceBusProcessor\TwitchSoft.ServiceBusProcessor.csproj", "{F8174AD6-B711-4973-B2D0-1B0375EF65EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchSoft.Maintenance", "TwitchSoft.Maintenance\TwitchSoft.Maintenance.csproj", "{D4C80634-2373-4CF2-8545-E2E2F698712A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchSoft.Maintenance", "TwitchSoft.Maintenance\TwitchSoft.Maintenance.csproj", "{D4C80634-2373-4CF2-8545-E2E2F698712A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchSoft.TwitchBotOrchestrator", "TwitchSoft.TwitchBotOrchestrator\TwitchSoft.TwitchBotOrchestrator.csproj", "{F82FA05B-556A-4CD5-BBD1-BEABFE14247E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C80634-2373-4CF2-8545-E2E2F698712A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F82FA05B-556A-4CD5-BBD1-BEABFE14247E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F82FA05B-556A-4CD5-BBD1-BEABFE14247E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F82FA05B-556A-4CD5-BBD1-BEABFE14247E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F82FA05B-556A-4CD5-BBD1-BEABFE14247E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

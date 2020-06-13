@@ -48,6 +48,12 @@ services:
         aliases:
           - maintenance
 
+  twitchsoft.twitchbotorchestrator:
+    image: ${DOCKER_REGISTRY}twitchsofttwitchbotorchestrator:latest
+    build:
+      context: .
+      dockerfile: TwitchSoft.TwitchBotOrchestrator/Dockerfile
+
 networks: 
   twitchsoft: 
     external: true
