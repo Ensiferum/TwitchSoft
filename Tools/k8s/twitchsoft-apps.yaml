@@ -36,8 +36,6 @@ metadata:
 spec:
   ports:
   - port: 80
-  - port: 5000
-  - port: 5001
   selector:
     app: ts-telegrambot
 ---
@@ -46,7 +44,7 @@ kind: Deployment
 metadata:
   name: ts-twitchbot
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: ts-twitchbot
@@ -182,7 +180,5 @@ metadata:
 spec:
   ports:
   - port: 80
-  - port: 5000
-  - port: 5001
   selector:
     app: ts-twitchbotorchestrator

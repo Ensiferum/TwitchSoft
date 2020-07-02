@@ -118,7 +118,9 @@ namespace TwitchSoft.TwitchBot
 
             connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
 
-            connection.StartAsync();
+            connection.StartAsync().Wait();
+
+            logger.LogInformation("Connected to signalR", connection.ConnectionId);
         }
 
         private void InitTwitchBotClient()
