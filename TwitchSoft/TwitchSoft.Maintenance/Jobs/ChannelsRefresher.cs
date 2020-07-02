@@ -2,18 +2,18 @@
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using static TwitchBotOrchestrationGrpc;
+using static TwitchBotOrchestratorGrpc;
 
 namespace TwitchSoft.Maintenance.Jobs
 {
     public class ChannelsRefresher : IInvocable
     {
         private readonly ILogger<ChannelsRefresher> logger;
-        private readonly TwitchBotOrchestrationGrpcClient twitchBotClient;
+        private readonly TwitchBotOrchestratorGrpcClient twitchBotClient;
 
         public ChannelsRefresher(
             ILogger<ChannelsRefresher> logger,
-            TwitchBotOrchestrationGrpcClient twitchBotClient)
+            TwitchBotOrchestratorGrpcClient twitchBotClient)
         {
             this.logger = logger;
             this.twitchBotClient = twitchBotClient;

@@ -8,7 +8,7 @@
     <None Remove="appsettings.json" />
     <None Remove="nlog.config" />
     <None Remove="Protos\TelegramBot.proto" />
-    <None Remove="Protos\TwitchBotOrchestration.proto" />
+    <None Remove="Protos\TwitchBotOrchestrator.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,7 +59,7 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\TelegramBot.proto" />
-    <Protobuf Include="Protos\TwitchBotOrchestration.proto" />
+    <Protobuf Include="Protos\TwitchBotOrchestrator.proto" />
   </ItemGroup>
 
 </Project>

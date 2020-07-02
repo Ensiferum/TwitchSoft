@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using static TelegramBotGrpc;
 using System;
-using static TwitchBotOrchestrationGrpc;
+using static TwitchBotOrchestratorGrpc;
 
 namespace TwitchSoft.Maintenance
 {
@@ -48,9 +48,9 @@ namespace TwitchSoft.Maintenance
                 options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TelegramBot")}");
             });
 
-            services.AddGrpcClient<TwitchBotOrchestrationGrpcClient>(options =>
+            services.AddGrpcClient<TwitchBotOrchestratorGrpcClient>(options =>
             {
-                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBotOrchestration")}");
+                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBotOrchestrator")}");
             });
         }
 

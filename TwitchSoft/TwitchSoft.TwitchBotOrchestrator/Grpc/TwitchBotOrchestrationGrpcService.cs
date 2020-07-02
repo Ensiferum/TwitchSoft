@@ -5,11 +5,11 @@ using Grpc.Core;
 using Microsoft.AspNetCore.SignalR;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.TwitchBotOrchestrator.Hubs;
-using static TwitchBotOrchestrationGrpc;
+using static TwitchBotOrchestratorGrpc;
 
 namespace TwitchSoft.TwitchBotOrcherstration.Grpc
 {
-    public class TwitchBotOrchestrationGrpcService : TwitchBotOrchestrationGrpcBase
+    public class TwitchBotOrchestrationGrpcService : TwitchBotOrchestratorGrpcBase
     {
         private readonly IHubContext<OrchestrationHub> hub;
         private readonly IRepository repository;

@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 import "google/protobuf/empty.proto";
 
-service TwitchBotOrchestrationGrpc {
+service TwitchBotOrchestratorGrpc {
   rpc JoinChannel (JoinChannelRequest) returns (google.protobuf.Empty);
   rpc RefreshChannels (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
