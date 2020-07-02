@@ -118,7 +118,13 @@ namespace TwitchSoft.TwitchBot
 
             connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
 
-            connection.StartAsync().Wait();
+            connection.StartAsync().ContinueWith(t => {
+                if (t.IsFaulted)
+                    logger.LogError(t.Exception.GetBaseException(), "Error during signalr hub connection");
+                else
+                    logger.LogInformation("Connected to Hub");
+
+            }).Wait(); ;
 
             logger.LogInformation("Connected to signalR", connection.ConnectionId);
         }
