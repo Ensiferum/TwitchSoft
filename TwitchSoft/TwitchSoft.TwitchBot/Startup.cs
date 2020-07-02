@@ -7,6 +7,7 @@ using TwitchSoft.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -35,6 +36,9 @@ namespace TwitchSoft.TwitchBot
             services.AddServiceBusProcessors(Configuration);
 
             services.AddCache(Configuration);
+
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
 
             services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
             services.AddTransient<IChatPlugin, RaffleParticipantBotChatPlugin>();
