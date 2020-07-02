@@ -17,6 +17,7 @@ using System.Linq;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Threading.Tasks;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -118,6 +119,10 @@ namespace TwitchSoft.TwitchBot
 
             connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
 
+            connection.Reconnected += Connection_Reconnected;
+
+            connection.Closed += Connection_Closed;
+
             connection.StartAsync().ContinueWith(t => {
                 if (t.IsFaulted)
                     logger.LogError(t.Exception.GetBaseException(), "Error hub connection");
@@ -125,6 +130,18 @@ namespace TwitchSoft.TwitchBot
                     logger.LogInformation("Connected to Hub");
 
             }).Wait();
+        }
+
+        private Task Connection_Closed(Exception arg)
+        {
+            logger.LogError(arg, "Hub Connection Closed");
+            return Task.CompletedTask;
+        }
+
+        private Task Connection_Reconnected(string arg)
+        {
+            logger.LogInformation("Hub Connection Reconnected", arg);
+            return Task.CompletedTask;
         }
 
         private void InitTwitchBotClient()
