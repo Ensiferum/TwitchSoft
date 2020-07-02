@@ -10,7 +10,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - telegrambot
+          - ts-telegrambot
 
 
   twitchsoft.twitchbot:
@@ -24,7 +24,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - twitchbot
+          - ts-twitchbot
 
   twitchsoft.servicebusprocessor:
     image: ${DOCKER_REGISTRY}twitchsoftservicebusprocessor:latest
@@ -35,7 +35,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - servicebusprocessor
+          - ts-servicebusprocessor
 
   twitchsoft.maintenance:
     image: ${DOCKER_REGISTRY}twitchsoftmaintenance:latest
@@ -46,7 +46,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - maintenance
+          - ts-maintenance
 
   twitchsoft.twitchbotorchestrator:
     image: ${DOCKER_REGISTRY}twitchsofttwitchbotorchestrator:latest
@@ -57,7 +57,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - twitchbotorchestrator
+          - ts-twitchbotorchestrator
 
 networks: 
   twitchsoft: 
