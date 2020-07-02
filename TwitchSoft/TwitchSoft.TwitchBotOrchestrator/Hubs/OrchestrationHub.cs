@@ -68,7 +68,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
             var botsCount = ConnectionChannelList.Count;
             var channelGroups = Split(channels.Select(_ => _.Username), botsCount);
 
-            logger.LogInformation("Hub Clients connected", botsCount);
+            logger.LogInformation($"Hub Clients connected: {botsCount}");
 
             for (int i = 0; i < botsCount; i++)
             {
@@ -77,7 +77,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
                 var channelsToJoin = channelGroups.ElementAt(i);
                 botConnectionInfo.Value.AddRange(channelsToJoin);
 
-                logger.LogInformation("Client channels", botConnectionInfo.Key, botConnectionInfo.Value);
+                logger.LogInformation($"Client channels. Client: {botConnectionInfo.Key}. Channels: {string.Join(", ", botConnectionInfo.Value)}");
 
                 await Clients.Client(botConnectionInfo.Key).SendAsync(JoinChannelsCommand, channelsToJoin);
             }

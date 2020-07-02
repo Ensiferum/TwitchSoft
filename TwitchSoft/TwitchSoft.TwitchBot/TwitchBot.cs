@@ -407,6 +407,7 @@ namespace TwitchSoft.TwitchBot
 
         public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
+            logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
             var joinedChannels = twitchClient.JoinedChannels;
 
             foreach (var channel in joinedChannels)

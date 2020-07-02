@@ -37,9 +37,6 @@ namespace TwitchSoft.TwitchBot
 
             services.AddCache(Configuration);
 
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
-
             services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
             services.AddTransient<IChatPlugin, RaffleParticipantBotChatPlugin>();
         }
