@@ -13,7 +13,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
     public class OrchestrationHub: Hub
     {
         private static ConcurrentDictionary<string, List<string>> ConnectionChannelList = new ConcurrentDictionary<string, List<string>>();
-        private static DebounceDispatcher DebounceDispatcher = new DebounceDispatcher(10000);
+        private static Th DebounceDispatcher = new DebounceDispatcher(10000);
 
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
@@ -87,16 +87,16 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
         public override async Task OnConnectedAsync()
         {
             logger.LogInformation("Hub client connected", Context.ConnectionId);
-            await DebounceDispatcher.DebounceAsync(TriggerReconnect);
             ConnectionChannelList.TryAdd(Context.ConnectionId, new List<string>());
+            await DebounceDispatcher.DebounceAsync(TriggerReconnect);
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             logger.LogInformation("Hub client disconnected", Context.ConnectionId);
-            await DebounceDispatcher.DebounceAsync(TriggerReconnect);
             ConnectionChannelList.TryRemove(Context.ConnectionId, out _);
+            await DebounceDispatcher.DebounceAsync(TriggerReconnect);
             await base.OnDisconnectedAsync(exception);
         }
     }
