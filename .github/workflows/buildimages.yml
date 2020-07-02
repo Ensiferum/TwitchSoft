@@ -107,8 +107,8 @@ jobs:
     - name: Push image
       run: |
         docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:latest
-  build-twitchbotorchestration:
-    name: TwitchBotOrchestration service build
+  build-twitchbotorchestrator:
+    name: TwitchBotOrchestrator service build
     env: 
       DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
@@ -128,8 +128,8 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TwitchBotOrchestration/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestration:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TwitchBotOrchestrator/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:latest TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestration:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:latest
         
