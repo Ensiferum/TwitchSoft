@@ -11,7 +11,7 @@ using TwitchSoft.Shared.Services.Extensions;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.TwitchApi;
 using User = TwitchSoft.Shared.Database.Models.User;
-using static TwitchBotGrpc;
+using static TwitchBotOrchestrationGrpc;
 using System;
 using System.Linq;
 using TwitchSoft.Shared.Services.Helpers;
@@ -200,8 +200,8 @@ Usage:
                 else
                 {
 
-                    Channel grpcChannel = new Channel("twitchbot", 80, ChannelCredentials.Insecure);
-                    var client = new TwitchBotGrpcClient(grpcChannel);
+                    Channel grpcChannel = new Channel("twitchbotorchestration", 80, ChannelCredentials.Insecure);
+                    var client = new TwitchBotOrchestrationGrpcClient(grpcChannel);
                     await client.JoinChannelAsync(new JoinChannelRequest { Channelname = channelName });
 
                     await telegramBotClient.SendTextMessageAsync(

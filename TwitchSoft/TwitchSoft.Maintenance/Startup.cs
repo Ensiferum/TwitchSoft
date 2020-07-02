@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using static TelegramBotGrpc;
 using System;
-using static TwitchBotGrpc;
+using static TwitchBotOrchestrationGrpc;
 
 namespace TwitchSoft.Maintenance
 {
@@ -36,10 +36,8 @@ namespace TwitchSoft.Maintenance
 
             services.AddScheduler();
 
-            //services.AddTransient<OldMessagesCleaner>();
             services.AddTransient<HoneymadFollowsJoin>();
             services.AddTransient<EnsthorFollowsJoin>();
-            //services.AddTransient<TopChannelsJoin>();
             services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
 
@@ -50,9 +48,9 @@ namespace TwitchSoft.Maintenance
                 options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TelegramBot")}");
             });
 
-            services.AddGrpcClient<TwitchBotGrpcClient>(options =>
+            services.AddGrpcClient<TwitchBotOrchestrationGrpcClient>(options =>
             {
-                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBot")}");
+                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBotOrchestration")}");
             });
         }
 
@@ -60,10 +58,6 @@ namespace TwitchSoft.Maintenance
         {
             app.ApplicationServices.UseScheduler(scheduler =>
             {
-                //scheduler
-                //    .Schedule<OldMessagesCleaner>()
-                //    .Hourly();
-
                 scheduler
                     .Schedule<HoneymadFollowsJoin>()
                     .EveryFifteenMinutes();

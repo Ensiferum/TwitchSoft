@@ -63,9 +63,9 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: 1Gi
+            memory: 200Mi
           requests:
-            memory: 512Mi
+            memory: 150Mi
         envFrom:
           - secretRef:
               name: ts-secret
@@ -79,8 +79,6 @@ metadata:
 spec:
   ports:
   - port: 80
-  - port: 5000
-  - port: 5001
   selector:
     app: ts-twitchbot
 ---
@@ -145,3 +143,46 @@ spec:
               name: ts-secret
           - configMapRef:
               name: log-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-twitchbotorchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-twitchbotorchestrator
+  template:
+    metadata:
+      labels:
+        app: ts-twitchbotorchestrator
+    spec:
+      nodeSelector: 
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: ts-twitchbotorchestrator
+        image: twitchsoft.azurecr.io/twitchsofttwitchbotorchestrator:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            memory: 150Mi
+        envFrom:
+          - secretRef:
+              name: ts-secret
+          - configMapRef:
+              name: log-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-twitchbotorchestrator
+spec:
+  ports:
+  - port: 80
+  - port: 5000
+  - port: 5001
+  selector:
+    app: ts-twitchbotorchestrator

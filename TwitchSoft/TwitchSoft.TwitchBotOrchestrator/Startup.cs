@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TwitchSoft.Shared;
+using TwitchSoft.TwitchBotOrcherstration.Grpc;
 using TwitchSoft.TwitchBotOrchestrator.Hubs;
 
 namespace TwitchSoft.TwitchBotOrchestrator
@@ -13,6 +14,8 @@ namespace TwitchSoft.TwitchBotOrchestrator
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddGrpc();
+
             services.ConfigureShared();
 
             services.AddSignalR();
@@ -31,6 +34,7 @@ namespace TwitchSoft.TwitchBotOrchestrator
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<OrchestrationHub>("/orchestration");
+                endpoints.MapGrpcService<TwitchBotOrchestrationGrpcService>();
             });
         }
     }

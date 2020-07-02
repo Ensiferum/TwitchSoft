@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.Services.TwitchApi;
-using TwitchSoft.TwitchBot.Grpc;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using TwitchSoft.Shared.Redis;
 using TwitchSoft.Shared;
@@ -22,8 +21,6 @@ namespace TwitchSoft.TwitchBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc();
-
             services.ConfigureShared();
 
             services.AddScoped<ITwitchApiService, TwitchApiService>();
@@ -46,11 +43,6 @@ namespace TwitchSoft.TwitchBot
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGrpcService<TwitchBotGrpcService>();
-            });
         }
     }
 }
