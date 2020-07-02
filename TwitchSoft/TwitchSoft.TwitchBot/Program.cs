@@ -2,7 +2,6 @@
 using TwitchSoft.Shared.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Security.Cryptography.X509Certificates;
 
 namespace TwitchSoft.TwitchBot

@@ -18,14 +18,17 @@ using TwitchSoft.TwitchBot.ChatPlugins;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TwitchSoft.TwitchBot
 {
     public class TwitchBot
     {
         private readonly ILogger<TwitchBot> logger;
-        private readonly ISendEndpointProvider bus;
+        private readonly IServiceProvider serviceProvider;
         private readonly IEnumerable<IChatPlugin> chatPlugins;
+
+        private ISendEndpointProvider Bus => serviceProvider.GetService<ISendEndpointProvider>();
 
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
@@ -40,11 +43,11 @@ namespace TwitchSoft.TwitchBot
         public TwitchBot(
             ILogger<TwitchBot> logger, 
             IOptions<BotSettings> options,
-            ISendEndpointProvider bus,
+            IServiceProvider serviceProvider,
             IEnumerable<IChatPlugin> chatPlugins)
         {
             this.logger = logger;
-            this.bus = bus;
+            this.serviceProvider = serviceProvider;
             this.chatPlugins = chatPlugins;
             BotSettings = options.Value;
         }
@@ -114,6 +117,8 @@ namespace TwitchSoft.TwitchBot
         {
             connection = new HubConnectionBuilder()
                 .WithUrl("https://ts-twitchbotorchestrator/orchestration")
+                .ConfigureLogging(_ => _.SetMinimumLevel(LogLevel.Trace))
+                .AddJsonProtocol()
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -130,6 +135,8 @@ namespace TwitchSoft.TwitchBot
                     logger.LogInformation("Connected to Hub");
 
             }).Wait();
+
+            logger.LogInformation($"HubInfo: {connection.ConnectionId}, {connection.State}");
         }
 
         private Task Connection_Closed(Exception arg)
@@ -258,7 +265,7 @@ namespace TwitchSoft.TwitchBot
                 PostedTime = DateTime.UtcNow,
                 UserType = Enum.Parse<UserType>(e.ChatMessage.UserType.ToString())
             };
-            await bus.Send(chatMessage);
+            await Bus.Send(chatMessage);
 
             foreach (var plugin in chatPlugins)
             {
@@ -284,7 +291,7 @@ namespace TwitchSoft.TwitchBot
                 UserType = Enum.Parse<UserType>(subInfo.UserType.ToString())
             };
 
-            await bus.Send(newSub);
+            await Bus.Send(newSub);
         }
 
 
@@ -306,7 +313,7 @@ namespace TwitchSoft.TwitchBot
                 UserType = Enum.Parse<UserType>(subInfo.UserType.ToString())
             };
 
-            await bus.Send(newSub);
+            await Bus.Send(newSub);
         }
 
         private async void Client_OnGiftedSubscription(object sender, OnGiftedSubscriptionArgs e)
@@ -331,7 +338,7 @@ namespace TwitchSoft.TwitchBot
                 }
             };
 
-            await bus.Send(newSub);
+            await Bus.Send(newSub);
         }
 
         private async void Client_OnCommunitySubscription(object sender, OnCommunitySubscriptionArgs e)
@@ -351,7 +358,7 @@ namespace TwitchSoft.TwitchBot
                 GiftCount = comSubInfo.MsgParamMassGiftCount,
             };
 
-            await bus.Send(newSub);
+            await Bus.Send(newSub);
         }
 
         private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
@@ -370,7 +377,7 @@ namespace TwitchSoft.TwitchBot
                 },
             };
 
-            await bus.Send(newBan);
+            await Bus.Send(newBan);
         }
 
 
@@ -391,7 +398,7 @@ namespace TwitchSoft.TwitchBot
                 },
             };
 
-            await bus.Send(newBan);
+            await Bus.Send(newBan);
         }
 
         public void RefreshJoinedChannels(IEnumerable<string> channels)

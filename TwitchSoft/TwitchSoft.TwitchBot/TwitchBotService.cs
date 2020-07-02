@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,7 +12,9 @@ namespace TwitchSoft.TwitchBot
         private readonly TwitchBot twitchBot;
 
         private ILogger<TwitchBotService> Logger { get; }
-        public TwitchBotService(ILogger<TwitchBotService> logger, TwitchBot twitchBot)
+        public TwitchBotService(
+            ILogger<TwitchBotService> logger,
+            TwitchBot twitchBot)
         {
             this.Logger = logger;
             this.twitchBot = twitchBot;

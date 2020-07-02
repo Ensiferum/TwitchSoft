@@ -53,6 +53,11 @@ services:
     build:
       context: .
       dockerfile: TwitchSoft.TwitchBotOrchestrator/Dockerfile
+    restart: unless-stopped
+    networks: 
+      twitchsoft:
+        aliases:
+          - twitchbotorchestrator
 
 networks: 
   twitchsoft: 

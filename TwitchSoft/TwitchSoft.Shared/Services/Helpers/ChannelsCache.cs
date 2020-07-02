@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 
@@ -14,11 +16,11 @@ namespace TwitchSoft.Shared.Services.Helpers
         public ChannelsCache(
             ILogger<ChannelsCache> logger,
             IMemoryCache memoryCache,
-            IRepository repository)
+            IServiceProvider serviceProvider)
         {
             this.logger = logger;
             this.memoryCache = memoryCache;
-            this.repository = repository;
+            this.repository = serviceProvider.GetService<IRepository>();
         }
 
         public async Task<string> GetChannelNameById(uint channelId)
