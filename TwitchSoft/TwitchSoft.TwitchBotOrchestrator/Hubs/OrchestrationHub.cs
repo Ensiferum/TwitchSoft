@@ -13,7 +13,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
     public class OrchestrationHub: Hub
     {
         private static ConcurrentDictionary<string, List<string>> ConnectionChannelList = new ConcurrentDictionary<string, List<string>>();
-        private static Th DebounceDispatcher = new DebounceDispatcher(10000);
+        private static DebounceDispatcher DebounceDispatcher = new DebounceDispatcher(10000);
 
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
