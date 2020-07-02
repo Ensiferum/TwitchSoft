@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Threading;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -14,11 +13,10 @@ using TwitchSoft.Shared.Services.Helpers;
 using User = TwitchSoft.Shared.ServiceBus.Models.User;
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.Shared.ServiceBus.Models;
-using System.Threading.Tasks;
 using System.Linq;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using System.Collections.Generic;
-using TwitchSoft.Shared.Services.Repository.Interfaces;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -26,26 +24,26 @@ namespace TwitchSoft.TwitchBot
     {
         private readonly ILogger<TwitchBot> logger;
         private readonly ISendEndpointProvider bus;
-        private readonly IRepository repository;
         private readonly IEnumerable<IChatPlugin> chatPlugins;
 
+        private const string JoinChannelsCommand = "JoinChannelsCommand";
+
         private BotSettings BotSettings { get; set; }
-        private static int LogMessagesCount { get; set; } = 0;
-        private static int LowMessagesCount { get; set; } = 0;
+        //private static int LogMessagesCount { get; set; } = 0;
+        //private static int LowMessagesCount { get; set; } = 0;
 
         private TwitchClient twitchClient;
-        private Timer timer;
+        private HubConnection connection;
+        //private Timer timer;
 
         public TwitchBot(
             ILogger<TwitchBot> logger, 
             IOptions<BotSettings> options,
             ISendEndpointProvider bus,
-            IRepository repository,
             IEnumerable<IChatPlugin> chatPlugins)
         {
             this.logger = logger;
             this.bus = bus;
-            this.repository = repository;
             this.chatPlugins = chatPlugins;
             BotSettings = options.Value;
         }
@@ -74,7 +72,7 @@ namespace TwitchSoft.TwitchBot
             {
                 InitTwitchBotClient();
                 twitchClient.Connect();
-
+                InitSignalRClient();
             }
             catch (Exception ex)
             {
@@ -82,33 +80,45 @@ namespace TwitchSoft.TwitchBot
             }
         }
 
-        private void CheckConnection(object state)
-        {
-            logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-            logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
-            if (LogMessagesCount < 5)
-            {
-                LowMessagesCount++;
-                if (LowMessagesCount >= 3)
-                {
-                    logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
-                    try
-                    {
-                        twitchClient.Disconnect();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "Failed to disconnect");
-                    }
+        //private void CheckConnection(object state)
+        //{
+        //    logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
+        //    logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
+        //    if (LogMessagesCount < 5)
+        //    {
+        //        LowMessagesCount++;
+        //        if (LowMessagesCount >= 3)
+        //        {
+        //            logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+        //            try
+        //            {
+        //                twitchClient.Disconnect();
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                logger.LogError(e, "Failed to disconnect");
+        //            }
 
-                    Connect();
-                }
-            }
-            else
-            {
-                LowMessagesCount = 0;
-            }
-            LogMessagesCount = 0;
+        //            Connect();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        LowMessagesCount = 0;
+        //    }
+        //    LogMessagesCount = 0;
+        //}
+
+        private void InitSignalRClient()
+        {
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://twitchbotorchestration/orchestration")
+                .WithAutomaticReconnect()
+                .Build();
+
+            connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
+
+            connection.StartAsync();
         }
 
         private void InitTwitchBotClient()
@@ -133,7 +143,7 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnConnectionError += Client_OnConnectionError;
             twitchClient.OnError += Client_OnError;
             twitchClient.OnReconnected += Client_OnReconnected;
-            twitchClient.OnLog += Client_OnLog;
+            //twitchClient.OnLog += Client_OnLog;
 
             twitchClient.OnNewSubscriber += Client_OnNewSubscriber;
             twitchClient.OnReSubscriber += Client_OnReSubscriber;
@@ -154,16 +164,16 @@ namespace TwitchSoft.TwitchBot
             logger.LogTrace($"OnJoinedChannel: {e.Channel}");
         }
 
-        private void Client_OnLog(object sender, OnLogArgs e)
-        {
-            Action<string> action = (string data) => logger.LogTrace(data);
-            if (LowMessagesCount >= 1)
-            {
-                action = (string data) => logger.LogWarning(data);
-            }
-            action($"OnLog: {e.Data}");
-            LogMessagesCount++;
-        }
+        //private void Client_OnLog(object sender, OnLogArgs e)
+        //{
+        //    Action<string> action = (string data) => logger.LogTrace(data);
+        //    if (LowMessagesCount >= 1)
+        //    {
+        //        action = (string data) => logger.LogWarning(data);
+        //    }
+        //    action($"OnLog: {e.Data}");
+        //    LogMessagesCount++;
+        //}
 
         private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
         {
@@ -195,16 +205,16 @@ namespace TwitchSoft.TwitchBot
             logger.LogInformation($"Bot is disconnected");
         }
 
-        private async void Client_OnConnected(object sender, OnConnectedArgs e)
+        private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
 
-            var channels = await repository.GetChannelsToTrack();
+            //var channels = await repository.GetChannelsToTrack();
 
-            foreach (var channel in channels)
-            {
-                twitchClient.JoinChannel(channel.Username);
-            }
+            //foreach (var channel in channels)
+            //{
+            //    twitchClient.JoinChannel(channel.Username);
+            //}
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -361,32 +371,31 @@ namespace TwitchSoft.TwitchBot
             await bus.Send(newBan);
         }
 
-        public async Task RefreshJoinedChannels()
+        public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
-            var channels = await repository.GetChannelsToTrack();
             var joinedChannels = twitchClient.JoinedChannels;
 
-            foreach (var chan in joinedChannels)
+            foreach (var channel in joinedChannels)
             {
-                if(channels.Any(_ => _.Username.Equals(chan.Channel, StringComparison.OrdinalIgnoreCase)))
+                if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
                 else
                 {
-                    twitchClient.LeaveChannel(chan.Channel);
+                    twitchClient.LeaveChannel(channel.Channel);
                 }
             }
 
-            foreach (var chan in channels)
+            foreach (var channel in channels)
             {
-                if (joinedChannels.Any(_ => _.Channel.Equals(chan.Username, StringComparison.OrdinalIgnoreCase)))
+                if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
                 else
                 {
-                    twitchClient.JoinChannel(chan.Username);
+                    twitchClient.JoinChannel(channel);
                 }
             }
         }
