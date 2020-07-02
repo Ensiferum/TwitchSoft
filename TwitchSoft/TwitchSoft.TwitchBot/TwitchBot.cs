@@ -27,6 +27,7 @@ namespace TwitchSoft.TwitchBot
         private readonly ILogger<TwitchBot> logger;
         private readonly IServiceProvider serviceProvider;
         private readonly IEnumerable<IChatPlugin> chatPlugins;
+        private readonly List<string> JoinedChannels = new List<string>();
 
         private ISendEndpointProvider Bus => serviceProvider.GetService<ISendEndpointProvider>();
 
@@ -217,6 +218,10 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected");
+            foreach (var channel in JoinedChannels)
+            {
+                twitchClient.JoinChannel(channel);
+            }
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -408,6 +413,8 @@ namespace TwitchSoft.TwitchBot
         public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
             logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
+            JoinedChannels.Clear();
+            JoinedChannels.AddRange(channels);
             var joinedChannels = twitchClient.JoinedChannels;
 
             foreach (var channel in joinedChannels)
