@@ -200,7 +200,7 @@ Usage:
                 else
                 {
 
-                    Channel grpcChannel = new Channel("twitchbotorchestration", 80, ChannelCredentials.Insecure);
+                    Channel grpcChannel = new Channel("ts-twitchbotorchestrator", 80, ChannelCredentials.Insecure);
                     var client = new TwitchBotOrchestrationGrpcClient(grpcChannel);
                     await client.JoinChannelAsync(new JoinChannelRequest { Channelname = channelName });
 
