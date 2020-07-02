@@ -62,7 +62,7 @@ namespace TwitchSoft.TwitchBot
         {
             //timer.Dispose();
             twitchClient.Disconnect();
-            await connection.StopAsync()
+            await connection.StopAsync();
         }
 
         public void JoinChannel(string channel)
