@@ -15,6 +15,8 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
         private static ConcurrentDictionary<string, List<string>> ConnectionChannelList = new ConcurrentDictionary<string, List<string>>();
         private static DebounceDispatcher DebounceDispatcher = new DebounceDispatcher(10000);
 
+        private const string JoinChannelsCommand = "JoinChannelsCommand";
+
         private readonly IRepository repository;
         private readonly ILogger<OrchestrationHub> logger;
 
@@ -31,6 +33,32 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
             for (var i = 0; i < (float)(array.Count() / size); i++)
             {
                 yield return array.Skip(i * size).Take(size);
+            }
+        }
+
+        public static async Task AddChannel(IHubClients clients, string channelname)
+        {
+            if (ConnectionChannelList.Any())
+            {
+                if (!ConnectionChannelList.Values.SelectMany(_ => _).Contains(channelname, StringComparer.OrdinalIgnoreCase))
+                {
+                    var clientToConnect = ConnectionChannelList.OrderByDescending(_ => _.Value.Count).First();
+                    clientToConnect.Value.Add(channelname);
+                    await clients.Client(clientToConnect.Key).SendAsync(JoinChannelsCommand, clientToConnect.Value);
+                }
+            }
+        }
+
+        public static async Task TriggerReconnect(IHubClients clients, IEnumerable<string> channels)
+        {
+            var alreadyConnectedChannels = ConnectionChannelList.Values.SelectMany(_ => _);
+            var array1Diff = alreadyConnectedChannels.Except(channels);
+            var array2Diff = channels.Except(alreadyConnectedChannels);
+            var notConnectedChannels = array1Diff.Intersect(array2Diff);
+
+            foreach (var channel in notConnectedChannels)
+            {
+                await AddChannel(clients, channel);
             }
         }
 
@@ -51,7 +79,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
 
                 logger.LogInformation("Client channels", botConnectionInfo.Key, botConnectionInfo.Value);
 
-                await Clients.Clients(botConnectionInfo.Key).SendAsync("joinchannels", channelsToJoin);
+                await Clients.Client(botConnectionInfo.Key).SendAsync(JoinChannelsCommand, channelsToJoin);
             }
         }
 

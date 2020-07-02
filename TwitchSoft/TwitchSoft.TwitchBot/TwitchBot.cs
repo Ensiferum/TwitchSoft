@@ -48,18 +48,17 @@ namespace TwitchSoft.TwitchBot
             this.repository = repository;
             this.chatPlugins = chatPlugins;
             BotSettings = options.Value;
-
         }
 
         public void Start()
         {
-            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+            //timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
             Connect();
         }
 
         public void Stop()
         {
-            timer.Dispose();
+            //timer.Dispose();
             twitchClient.Disconnect();
         }
 

@@ -39,7 +39,7 @@ namespace TwitchSoft.Maintenance
             services.AddTransient<HoneymadFollowsJoin>();
             services.AddTransient<EnsthorFollowsJoin>();
             services.AddTransient<SentDailyMessageDigest>();
-            services.AddTransient<ChannelsRefresher>();
+            //services.AddTransient<ChannelsRefresher>();
 
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
@@ -66,9 +66,9 @@ namespace TwitchSoft.Maintenance
                     .Schedule<EnsthorFollowsJoin>()
                     .EveryFifteenMinutes();
 
-                scheduler
-                    .Schedule<ChannelsRefresher>()
-                    .EveryFifteenMinutes();
+                //scheduler
+                //    .Schedule<ChannelsRefresher>()
+                //    .EveryFifteenMinutes();
 
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
