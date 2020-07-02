@@ -57,7 +57,7 @@ services:
     networks: 
       twitchsoft:
         aliases:
-          - twitchbotorchestrator
+          - maintenance
 
 networks: 
   twitchsoft: 

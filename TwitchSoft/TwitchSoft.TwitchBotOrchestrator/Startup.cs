@@ -18,7 +18,10 @@ namespace TwitchSoft.TwitchBotOrchestrator
 
             services.ConfigureShared();
 
-            services.AddSignalR();
+            services.AddSignalR(hubOptions =>
+            {
+                hubOptions.EnableDetailedErrors = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

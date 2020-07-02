@@ -118,8 +118,10 @@ namespace TwitchSoft.TwitchBot
         {
             connection = new HubConnectionBuilder()
                 .WithUrl("https://ts-twitchbotorchestrator/orchestration")
-                .ConfigureLogging(_ => _.SetMinimumLevel(LogLevel.Trace))
-                .AddJsonProtocol()
+                .ConfigureLogging(_ => {
+                    _.SetMinimumLevel(LogLevel.Trace);
+                    _.AddConsole();
+                })
                 .WithAutomaticReconnect()
                 .Build();
 
