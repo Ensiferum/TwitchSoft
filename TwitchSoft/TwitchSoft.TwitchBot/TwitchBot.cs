@@ -112,7 +112,7 @@ namespace TwitchSoft.TwitchBot
         private void InitSignalRClient()
         {
             connection = new HubConnectionBuilder()
-                .WithUrl("http://twitchbotorchestration/orchestration")
+                .WithUrl("http://twitchbotorchestrator/orchestration")
                 .WithAutomaticReconnect()
                 .Build();
 
