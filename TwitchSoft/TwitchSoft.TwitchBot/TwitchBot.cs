@@ -52,16 +52,17 @@ namespace TwitchSoft.TwitchBot
             BotSettings = options.Value;
         }
 
-        public void Start()
+        public Task Start()
         {
             //timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
-            Connect();
+            return Connect();
         }
 
-        public void Stop()
+        public async Task Stop()
         {
             //timer.Dispose();
             twitchClient.Disconnect();
+            await connection.StopAsync()
         }
 
         public void JoinChannel(string channel)
@@ -70,13 +71,13 @@ namespace TwitchSoft.TwitchBot
             twitchClient.JoinChannel(channel);
         }
 
-        private void Connect()
+        private async Task Connect()
         {
             try
             {
                 InitTwitchBotClient();
                 twitchClient.Connect();
-                InitSignalRClient();
+                await InitSignalRClient();
             }
             catch (Exception ex)
             {
@@ -113,7 +114,7 @@ namespace TwitchSoft.TwitchBot
         //    LogMessagesCount = 0;
         //}
 
-        private void InitSignalRClient()
+        private async Task InitSignalRClient()
         {
             connection = new HubConnectionBuilder()
                 .WithUrl("https://ts-twitchbotorchestrator/orchestration")
@@ -128,13 +129,14 @@ namespace TwitchSoft.TwitchBot
 
             connection.Closed += Connection_Closed;
 
-            connection.StartAsync().ContinueWith(t => {
-                if (t.IsFaulted)
-                    logger.LogError(t.Exception.GetBaseException(), "Error hub connection");
-                else
-                    logger.LogInformation("Connected to Hub");
-
-            }).Wait();
+            try
+            {
+                await connection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occured");
+            }
 
             logger.LogInformation($"HubInfo: {connection.ConnectionId}, {connection.State}");
         }
