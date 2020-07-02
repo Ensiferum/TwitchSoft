@@ -30,10 +30,11 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
 
         public static IEnumerable<IEnumerable<T>> Split<T>(IEnumerable<T> array, int size)
         {
-            for (var i = 0; i < (float)(array.Count() / size); i++)
-            {
-                yield return array.Skip(i * size).Take(size);
-            }
+            int i = 0;
+            var splits = from item in array
+                         group item by i++ % size into part
+                         select part.AsEnumerable();
+            return splits;
         }
 
         public static async Task AddChannel(IHubClients clients, string channelname)

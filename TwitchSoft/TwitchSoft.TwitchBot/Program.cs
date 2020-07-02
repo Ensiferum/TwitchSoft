@@ -2,7 +2,6 @@
 using TwitchSoft.Shared.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
-using System.Security.Cryptography.X509Certificates;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -19,13 +18,6 @@ namespace TwitchSoft.TwitchBot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.ConfigureKestrel(kestrel =>
-                    {
-                        kestrel.ConfigureHttpsDefaults(https =>
-                        {
-                            https.ServerCertificate = new X509Certificate2();
-                        });
-                    });
                 });
     }
 }
