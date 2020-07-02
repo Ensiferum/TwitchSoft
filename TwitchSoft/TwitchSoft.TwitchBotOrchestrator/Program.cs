@@ -20,13 +20,13 @@ namespace TwitchSoft.TwitchBotOrchestrator
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.ConfigureKestrel(kestrel =>
-                    {
-                        kestrel.ConfigureHttpsDefaults(https =>
-                        {
-                            https.ServerCertificate = new X509Certificate2();
-                        });
-                    });
+                    //webBuilder.ConfigureKestrel(kestrel =>
+                    //{
+                    //    kestrel.ConfigureHttpsDefaults(https =>
+                    //    {
+                    //        https.ServerCertificate = new X509Certificate2();
+                    //    });
+                    //});
                 });
     }
 }
