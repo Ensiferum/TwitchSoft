@@ -120,13 +120,11 @@ namespace TwitchSoft.TwitchBot
 
             connection.StartAsync().ContinueWith(t => {
                 if (t.IsFaulted)
-                    logger.LogError(t.Exception.GetBaseException(), "Error during signalr hub connection");
+                    logger.LogError(t.Exception.GetBaseException(), "Error hub connection");
                 else
                     logger.LogInformation("Connected to Hub");
 
-            }).Wait(); ;
-
-            logger.LogInformation("Connected to signalR", connection.ConnectionId);
+            }).Wait();
         }
 
         private void InitTwitchBotClient()
