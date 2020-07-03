@@ -178,7 +178,7 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnConnectionError += Client_OnConnectionError;
             twitchClient.OnError += Client_OnError;
             twitchClient.OnReconnected += Client_OnReconnected;
-            //twitchClient.OnLog += Client_OnLog;
+            twitchClient.OnLog += Client_OnLog;
 
             twitchClient.OnNewSubscriber += Client_OnNewSubscriber;
             twitchClient.OnReSubscriber += Client_OnReSubscriber;
@@ -199,16 +199,17 @@ namespace TwitchSoft.TwitchBot
             logger.LogTrace($"OnJoinedChannel: {e.Channel}");
         }
 
-        //private void Client_OnLog(object sender, OnLogArgs e)
-        //{
-        //    Action<string> action = (string data) => logger.LogTrace(data);
-        //    if (LowMessagesCount >= 1)
-        //    {
-        //        action = (string data) => logger.LogWarning(data);
-        //    }
-        //    action($"OnLog: {e.Data}");
-        //    LogMessagesCount++;
-        //}
+        private void Client_OnLog(object sender, OnLogArgs e)
+        {
+            logger.LogTrace($"OnLog: {e.Data}");
+            //Action<string> action = (string data) => logger.LogTrace(data);
+            //if (LowMessagesCount >= 1)
+            //{
+            //    action = (string data) => logger.LogWarning(data);
+            //}
+            //action($"OnLog: {e.Data}");
+            //LogMessagesCount++;
+        }
 
         private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
         {
@@ -217,7 +218,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
-            logger.LogWarning("OnReconnected");
+            logger.LogWarning("OnReconnected", e);
             foreach(var channel in twitchClient.JoinedChannels)
             {
                 twitchClient.LeaveChannel(channel);
@@ -246,7 +247,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
-            logger.LogInformation($"Bot is disconnected");
+            logger.LogInformation($"Bot is disconnected", e);
         }
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
