@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -34,12 +35,12 @@ namespace TwitchSoft.TwitchBot
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
         private BotSettings BotSettings { get; set; }
-        //private static int LogMessagesCount { get; set; } = 0;
-        //private static int LowMessagesCount { get; set; } = 0;
+        private static int LogMessagesCount { get; set; } = 0;
+        private static int LowMessagesCount { get; set; } = 0;
 
         private TwitchClient twitchClient;
         private HubConnection connection;
-        //private Timer timer;
+        private Timer timer;
 
         public TwitchBot(
             ILogger<TwitchBot> logger, 
@@ -55,13 +56,13 @@ namespace TwitchSoft.TwitchBot
 
         public Task Start()
         {
-            //timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
             return Connect();
         }
 
         public async Task Stop()
         {
-            //timer.Dispose();
+            timer.Dispose();
             twitchClient.Disconnect();
             await connection.StopAsync();
         }
@@ -86,43 +87,40 @@ namespace TwitchSoft.TwitchBot
             }
         }
 
-        //private void CheckConnection(object state)
-        //{
-        //    logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-        //    logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
-        //    if (LogMessagesCount < 5)
-        //    {
-        //        LowMessagesCount++;
-        //        if (LowMessagesCount >= 3)
-        //        {
-        //            logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
-        //            try
-        //            {
-        //                twitchClient.Disconnect();
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                logger.LogError(e, "Failed to disconnect");
-        //            }
+        private void CheckConnection(object state)
+        {
+            logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
+            logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
+            if (LogMessagesCount < 5)
+            {
+                LowMessagesCount++;
+                if (LowMessagesCount >= 3)
+                {
+                    logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+                    try
+                    {
+                        twitchClient.Disconnect();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Failed to disconnect");
+                    }
 
-        //            Connect();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        LowMessagesCount = 0;
-        //    }
-        //    LogMessagesCount = 0;
-        //}
+                    InitTwitchBotClient();
+                    twitchClient.Connect();
+                }
+            }
+            else
+            {
+                LowMessagesCount = 0;
+            }
+            LogMessagesCount = 0;
+        }
 
         private async Task InitSignalRClient()
         {
             connection = new HubConnectionBuilder()
                 .WithUrl("http://ts-twitchbotorchestrator/orchestration")
-                .ConfigureLogging(_ => {
-                    _.SetMinimumLevel(LogLevel.Trace);
-                    _.AddConsole();
-                })
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -201,14 +199,13 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLog(object sender, OnLogArgs e)
         {
-            logger.LogTrace($"OnLog: {e.Data}");
-            //Action<string> action = (string data) => logger.LogTrace(data);
-            //if (LowMessagesCount >= 1)
-            //{
-            //    action = (string data) => logger.LogWarning(data);
-            //}
-            //action($"OnLog: {e.Data}");
-            //LogMessagesCount++;
+            Action<string> action = (string data) => logger.LogTrace(data);
+            if (LowMessagesCount >= 1)
+            {
+                action = (string data) => logger.LogWarning(data);
+            }
+            action($"OnLog: {e.Data}");
+            LogMessagesCount++;
         }
 
         private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
