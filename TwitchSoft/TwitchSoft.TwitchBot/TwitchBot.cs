@@ -201,7 +201,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLog(object sender, OnLogArgs e)
         {
-            logger.LogInformation($"OnLog: {e.Data}");
+            logger.LogTrace($"OnLog: {e.Data}");
             //Action<string> action = (string data) => logger.LogTrace(data);
             //if (LowMessagesCount >= 1)
             //{
