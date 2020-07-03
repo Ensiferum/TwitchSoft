@@ -108,6 +108,10 @@ namespace TwitchSoft.TwitchBot
 
                     InitTwitchBotClient();
                     twitchClient.Connect();
+                    foreach (var channel in JoinedChannels)
+                    {
+                        twitchClient.JoinChannel(channel);
+                    }
                 }
             }
             else
@@ -216,11 +220,6 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected", e);
-            foreach(var channel in twitchClient.JoinedChannels)
-            {
-                twitchClient.LeaveChannel(channel);
-            }
-            
             foreach (var channel in JoinedChannels)
             {
                 JoinChannel(channel);

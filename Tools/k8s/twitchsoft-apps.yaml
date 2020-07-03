@@ -70,16 +70,6 @@ spec:
           - configMapRef:
               name: log-config
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: ts-twitchbot
-spec:
-  ports:
-  - port: 80
-  selector:
-    app: ts-twitchbot
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
