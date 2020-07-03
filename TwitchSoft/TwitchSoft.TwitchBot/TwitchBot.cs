@@ -108,10 +108,6 @@ namespace TwitchSoft.TwitchBot
 
                     InitTwitchBotClient();
                     twitchClient.Connect();
-                    foreach (var channel in JoinedChannels)
-                    {
-                        twitchClient.JoinChannel(channel);
-                    }
                 }
             }
             else
@@ -249,6 +245,11 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
+
+            foreach (var channel in JoinedChannels)
+            {
+                twitchClient.JoinChannel(channel);
+            }
 
             //var channels = await repository.GetChannelsToTrack();
 
