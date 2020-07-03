@@ -164,7 +164,7 @@ namespace TwitchSoft.TwitchBot
             };
             var customClient = new WebSocketClient(clientOptions);
             twitchClient = new TwitchClient(customClient);
-            twitchClient.Initialize(credentials, autoReListenOnExceptions: false);
+            twitchClient.Initialize(credentials, autoReListenOnExceptions: true);
 
             twitchClient.OnDisconnected += Client_OnDisconnected;
             twitchClient.OnConnected += Client_OnConnected;
