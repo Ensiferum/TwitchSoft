@@ -217,6 +217,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected", e);
+            twitchClient.Disconnect();
             foreach (var channel in JoinedChannels)
             {
                 JoinChannel(channel);
