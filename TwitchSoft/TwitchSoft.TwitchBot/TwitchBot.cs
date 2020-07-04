@@ -251,13 +251,6 @@ namespace TwitchSoft.TwitchBot
             {
                 twitchClient.JoinChannel(channel);
             }
-
-            //var channels = await repository.GetChannelsToTrack();
-
-            //foreach (var channel in channels)
-            //{
-            //    twitchClient.JoinChannel(channel.Username);
-            //}
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -419,29 +412,33 @@ namespace TwitchSoft.TwitchBot
             logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
             JoinedChannels.Clear();
             JoinedChannels.AddRange(channels);
-            var joinedChannels = twitchClient.JoinedChannels;
 
-            foreach (var channel in joinedChannels)
+            if (twitchClient.IsConnected)
             {
-                if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-                else
-                {
-                    twitchClient.LeaveChannel(channel.Channel);
-                }
-            }
+                var joinedChannels = twitchClient.JoinedChannels;
 
-            foreach (var channel in channels)
-            {
-                if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
+                foreach (var channel in joinedChannels)
                 {
-                    continue;
+                    if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.LeaveChannel(channel.Channel);
+                    }
                 }
-                else
+
+                foreach (var channel in channels)
                 {
-                    twitchClient.JoinChannel(channel);
+                    if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.JoinChannel(channel);
+                    }
                 }
             }
         }
