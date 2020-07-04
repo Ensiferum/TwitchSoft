@@ -56,7 +56,7 @@ namespace TwitchSoft.TwitchBot
 
         public Task Start()
         {
-            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
             return Connect();
         }
 
@@ -79,6 +79,7 @@ namespace TwitchSoft.TwitchBot
             {
                 InitTwitchBotClient();
                 twitchClient.Connect();
+                await Task.Delay(5000);
                 await InitSignalRClient();
             }
             catch (Exception ex)
