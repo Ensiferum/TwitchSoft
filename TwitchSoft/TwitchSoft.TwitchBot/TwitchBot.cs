@@ -35,8 +35,8 @@ namespace TwitchSoft.TwitchBot
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
         private BotSettings BotSettings { get; set; }
-        //private static int LogMessagesCount { get; set; } = 0;
-        //private static int LowMessagesCount { get; set; } = 0;
+        private static int LogMessagesCount = 0;
+        private static int LowMessagesCount = 0;
         private static int MessagesCountPer10Sec = 0;
 
         private TwitchClient twitchClient;
@@ -94,32 +94,32 @@ namespace TwitchSoft.TwitchBot
             logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
             MessagesCountPer10Sec = 0;
 
-            //logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-            //logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
-            //if (LogMessagesCount < 5)
-            //{
-            //    LowMessagesCount++;
-            //    if (LowMessagesCount >= 3)
-            //    {
-            //        logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
-            //        try
-            //        {
-            //            twitchClient.Disconnect();
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            logger.LogError(e, "Failed to disconnect");
-            //        }
+            logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
+            logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
+            if (LogMessagesCount < 5)
+            {
+                LowMessagesCount++;
+                if (LowMessagesCount >= 5)
+                {
+                    logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+                    try
+                    {
+                        twitchClient.Disconnect();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Failed to disconnect");
+                    }
 
-            //        InitTwitchBotClient();
-            //        twitchClient.Connect();
-            //    }
-            //}
-            //else
-            //{
-            //    LowMessagesCount = 0;
-            //}
-            //LogMessagesCount = 0;
+                    InitTwitchBotClient();
+                    twitchClient.Connect();
+                }
+            }
+            else
+            {
+                LowMessagesCount = 0;
+            }
+            LogMessagesCount = 0;
         }
 
         private async Task InitSignalRClient()
@@ -210,7 +210,7 @@ namespace TwitchSoft.TwitchBot
             //    action = (string data) => logger.LogWarning(data);
             //}
             //action($"OnLog: {e.Data}");
-            //LogMessagesCount++;
+            LogMessagesCount++;
         }
 
         private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
@@ -223,8 +223,8 @@ namespace TwitchSoft.TwitchBot
             logger.LogWarning("OnReconnected", e);
             twitchClient.Disconnect();
 
-            InitTwitchBotClient();
-            twitchClient.Connect();
+            //InitTwitchBotClient();
+            //twitchClient.Connect();
             //foreach (var channel in JoinedChannels)
             //{
             //    JoinChannel(channel);
