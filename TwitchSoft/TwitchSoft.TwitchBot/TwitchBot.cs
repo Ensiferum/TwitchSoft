@@ -35,8 +35,9 @@ namespace TwitchSoft.TwitchBot
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
         private BotSettings BotSettings { get; set; }
-        private static int LogMessagesCount { get; set; } = 0;
-        private static int LowMessagesCount { get; set; } = 0;
+        //private static int LogMessagesCount { get; set; } = 0;
+        //private static int LowMessagesCount { get; set; } = 0;
+        private static int MessagesCountPer10Sec = 0;
 
         private TwitchClient twitchClient;
         private HubConnection connection;
@@ -90,32 +91,35 @@ namespace TwitchSoft.TwitchBot
 
         private void CheckConnection(object state)
         {
-            logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-            logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
-            if (LogMessagesCount < 5)
-            {
-                LowMessagesCount++;
-                if (LowMessagesCount >= 3)
-                {
-                    logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
-                    try
-                    {
-                        twitchClient.Disconnect();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "Failed to disconnect");
-                    }
+            logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
+            MessagesCountPer10Sec = 0;
 
-                    InitTwitchBotClient();
-                    twitchClient.Connect();
-                }
-            }
-            else
-            {
-                LowMessagesCount = 0;
-            }
-            LogMessagesCount = 0;
+            //logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
+            //logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
+            //if (LogMessagesCount < 5)
+            //{
+            //    LowMessagesCount++;
+            //    if (LowMessagesCount >= 3)
+            //    {
+            //        logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+            //        try
+            //        {
+            //            twitchClient.Disconnect();
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            logger.LogError(e, "Failed to disconnect");
+            //        }
+
+            //        InitTwitchBotClient();
+            //        twitchClient.Connect();
+            //    }
+            //}
+            //else
+            //{
+            //    LowMessagesCount = 0;
+            //}
+            //LogMessagesCount = 0;
         }
 
         private async Task InitSignalRClient()
@@ -200,13 +204,13 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLog(object sender, OnLogArgs e)
         {
-            Action<string> action = (string data) => logger.LogTrace(data);
-            if (LowMessagesCount >= 1)
-            {
-                action = (string data) => logger.LogWarning(data);
-            }
-            action($"OnLog: {e.Data}");
-            LogMessagesCount++;
+            logger.LogTrace(e.Data);
+            //if (LowMessagesCount >= 1)
+            //{
+            //    action = (string data) => logger.LogWarning(data);
+            //}
+            //action($"OnLog: {e.Data}");
+            //LogMessagesCount++;
         }
 
         private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
@@ -218,10 +222,13 @@ namespace TwitchSoft.TwitchBot
         {
             logger.LogWarning("OnReconnected", e);
             twitchClient.Disconnect();
-            foreach (var channel in JoinedChannels)
-            {
-                JoinChannel(channel);
-            }
+
+            InitTwitchBotClient();
+            twitchClient.Connect();
+            //foreach (var channel in JoinedChannels)
+            //{
+            //    JoinChannel(channel);
+            //}
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -256,6 +263,7 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
+            MessagesCountPer10Sec++;
             var chatMessage = new NewTwitchChannelMessage()
             {
                 Id = Guid.Parse(e.ChatMessage.Id),
