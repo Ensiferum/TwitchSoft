@@ -97,7 +97,7 @@ namespace TwitchSoft.TwitchBot
                 {
                     logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
 
-                    logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel)}");
+                    logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
                     try
                     {
                         twitchClient.Disconnect();
