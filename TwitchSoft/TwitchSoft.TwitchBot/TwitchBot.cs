@@ -68,12 +68,6 @@ namespace TwitchSoft.TwitchBot
             await connection.StopAsync();
         }
 
-        public void JoinChannel(string channel)
-        {
-            logger.LogInformation($"JoinChannel {channel} triggered");
-            twitchClient.JoinChannel(channel);
-        }
-
         private async Task Connect()
         {
             try
@@ -102,6 +96,8 @@ namespace TwitchSoft.TwitchBot
                 if (LowMessagesCount >= 5)
                 {
                     logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+
+                    logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel)}");
                     try
                     {
                         twitchClient.Disconnect();
@@ -187,9 +183,6 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnReSubscriber += Client_OnReSubscriber;
             twitchClient.OnGiftedSubscription += Client_OnGiftedSubscription;
             twitchClient.OnCommunitySubscription += Client_OnCommunitySubscription;
-
-            // twitchClient.OnUserBanned += Client_OnUserBanned;
-            // twitchClient.OnUserTimedout += Client_OnUserTimedout;
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
@@ -205,30 +198,13 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             logger.LogTrace(e.Data);
-            //if (LowMessagesCount >= 1)
-            //{
-            //    action = (string data) => logger.LogWarning(data);
-            //}
-            //action($"OnLog: {e.Data}");
             LogMessagesCount++;
-        }
-
-        private void Client_OnUnaccountedFor(object sender, OnUnaccountedForArgs e)
-        {
-            logger.LogWarning($"OnUnaccountedFor: {e.BotUsername} {e.Channel} {e.Location} {e.RawIRC}");
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected", e);
             twitchClient.Disconnect();
-
-            //InitTwitchBotClient();
-            //twitchClient.Connect();
-            //foreach (var channel in JoinedChannels)
-            //{
-            //    JoinChannel(channel);
-            //}
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -376,45 +352,45 @@ namespace TwitchSoft.TwitchBot
             await Bus.Send(newSub);
         }
 
-        private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
-        {
-            var banInfo = e.UserBan;
-            var newBan = new NewBan
-            {
-                Channel = banInfo.Channel,
-                Reason = banInfo.BanReason,
-                BannedTime = DateTime.UtcNow,
-                BanType = BanType.Ban,
-                User = new User
-                {
-                    // we have no userId here
-                    UserName = banInfo.Username,
-                },
-            };
+        //private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
+        //{
+        //    var banInfo = e.UserBan;
+        //    var newBan = new NewBan
+        //    {
+        //        Channel = banInfo.Channel,
+        //        Reason = banInfo.BanReason,
+        //        BannedTime = DateTime.UtcNow,
+        //        BanType = BanType.Ban,
+        //        User = new User
+        //        {
+        //            // we have no userId here
+        //            UserName = banInfo.Username,
+        //        },
+        //    };
 
-            await Bus.Send(newBan);
-        }
+        //    await Bus.Send(newBan);
+        //}
 
 
-        private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
-        {
-            var banInfo = e.UserTimeout;
-            var newBan = new NewBan
-            {
-                Channel = banInfo.Channel,
-                Reason = banInfo.TimeoutReason,
-                BannedTime = DateTime.UtcNow,
-                BanType = BanType.Timeout,
-                Duration = banInfo.TimeoutDuration,
-                User = new User
-                {
-                    // we have no userId here
-                    UserName = banInfo.Username,
-                },
-            };
+        //private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
+        //{
+        //    var banInfo = e.UserTimeout;
+        //    var newBan = new NewBan
+        //    {
+        //        Channel = banInfo.Channel,
+        //        Reason = banInfo.TimeoutReason,
+        //        BannedTime = DateTime.UtcNow,
+        //        BanType = BanType.Timeout,
+        //        Duration = banInfo.TimeoutDuration,
+        //        User = new User
+        //        {
+        //            // we have no userId here
+        //            UserName = banInfo.Username,
+        //        },
+        //    };
 
-            await Bus.Send(newBan);
-        }
+        //    await Bus.Send(newBan);
+        //}
 
         public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
