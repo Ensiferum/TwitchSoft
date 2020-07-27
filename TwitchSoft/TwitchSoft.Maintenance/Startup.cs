@@ -50,7 +50,7 @@ namespace TwitchSoft.Maintenance
 
             services.AddGrpcClient<TwitchBotOrchestratorGrpcClient>(options =>
             {
-                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBotOrchestrator")}");
+                options.Address = new Uri($"http://{Configuration.GetValue<string>("Services:TwitchBotOrchestrator")}:5001");
             });
         }
 
