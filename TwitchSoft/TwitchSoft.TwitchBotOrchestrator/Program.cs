@@ -24,7 +24,7 @@ namespace TwitchSoft.TwitchBotOrchestrator
                         options.ConfigureEndpointDefaults(listenOptions =>
                         {
                             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-                        })
+                        });
                     });
                     webBuilder.UseStartup<Startup>();
                 });
