@@ -170,5 +170,8 @@ metadata:
 spec:
   ports:
   - port: 80
+    name: http-port
+  - port: 5001
+    name: signalr-hub-port
   selector:
     app: ts-twitchbotorchestrator
