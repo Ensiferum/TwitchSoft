@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 using TwitchSoft.Shared.Logging;
 
@@ -18,6 +19,13 @@ namespace TwitchSoft.TwitchBotOrchestrator
                 .ConfigureLogger()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureKestrel(options =>
+                    {
+                        options.ConfigureEndpointDefaults(listenOptions =>
+                        {
+                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        })
+                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }
