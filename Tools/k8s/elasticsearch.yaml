@@ -86,7 +86,6 @@ kind: Service
 metadata:
   name: kibana
 spec:
-  type: LoadBalancer
   ports:
   - port: 5601
   selector:
