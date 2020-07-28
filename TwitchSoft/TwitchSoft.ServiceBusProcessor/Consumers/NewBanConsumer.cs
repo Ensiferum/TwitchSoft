@@ -32,20 +32,26 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 
             foreach (var newBanInfo in newBanInfos)
             {
-                newBans.Add(new UserBan
+                if (newBanInfo.BanType == BanType.Ban || newBanInfo.Duration >= 600)
                 {
-                    Channel = newBanInfo.Channel,
-                    BannedTime = newBanInfo.BannedTime,
-                    BanType = newBanInfo.BanType,
-                    Duration = newBanInfo.Duration,
-                    Reason = newBanInfo.Reason,
-                    UserName = newBanInfo.User.UserName,
-                });
+                    newBans.Add(new UserBan
+                    {
+                        Channel = newBanInfo.Channel,
+                        BannedTime = newBanInfo.BannedTime,
+                        BanType = newBanInfo.BanType,
+                        Duration = newBanInfo.Duration,
+                        Reason = newBanInfo.Reason,
+                        UserName = newBanInfo.User.UserName,
+                    });
+                }
             }
 
             try
             {
-                await repository.SaveUserBansAsync(newBans.ToArray());
+                if (newBans.Any())
+                {
+                    await repository.SaveUserBansAsync(newBans.ToArray());
+                }
             }
             catch (Exception ex)
             {
