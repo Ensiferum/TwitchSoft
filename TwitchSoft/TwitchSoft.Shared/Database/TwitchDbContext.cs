@@ -71,25 +71,20 @@ namespace TwitchSoft.Shared.Database
                 .IncludeProperties(u => new { u.SubscribedTime });
 
             modelBuilder.Entity<UserBan>()
-                .HasOne(u => u.User)
-                .WithMany(u => u.UserUserBans)
-                .HasForeignKey(c => c.UserId);
-
-            modelBuilder.Entity<UserBan>()
-                .HasOne(u => u.Channel)
-                .WithMany(u => u.ChannelUserBans)
-                .HasForeignKey(c => c.ChannelId);
-
-            modelBuilder.Entity<UserBan>()
                 .Property(u => u.Reason)
                 .HasMaxLength(140);
 
             modelBuilder.Entity<UserBan>()
-                .HasKey(u => new { u.UserId, u.BannedTime });
+                .Property(u => u.UserName)
+                .HasMaxLength(60);
 
             modelBuilder.Entity<UserBan>()
-                .HasIndex(u => new { u.UserId })
-                .IncludeProperties(u => new { u.BannedTime });
+                .Property(u => u.Channel)
+                .HasMaxLength(60);
+
+            modelBuilder.Entity<UserBan>()
+                .HasIndex(u => new { u.Id })
+                .IncludeProperties(u => new { u.UserName, u.Channel, u.BannedTime });
 
             modelBuilder.Entity<CommunitySubscription>()
                 .HasOne(u => u.User)

@@ -29,26 +29,18 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             var newBans = new List<UserBan>();
 
             var newBanInfos = new NewBan[] { context.Message };
-            var userNamesToLoad = newBanInfos
-                .Select(_ => _.User.UserName)
-                .ToArray();
-
-            var usersMap = await repository.GetUserIds(userNamesToLoad);
 
             foreach (var newBanInfo in newBanInfos)
             {
-                if (usersMap.TryGetValue(newBanInfo.User.UserName, out var userId))
+                newBans.Add(new UserBan
                 {
-                    newBans.Add(new UserBan
-                    {
-                        ChannelId = await channelsCache.GetChannelIdByName(newBanInfo.Channel),
-                        BannedTime = newBanInfo.BannedTime,
-                        BanType = newBanInfo.BanType,
-                        Duration = newBanInfo.Duration,
-                        Reason = newBanInfo.Reason,
-                        UserId = userId,
-                    });
-                }
+                    Channel = newBanInfo.Channel,
+                    BannedTime = newBanInfo.BannedTime,
+                    BanType = newBanInfo.BanType,
+                    Duration = newBanInfo.Duration,
+                    Reason = newBanInfo.Reason,
+                    UserName = newBanInfo.User.UserName,
+                });
             }
 
             try

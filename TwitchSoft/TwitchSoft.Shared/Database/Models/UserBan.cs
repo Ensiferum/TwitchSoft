@@ -6,15 +6,13 @@ namespace TwitchSoft.Shared.Database.Models
     [Table("UserBans")]
     public class UserBan
     {
-        public uint UserId { get; set; }
-        public uint ChannelId { get; set; }
-        [Write(false)]
-        public User Channel { get; set; }
+        [Key]
+        public long Id { get; set; }
+        public string Channel { get; set; }
+        public string UserName { get; set; }
         public string Reason { get; set; }
         public int? Duration { get; set; }
         public DateTime BannedTime { get; set; }
         public BanType BanType { get; set; }
-        [Write(false)]
-        public User User { get; set; }
     }
 }

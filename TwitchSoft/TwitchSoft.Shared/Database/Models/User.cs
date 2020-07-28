@@ -17,12 +17,8 @@ namespace TwitchSoft.Shared.Database.Models
         [Write(false)]
         public List<CommunitySubscription> UserCommunitySubscriptions { get; set; }
         [Write(false)]
-        public List<UserBan> UserUserBans { get; set; }
-        [Write(false)]
         public List<Subscription> ChannelSubscriptions { get; set; }
         [Write(false)]
         public List<CommunitySubscription> ChannelCommunitySubscriptions { get; set; }
-        [Write(false)]
-        public List<UserBan> ChannelUserBans { get; set; }
     }
 }

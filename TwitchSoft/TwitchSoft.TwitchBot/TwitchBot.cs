@@ -141,18 +141,18 @@ namespace TwitchSoft.TwitchBot
             }
 
             logger.LogInformation($"HubInfo: {connection.ConnectionId}, {connection.State}");
-        }
 
-        private Task Connection_Closed(Exception arg)
-        {
-            logger.LogError(arg, "Hub Connection Closed");
-            return Task.CompletedTask;
-        }
+            Task Connection_Closed(Exception arg)
+            {
+                logger.LogError(arg, "Hub Connection Closed");
+                return Task.CompletedTask;
+            }
 
-        private Task Connection_Reconnected(string arg)
-        {
-            logger.LogInformation("Hub Connection Reconnected", arg);
-            return Task.CompletedTask;
+            Task Connection_Reconnected(string arg)
+            {
+                logger.LogInformation("Hub Connection Reconnected", arg);
+                return Task.CompletedTask;
+            }
         }
 
         private void InitTwitchBotClient()
@@ -183,6 +183,9 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnReSubscriber += Client_OnReSubscriber;
             twitchClient.OnGiftedSubscription += Client_OnGiftedSubscription;
             twitchClient.OnCommunitySubscription += Client_OnCommunitySubscription;
+
+            twitchClient.OnUserBanned += Client_OnUserBanned;
+            twitchClient.OnUserTimedout += Client_OnUserTimedout;
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
@@ -352,45 +355,46 @@ namespace TwitchSoft.TwitchBot
             await Bus.Send(newSub);
         }
 
-        //private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
-        //{
-        //    var banInfo = e.UserBan;
-        //    var newBan = new NewBan
-        //    {
-        //        Channel = banInfo.Channel,
-        //        Reason = banInfo.BanReason,
-        //        BannedTime = DateTime.UtcNow,
-        //        BanType = BanType.Ban,
-        //        User = new User
-        //        {
-        //            // we have no userId here
-        //            UserName = banInfo.Username,
-        //        },
-        //    };
+        private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
+        {
+            var banInfo = e.UserBan;
+            var newBan = new NewBan
+            {
+                Channel = banInfo.Channel,
+                Reason = banInfo.BanReason,
+                BannedTime = DateTime.UtcNow,
+                BanType = BanType.Ban,
+                User = new User
+                {
+                    // we have no userId here
+                    UserName = banInfo.Username,
+                },
+            };
 
-        //    await Bus.Send(newBan);
-        //}
+            await Bus.Send(newBan);
+        }
 
 
-        //private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
-        //{
-        //    var banInfo = e.UserTimeout;
-        //    var newBan = new NewBan
-        //    {
-        //        Channel = banInfo.Channel,
-        //        Reason = banInfo.TimeoutReason,
-        //        BannedTime = DateTime.UtcNow,
-        //        BanType = BanType.Timeout,
-        //        Duration = banInfo.TimeoutDuration,
-        //        User = new User
-        //        {
-        //            // we have no userId here
-        //            UserName = banInfo.Username,
-        //        },
-        //    };
+        private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
+        {
+            var banInfo = e.UserTimeout;
+            var newBan = new NewBan
+            {
+                Channel = banInfo.Channel,
+                Reason = banInfo.TimeoutReason,
+                BannedTime = DateTime.UtcNow,
+                BanType = BanType.Timeout,
+                Duration = banInfo.TimeoutDuration,
+                User = new User
+                {
+                    // we have no userId here
+                    
+                    UserName = banInfo.Username,
+                },
+            };
 
-        //    await Bus.Send(newBan);
-        //}
+            await Bus.Send(newBan);
+        }
 
         public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
