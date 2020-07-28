@@ -62,6 +62,7 @@ namespace TwitchSoft.ServiceBusProcessor
                     {
                         ep.PrefetchCount = prefetchCount;
                         ep.UseRetry(r => r.Interval(5, 1000));
+                        ep.ConsumerPriority = -1;
 
                         ep.ConfigureConsumer<NewBanConsumer>(context);
                         EndpointConvention.Map<NewBan>(ep.InputAddress);
