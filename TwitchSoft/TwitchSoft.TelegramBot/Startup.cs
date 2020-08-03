@@ -8,6 +8,8 @@ using TwitchSoft.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
+using static TwitchBotOrchestratorGrpc;
+using System;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -38,6 +40,11 @@ namespace TwitchSoft.TelegramBot
 
             services.AddCache(Configuration);
             services.AddElasticSearch(Configuration);
+
+            services.AddGrpcClient<TwitchBotOrchestratorGrpcClient>(o =>
+            {
+                o.Address = new Uri(Configuration.GetValue<string>("Services:TwitchBotOrchestrator"));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

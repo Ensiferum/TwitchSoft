@@ -197,10 +197,8 @@ Usage:
                 }
                 else
                 {
-
-                    Channel grpcChannel = new Channel("ts-twitchbotorchestrator", 80, ChannelCredentials.Insecure);
-                    var client = new TwitchBotOrchestratorGrpcClient(grpcChannel);
-                    await client.JoinChannelAsync(new JoinChannelRequest { Channelname = channelName });
+                    var twitchGrpcClient = scope.ServiceProvider.GetRequiredService<TwitchBotOrchestratorGrpcClient>();
+                    await twitchGrpcClient.JoinChannelAsync(new JoinChannelRequest { Channelname = channelName });
 
                     await telegramBotClient.SendTextMessageAsync(
                             chatId: chatId,
