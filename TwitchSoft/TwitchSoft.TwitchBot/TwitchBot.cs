@@ -20,12 +20,14 @@ using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 namespace TwitchSoft.TwitchBot
 {
     public class TwitchBot
     {
         private readonly ILogger<TwitchBot> logger;
+        private readonly IConfiguration configuration;
         private readonly IServiceProvider serviceProvider;
         private readonly IEnumerable<IChatPlugin> chatPlugins;
         private readonly List<string> JoinedChannels = new List<string>();
@@ -46,10 +48,12 @@ namespace TwitchSoft.TwitchBot
         public TwitchBot(
             ILogger<TwitchBot> logger, 
             IOptions<BotSettings> options,
+            IConfiguration configuration,
             IServiceProvider serviceProvider,
             IEnumerable<IChatPlugin> chatPlugins)
         {
             this.logger = logger;
+            this.configuration = configuration;
             this.serviceProvider = serviceProvider;
             this.chatPlugins = chatPlugins;
             BotSettings = options.Value;
@@ -121,7 +125,7 @@ namespace TwitchSoft.TwitchBot
         private async Task InitSignalRClient()
         {
             connection = new HubConnectionBuilder()
-                .WithUrl("http://ts-twitchbotorchestrator/orchestration")
+                .WithUrl(configuration.GetValue<string>("Services:TwitchBotOrchestratorHub"))
                 .WithAutomaticReconnect()
                 .Build();
 
