@@ -1,1 +1,0 @@
-kubectl apply -f .\Tools\k8s\rabbitmq.yaml 
