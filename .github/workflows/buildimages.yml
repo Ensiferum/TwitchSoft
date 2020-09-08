@@ -6,11 +6,15 @@ on:
   pull_request:
     branches: [ master ]
 
+# Environment variables available to all jobs and steps in this workflow
+env:
+  CLUSTER_NAME: ts-aks
+  CLUSTER_RESOURCE_GROUP: twitchsoft
+  DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
+
 jobs:
   build-maitenance:
     name: Maintenance service build
-    env: 
-      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
     steps:
@@ -36,12 +40,13 @@ jobs:
     # Install helm
     - name: Helm tool installer
       uses: Azure/setup-helm@v1
-
     
-    # Login to AKS
-    - uses: Azure/k8s-set-context@v1
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     # Upgrade chart
     - name: Helm Upgrade
@@ -49,8 +54,6 @@ jobs:
         helm upgrade ts-maintenance ./TwitchSoft/TwitchSoft.Maintenance/charts/twitchsoftmaintenance/
   build-servicebusprocessor:
     name: ServiceBusProcessor service build
-    env: 
-      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
     steps:
@@ -77,11 +80,12 @@ jobs:
     - name: Helm tool installer
       uses: Azure/setup-helm@v1
 
-    
-    # Login to AKS
-    - uses: Azure/k8s-set-context@v1
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     # Upgrade chart
     - name: Helm Upgrade
@@ -89,8 +93,6 @@ jobs:
         helm upgrade ts-servicebusprocessor ./TwitchSoft/TwitchSoft.ServiceBusProcessor/charts/twitchsoftservicebusprocessor/
   build-twitchbot:
     name: TwitchBot service build
-    env: 
-      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
     steps:
@@ -117,11 +119,12 @@ jobs:
     - name: Helm tool installer
       uses: Azure/setup-helm@v1
 
-    
-    # Login to AKS
-    - uses: Azure/k8s-set-context@v1
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     # Upgrade chart
     - name: Helm Upgrade
@@ -129,8 +132,6 @@ jobs:
         helm upgrade ts-twitchbot ./TwitchSoft/TwitchSoft.TwitchBot/charts/twitchsofttwitchbot/
   build-telegrambot:
     name: TelegramBot service build
-    env: 
-      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
     steps:
@@ -157,11 +158,12 @@ jobs:
     - name: Helm tool installer
       uses: Azure/setup-helm@v1
 
-    
-    # Login to AKS
-    - uses: Azure/k8s-set-context@v1
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     # Upgrade chart
     - name: Helm Upgrade
@@ -169,8 +171,6 @@ jobs:
         helm upgrade ts-telegrambot ./TwitchSoft/TwitchSoft.TelegramBot/charts/twitchsofttelegrambot/
   build-twitchbotorchestrator:
     name: TwitchBotOrchestrator service build
-    env: 
-      DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
     runs-on: ubuntu-latest
 
     steps:
@@ -197,11 +197,12 @@ jobs:
     - name: Helm tool installer
       uses: Azure/setup-helm@v1
 
-    
-    # Login to AKS
-    - uses: Azure/k8s-set-context@v1
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     # Upgrade chart
     - name: Helm Upgrade
