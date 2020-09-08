@@ -11,6 +11,7 @@ env:
   CLUSTER_NAME: ts-aks
   CLUSTER_RESOURCE_GROUP: twitchsoft
   DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
+  IMAGE_TAG: ${{ GITHUB_SHA }}
 
 jobs:
   build-maitenance:
@@ -32,10 +33,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:${{ env.IMAGE_TAG }} TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:${{ env.IMAGE_TAG }}
     
     # Install helm
     - name: Helm tool installer
@@ -51,7 +52,7 @@ jobs:
     # Upgrade chart
     - name: Helm Upgrade
       run: |
-        helm upgrade ts-maintenance ./TwitchSoft/TwitchSoft.Maintenance/charts/twitchsoftmaintenance/
+        helm upgrade ts-maintenance ./TwitchSoft/TwitchSoft.Maintenance/charts/twitchsoftmaintenance/ --set image.tag=${{ env.IMAGE_TAG }}
   build-servicebusprocessor:
     name: ServiceBusProcessor service build
     runs-on: ubuntu-latest
@@ -71,10 +72,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.ServiceBusProcessor/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.ServiceBusProcessor/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:${{ env.IMAGE_TAG }} TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftservicebusprocessor:${{ env.IMAGE_TAG }}
 
     # Install helm
     - name: Helm tool installer
@@ -90,7 +91,7 @@ jobs:
     # Upgrade chart
     - name: Helm Upgrade
       run: |
-        helm upgrade ts-servicebusprocessor ./TwitchSoft/TwitchSoft.ServiceBusProcessor/charts/twitchsoftservicebusprocessor/
+        helm upgrade ts-servicebusprocessor ./TwitchSoft/TwitchSoft.ServiceBusProcessor/charts/twitchsoftservicebusprocessor/ --set image.tag=${{ env.IMAGE_TAG }}
   build-twitchbot:
     name: TwitchBot service build
     runs-on: ubuntu-latest
@@ -110,10 +111,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TwitchBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TwitchBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:${{ env.IMAGE_TAG }} TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbot:${{ env.IMAGE_TAG }}
 
     # Install helm
     - name: Helm tool installer
@@ -129,7 +130,7 @@ jobs:
     # Upgrade chart
     - name: Helm Upgrade
       run: |
-        helm upgrade ts-twitchbot ./TwitchSoft/TwitchSoft.TwitchBot/charts/twitchsofttwitchbot/
+        helm upgrade ts-twitchbot ./TwitchSoft/TwitchSoft.TwitchBot/charts/twitchsofttwitchbot/ --set image.tag=${{ env.IMAGE_TAG }}
   build-telegrambot:
     name: TelegramBot service build
     runs-on: ubuntu-latest
@@ -149,10 +150,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TelegramBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TelegramBot/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:${{ env.IMAGE_TAG }} TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttelegrambot:${{ env.IMAGE_TAG }}
 
     # Install helm
     - name: Helm tool installer
@@ -168,7 +169,7 @@ jobs:
     # Upgrade chart
     - name: Helm Upgrade
       run: |
-        helm upgrade ts-telegrambot ./TwitchSoft/TwitchSoft.TelegramBot/charts/twitchsofttelegrambot/
+        helm upgrade ts-telegrambot ./TwitchSoft/TwitchSoft.TelegramBot/charts/twitchsofttelegrambot/ --set image.tag=${{ env.IMAGE_TAG }}
   build-twitchbotorchestrator:
     name: TwitchBotOrchestrator service build
     runs-on: ubuntu-latest
@@ -188,10 +189,10 @@ jobs:
     # Build & Push image to ACR
     - name: Build image
       run: |
-        docker build -f TwitchSoft/TwitchSoft.TwitchBotOrchestrator/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:latest TwitchSoft
+        docker build -f TwitchSoft/TwitchSoft.TwitchBotOrchestrator/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:${{ env.IMAGE_TAG }} TwitchSoft
     - name: Push image
       run: |
-        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsofttwitchbotorchestrator:${{ env.IMAGE_TAG }}
 
     # Install helm
     - name: Helm tool installer
@@ -207,5 +208,5 @@ jobs:
     # Upgrade chart
     - name: Helm Upgrade
       run: |
-        helm upgrade ts-twitchbotorchestrator ./TwitchSoft/TwitchSoft.TwitchBotOrchestrator/charts/twitchsofttwitchbotorchestrator/
+        helm upgrade ts-twitchbotorchestrator ./TwitchSoft/TwitchSoft.TwitchBotOrchestrator/charts/twitchsofttwitchbotorchestrator/ --set image.tag=${{ env.IMAGE_TAG }}
         
