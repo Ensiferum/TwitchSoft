@@ -11,7 +11,7 @@ env:
   CLUSTER_NAME: ts-aks
   CLUSTER_RESOURCE_GROUP: twitchsoft
   DOCKER_REGISTRY: 'twitchsoft.azurecr.io'
-  IMAGE_TAG: ${{ GITHUB_SHA }}
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-maitenance:
