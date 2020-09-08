@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "twitchsofttwitchbotorchestrator.fullname" . }}
+  labels:
+    app: {{ template "twitchsofttwitchbotorchestrator.name" . }}
+    chart: {{ template "twitchsofttwitchbotorchestrator.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.ports }}
+  ports:
+  {{- range .Values.service.ports }}
+    - port: {{ .port }}
+      targetPort: http
+      protocol: TCP
+      name: {{ .name }}
+  {{- end}}
+  {{- end}}
+  selector:
+    app: {{ template "twitchsofttwitchbotorchestrator.name" . }}
+    release: {{ .Release.Name }}
