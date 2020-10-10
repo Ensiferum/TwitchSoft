@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using TwitchSoft.Shared.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using System;
 
 namespace TwitchSoft.Maintenance
 {
@@ -9,6 +10,7 @@ namespace TwitchSoft.Maintenance
     {
         public static void Main(string[] args)
         {
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             CreateHostBuilder(args).Build().Run();
         }
 

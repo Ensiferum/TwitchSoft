@@ -41,8 +41,6 @@ namespace TwitchSoft.Maintenance
             services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
 
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
             services.AddGrpcClient<TelegramBotGrpcClient>(options =>
             {
                 options.Address = new Uri(Configuration.GetValue<string>("Services:TelegramBot"));
