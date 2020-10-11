@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
+using System.Security.Cryptography.X509Certificates;
 using TwitchSoft.Shared.Logging;
 
 namespace TwitchSoft.TwitchBotOrchestrator
@@ -29,6 +30,11 @@ namespace TwitchSoft.TwitchBotOrchestrator
                         options.ListenAnyIP(80, listenOptions =>
                         {
                             listenOptions.Protocols = HttpProtocols.Http1;
+                        });
+
+                        options.ConfigureHttpsDefaults(https =>
+                        {
+                            https.ServerCertificate = new X509Certificate2();
                         });
                     });
                     webBuilder.UseStartup<Startup>();
