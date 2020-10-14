@@ -19,7 +19,9 @@ service:
     ports: 
       - name: http-port
         port: 80
-      - name: signalr-hub-port
+      - name: grpc-port1
+        port: 5000
+      - name: grpc-port2
         port: 5001
 
 probes:

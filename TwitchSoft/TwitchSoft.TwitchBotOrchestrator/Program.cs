@@ -22,7 +22,7 @@ namespace TwitchSoft.TwitchBotOrchestrator
                 {
                     webBuilder.ConfigureKestrel(options =>
                     {
-                        options.ListenAnyIP(5001, listenOptions =>
+                        options.ListenAnyIP(5000, listenOptions =>
                         {
                             listenOptions.Protocols = HttpProtocols.Http2;
                         });
