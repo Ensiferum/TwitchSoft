@@ -24,17 +24,12 @@ namespace TwitchSoft.TwitchBotOrchestrator
                     {
                         options.ListenAnyIP(5001, listenOptions =>
                         {
-                            listenOptions.Protocols = HttpProtocols.Http2;
+                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
                         });
 
                         options.ListenAnyIP(80, listenOptions =>
                         {
                             listenOptions.Protocols = HttpProtocols.Http1;
-                        });
-
-                        options.ConfigureHttpsDefaults(https =>
-                        {
-                            https.ServerCertificate = new X509Certificate2();
                         });
                     });
                     webBuilder.UseStartup<Startup>();
