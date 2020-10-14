@@ -24,7 +24,7 @@ namespace TwitchSoft.TwitchBotOrchestrator
                     {
                         options.ListenAnyIP(5001, listenOptions =>
                         {
-                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                            listenOptions.Protocols = HttpProtocols.Http2;
                         });
 
                         options.ListenAnyIP(80, listenOptions =>
