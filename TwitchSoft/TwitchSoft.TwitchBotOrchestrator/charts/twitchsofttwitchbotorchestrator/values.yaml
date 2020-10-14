@@ -19,9 +19,7 @@ service:
     ports: 
       - name: http-port
         port: 80
-      - name: grpc-port1
-        port: 5000
-      - name: grpc-port2
+      - name: grpc-port
         port: 5001
 
 probes:
