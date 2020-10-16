@@ -2,22 +2,14 @@
 using TwitchSoft.Shared.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using TwitchSoft.TelegramBot;
 
-namespace TwitchSoft.TelegramBot
-{
-    public class Program
-    {
-        public static void Main(string[] args)
+CreateHostBuilder(args).Build().Run();
+
+static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureLogger()
+        .ConfigureWebHostDefaults(webBuilder =>
         {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureLogger()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+            webBuilder.UseStartup<Startup>();
+        });
