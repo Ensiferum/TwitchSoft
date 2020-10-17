@@ -3,7 +3,7 @@ using TwitchSoft.Shared.Database.Models;
 
 namespace TwitchSoft.Shared.ServiceBus.Models
 {
-    public class NewTwitchChannelMessage
+    public record NewTwitchChannelMessage
     {
         public Guid Id { get; set; }
         public string Channel { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace TwitchSoft.Shared.ServiceBus.Models
 {
-    public class User
+    public record User
     {
         public uint UserId { get; set; }
         public string UserName { get; set; }

@@ -2,7 +2,7 @@
 
 namespace TwitchSoft.Shared.ElasticSearch.Models
 {
-    public class ChatMessage
+    public record ChatMessage
     {
         public Guid Id { get; set; }
         public uint ChannelId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace TwitchSoft.Shared.Services.Models
 {
-    public class ChatMessageModelForDisplaying
+    public record ChatMessageModelForDisplaying
     {
         public string UserName { get; set; }
         public string Message { get; set; }
