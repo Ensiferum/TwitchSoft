@@ -14,7 +14,7 @@ namespace TwitchSoft.ServiceBusProcessor
         {
             var serviceBusSettings = new ServiceBusSettings();
             Configuration.GetSection(nameof(ServiceBusSettings)).Bind(serviceBusSettings);
-            ushort prefetchCount = 10;
+            ushort prefetchCount = 5;
 
             services.AddMassTransit(conf =>
             {
