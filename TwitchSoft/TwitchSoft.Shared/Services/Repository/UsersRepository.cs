@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,30 +8,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
-using TwitchSoft.Shared.Services.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using UserTwitch = TwitchLib.Api.Helix.Models.Users.User;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class Repository : IRepository
+    public class UsersRepository : BaseRepository, IUsersRepository
     {
-        private readonly IConfiguration configuration;
-        private readonly ILogger<Repository> logger;
-
-        private string ConnectionString => configuration.GetConnectionString("TwitchDb");
-
-        public Repository(
-            IConfiguration configuration, 
-            ILogger<Repository> logger)
+        public UsersRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
         {
-            this.configuration = configuration;
-            this.logger = logger;
         }
 
         public async Task<Dictionary<string, uint>> GetUserIds(params string[] userNames)
         {
-            using(var connection = new SqlConnection(ConnectionString))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 var result = await connection.QueryAsync<(uint Id, string Username)>(@"
 SELECT Id, Username FROM Users
@@ -49,7 +38,7 @@ WHERE Username IN @userNames", new { userNames });
                 return await connection.QueryAsync<(uint Id, string Username)>(@"
 SELECT TOP (@count) Id, Username FROM Users
 WHERE Username = @userNamePart
-ORDER BY Id", new { userNamePart , count });
+ORDER BY Id", new { userNamePart, count });
             }
         }
 
@@ -126,46 +115,7 @@ WHEN NOT MATCHED THEN
             }
         }
 
-        public async Task SaveSubscriberAsync(params Subscription[] subscriptions)
-        {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                await connection.InsertAsync(subscriptions);
-            }
-        }
-
-        public async Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(ConnectionString))
-                {
-                    await connection.InsertAsync(communitySubscription);
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, $"Error while saving {nameof(CommunitySubscription)}");
-            }
-            
-        }
-
-        public async Task SaveUserBansAsync(params UserBan[] userBans)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(ConnectionString))
-                {
-                    await connection.InsertAsync(userBans);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error while saving {nameof(UserBan)}");
-            }
-        }
-
-        public async Task<User> GetUserById(uint id) 
+        public async Task<User> GetUserById(uint id)
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -215,39 +165,11 @@ WHERE JoinChannel = 1
                 }
                 else
                 {
-                    
+
                     user.JoinChannel = true;
                     await connection.UpdateAsync(user);
                 }
                 return userIsTracking;
-            }
-        }
-
-        public async Task<IEnumerable<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count)
-        {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryAsync<ChannelSubs>(@"
-SELECT us.Username as Channel, COUNT(*) AS SubsCount FROM Subscriptions sub
-JOIN Users us ON sub.ChannelId = us.Id
-WHERE sub.SubscribedTime >= @date
-GROUP BY us.Username
-ORDER BY SubsCount DESC
-OFFSET @skip ROWS
-FETCH NEXT @count ROWS ONLY
-", new { count, skip, date = DateTime.UtcNow.AddMonths(-1) });
-            }
-        }
-
-        public async Task<int> GetSubscribersCountFor(string channel)
-        {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.ExecuteScalarAsync<int>(@"
-SELECT COUNT(*) FROM Subscriptions sub
-JOIN Users us ON sub.ChannelId = us.Id
-WHERE us.Username = @channel AND sub.SubscribedTime >= @date
-", new { channel, date = DateTime.UtcNow.AddMonths(-1) });
             }
         }
     }

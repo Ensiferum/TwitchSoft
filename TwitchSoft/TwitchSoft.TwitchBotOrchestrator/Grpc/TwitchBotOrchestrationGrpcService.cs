@@ -12,14 +12,14 @@ namespace TwitchSoft.TwitchBotOrcherstration.Grpc
     public class TwitchBotOrchestrationGrpcService : TwitchBotOrchestratorGrpcBase
     {
         private readonly IHubContext<OrchestrationHub> hub;
-        private readonly IRepository repository;
+        private readonly IUsersRepository usersRepository;
 
         public TwitchBotOrchestrationGrpcService(
             IHubContext<OrchestrationHub> hub,
-            IRepository repository)
+            IUsersRepository usersRepository)
         {
             this.hub = hub;
-            this.repository = repository;
+            this.usersRepository = usersRepository;
         }
         public override async Task<Empty> JoinChannel(JoinChannelRequest request, ServerCallContext context)
         {
@@ -29,7 +29,7 @@ namespace TwitchSoft.TwitchBotOrcherstration.Grpc
 
         public override async Task<Empty> RefreshChannels(Empty request, ServerCallContext context)
         {
-            var channels = await repository.GetChannelsToTrack();
+            var channels = await usersRepository.GetChannelsToTrack();
             await OrchestrationHub.TriggerReconnect(hub.Clients, channels.Select(_ => _.Username));
             return new Empty();
         }

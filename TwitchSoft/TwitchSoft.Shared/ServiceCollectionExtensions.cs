@@ -11,7 +11,9 @@ namespace TwitchSoft.Shared
         {
             SqlMapper.AddTypeMap(typeof(uint), System.Data.DbType.Int64);
 
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IUserBansRepository, UserBansRepository>();
+            services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
         }
     }
 }

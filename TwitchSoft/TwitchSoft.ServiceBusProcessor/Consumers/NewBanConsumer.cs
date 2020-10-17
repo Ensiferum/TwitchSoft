@@ -14,13 +14,13 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     public class NewBanConsumer : IConsumer<NewBan>
     {
         private readonly ILogger<NewBanConsumer> logger;
-        private readonly IRepository repository;
+        private readonly IUserBansRepository userBansRepository;
         private readonly IChannelsCache channelsCache;
 
-        public NewBanConsumer(ILogger<NewBanConsumer> logger, IRepository repository, IChannelsCache channelsCache)
+        public NewBanConsumer(ILogger<NewBanConsumer> logger, IUserBansRepository userBansRepository, IChannelsCache channelsCache)
         {
             this.logger = logger;
-            this.repository = repository;
+            this.userBansRepository = userBansRepository;
             this.channelsCache = channelsCache;
         }
 
@@ -50,7 +50,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
             {
                 if (newBans.Any())
                 {
-                    await repository.SaveUserBansAsync(newBans.ToArray());
+                    await userBansRepository.SaveUserBansAsync(newBans.ToArray());
                 }
             }
             catch (Exception ex)

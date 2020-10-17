@@ -1,7 +1,5 @@
 ﻿using Coravel.Invocable;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
@@ -14,23 +12,23 @@ namespace TwitchSoft.Maintenance.Jobs
     {
         private readonly ILogger<HoneymadFollowsJoin> logger;
         private readonly ITwitchApiService twitchApiService;
-        private readonly IRepository repository;
+        private readonly IUsersRepository usersRepository;
 
         public HoneymadFollowsJoin(
             ILogger<HoneymadFollowsJoin> logger,
             ITwitchApiService twitchApiService,
-            IRepository repository)
+            IUsersRepository usersRepository)
         {
             this.logger = logger;
             this.twitchApiService = twitchApiService;
-            this.repository = repository;
+            this.usersRepository = usersRepository;
         }
         public async Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(HoneymadFollowsJoin)}");
             var follows = await twitchApiService.GetFollowsForUser("40298003", null); //honeymad
 
-            await repository.CreateOrUpdateUsers(follows.Select(f => new User
+            await usersRepository.CreateOrUpdateUsers(follows.Select(f => new User
             {
                 Id = uint.Parse(f.ToUserId),
                 Username = f.ToUserName.ToLower(),

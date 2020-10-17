@@ -51,7 +51,7 @@ Usage:
         {
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
 
                 var chatIdentifier = chatId.Identifier.ToString();
@@ -82,7 +82,7 @@ Usage:
         {
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
                 var userIds = await repository.GetUserIds(userName);
                 if (!userIds.Any())
@@ -132,7 +132,7 @@ Usage:
             IEnumerable<(uint Id, string Username)> users = null;
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
 
                 users = await repository.SearchUsers(queryText);
             });
@@ -185,7 +185,7 @@ Usage:
                         );
                     return;
                 }
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
                 var alreadyExist = await repository.AddChannelToTrack(channel);
                 if (alreadyExist)
                 {
@@ -213,7 +213,7 @@ Usage:
         {
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
 
                 var count = 50;
@@ -252,7 +252,7 @@ Usage:
         {
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<ISubscriptionsRepository>();
                 var count = 10;
                 var skip = 0;
                 string channel = null;

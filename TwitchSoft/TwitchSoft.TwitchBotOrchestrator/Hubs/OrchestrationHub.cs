@@ -17,14 +17,14 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
 
         private const string JoinChannelsCommand = "JoinChannelsCommand";
 
-        private readonly IRepository repository;
+        private readonly IUsersRepository usersRepository;
         private readonly ILogger<OrchestrationHub> logger;
 
         public OrchestrationHub(
-            IRepository repository,
+            IUsersRepository usersRepository,
             ILogger<OrchestrationHub> logger)
         {
-            this.repository = repository;
+            this.usersRepository = usersRepository;
             this.logger = logger;
         }
 
@@ -65,7 +65,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
 
         public async Task TriggerReconnect()
         {
-            var channels = await repository.GetChannelsToTrack();
+            var channels = await usersRepository.GetChannelsToTrack();
             var botsCount = ConnectionChannelList.Count;
             var channelGroups = Split(channels.Select(_ => _.Username), botsCount);
 

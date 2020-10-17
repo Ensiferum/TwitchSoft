@@ -11,13 +11,19 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
     public class NewSubscriberConsumer : IConsumer<NewSubscriber>
     {
-        private readonly IRepository repository;
+        private readonly ISubscriptionsRepository subscriptionsRepository;
+        private readonly IUsersRepository usersRepository;
         private readonly IChannelsCache channelsCache;
 
-        public NewSubscriberConsumer(IRepository repository, IChannelsCache channelsCache)
+        public NewSubscriberConsumer(
+            ISubscriptionsRepository subscriptionsRepository,
+            IUsersRepository usersRepository,
+            IChannelsCache channelsCache
+            )
         {
-            this.repository = repository;
+            this.subscriptionsRepository = subscriptionsRepository;
             this.channelsCache = channelsCache;
+            this.usersRepository = usersRepository;
         }
 
         public async Task Consume(ConsumeContext<NewSubscriber> context)
@@ -37,8 +43,8 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                     Id = subInfo.GiftedBy.UserId
                 });
             }
-            await repository.CreateOrUpdateUsers(users.ToArray());
-            await repository.SaveSubscriberAsync(new Subscription
+            await usersRepository.CreateOrUpdateUsers(users.ToArray());
+            await subscriptionsRepository.SaveSubscriberAsync(new Subscription
             {
                 Id = subInfo.Id,
                 ChannelId = await channelsCache.GetChannelIdByName(subInfo.Channel),

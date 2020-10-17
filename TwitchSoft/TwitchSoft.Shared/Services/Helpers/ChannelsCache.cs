@@ -11,7 +11,7 @@ namespace TwitchSoft.Shared.Services.Helpers
     {
         private readonly ILogger<ChannelsCache> logger;
         private readonly IMemoryCache memoryCache;
-        private readonly IRepository repository;
+        private readonly IUsersRepository usersRepository;
 
         public ChannelsCache(
             ILogger<ChannelsCache> logger,
@@ -20,7 +20,7 @@ namespace TwitchSoft.Shared.Services.Helpers
         {
             this.logger = logger;
             this.memoryCache = memoryCache;
-            this.repository = serviceProvider.GetService<IRepository>();
+            this.usersRepository = serviceProvider.GetService<IUsersRepository>();
         }
 
         public async Task<string> GetChannelNameById(uint channelId)
@@ -32,7 +32,7 @@ namespace TwitchSoft.Shared.Services.Helpers
             else
             {
                 logger.LogInformation("Missing channelId in cache", channelId);
-                var user = await repository.GetUserById(channelId);
+                var user = await usersRepository.GetUserById(channelId);
                 memoryCache.Set(channelId, user.Username);
                 return user.Username;
             }
@@ -47,7 +47,7 @@ namespace TwitchSoft.Shared.Services.Helpers
             else
             {
                 logger.LogInformation("Missing channelName in cache", channelName);
-                var user = await repository.GetUserByName(channelName);
+                var user = await usersRepository.GetUserByName(channelName);
                 memoryCache.Set(channelName, user.Id);
                 return user.Id;
             }

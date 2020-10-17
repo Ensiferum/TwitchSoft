@@ -11,16 +11,16 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
     public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
     {
-        private readonly IRepository repository;
+        private readonly IUsersRepository usersRepository;
         private readonly IChannelsCache channelsCache;
         private readonly IElasticClient elasticClient;
 
         public NewTwitchChannelMessageConsumer(
-            IRepository repository, 
+            IUsersRepository usersRepository, 
             IChannelsCache channelsCache,
             IElasticClient elasticClient)
         {
-            this.repository = repository;
+            this.usersRepository = usersRepository;
             this.channelsCache = channelsCache;
             this.elasticClient = elasticClient;
         }
@@ -28,7 +28,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
         {
             var chatMessage = context.Message;
-            await repository.CreateOrUpdateUsers(new User
+            await usersRepository.CreateOrUpdateUsers(new User
             {
                 Username = chatMessage.User.UserName,
                 Id = chatMessage.User.UserId
