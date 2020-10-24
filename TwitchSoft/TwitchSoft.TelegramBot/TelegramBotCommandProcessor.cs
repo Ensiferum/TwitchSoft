@@ -1,5 +1,4 @@
-﻿using Grpc.Core;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -213,7 +212,6 @@ Usage:
         {
             await scopeFactory.RunInScope(async (scope) =>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IUsersRepository>();
                 var esClient = scope.ServiceProvider.GetService<IESService>();
 
                 var count = 50;
