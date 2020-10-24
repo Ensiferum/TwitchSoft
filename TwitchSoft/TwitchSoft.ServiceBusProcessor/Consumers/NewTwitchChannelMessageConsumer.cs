@@ -44,7 +44,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 PostedTime = chatMessage.PostedTime,
             };
 
-            await elasticClient.IndexManyAsync(new[] { chatMessageES });
+            await elasticClient.IndexDocumentAsync(chatMessageES);
         }
     }
 }
