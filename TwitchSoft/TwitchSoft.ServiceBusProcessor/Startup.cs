@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared;
 using TwitchSoft.Shared.ElasticSearch;
@@ -26,6 +28,11 @@ namespace TwitchSoft.ServiceBusProcessor
 
             services.AddCache(Configuration);
             services.AddElasticSearch(Configuration);
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+
         }
     }
 }
