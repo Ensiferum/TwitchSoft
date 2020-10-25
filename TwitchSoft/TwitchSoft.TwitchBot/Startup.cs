@@ -7,7 +7,12 @@ using TwitchSoft.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using System;
+using MediatR;
+using TwitchLib.Client.Interfaces;
+using Microsoft.Extensions.Options;
+using TwitchLib.Client.Models;
+using TwitchLib.Client;
+using AutoMapper;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -23,7 +28,6 @@ namespace TwitchSoft.TwitchBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureShared();
-
             services.AddScoped<ITwitchApiService, TwitchApiService>();
             services.AddSingleton<TwitchBot>();
 
@@ -32,6 +36,7 @@ namespace TwitchSoft.TwitchBot
                 .AddOptions();
 
             services.AddHostedService<TwitchBotService>();
+            services.AddHostedService<OrcherstratorClient>();
 
             services.AddServiceBusProcessors(Configuration);
 
@@ -39,6 +44,21 @@ namespace TwitchSoft.TwitchBot
 
             services.AddTransient<IChatPlugin, KrippArenaBotChatPlugin>();
             services.AddTransient<IChatPlugin, RaffleParticipantBotChatPlugin>();
+
+            services.AddSingleton<ITwitchClient>(sp =>
+            {
+                var botSettings = sp.GetService<IOptions<BotSettings>>();
+
+                ConnectionCredentials credentials = new ConnectionCredentials(botSettings.Value.BotName, botSettings.Value.BotOAuthToken);
+
+                var client =  new TwitchClient();
+                client.Initialize(credentials);
+                return client;
+            });
+
+            services.AddMediatR(typeof(Startup));
+
+            services.AddAutoMapper(typeof(Startup));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

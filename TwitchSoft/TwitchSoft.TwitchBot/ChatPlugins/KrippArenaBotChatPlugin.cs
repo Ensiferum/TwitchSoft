@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using TwitchLib.Client;
+using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 
 namespace TwitchSoft.TwitchBot.ChatPlugins
@@ -14,7 +14,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
         {
             this.logger = logger;
         }
-        public Task ProcessMessage(ChatMessage chatMessage, TwitchClient twitchClient)
+        public Task ProcessMessage(ChatMessage chatMessage, ITwitchClient twitchClient)
         {
             if (chatMessage.Channel == "nl_kripp" &&
                 chatMessage.Username.Equals("streamlabs", StringComparison.OrdinalIgnoreCase) &&

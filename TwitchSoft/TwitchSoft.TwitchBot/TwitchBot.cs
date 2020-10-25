@@ -1,85 +1,55 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
 using System;
-using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Events;
-using TwitchLib.Communication.Models;
-using TwitchSoft.Shared.Database.Models;
-using TwitchSoft.Shared.Services.Helpers;
-using User = TwitchSoft.Shared.ServiceBus.Models.User;
-using TwitchSoft.Shared.Services.Models.Twitch;
-using TwitchSoft.Shared.ServiceBus.Models;
 using System.Linq;
-using TwitchSoft.TwitchBot.ChatPlugins;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.SignalR.Client;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
-using Microsoft.Extensions.Configuration;
+using TwitchLib.Client.Interfaces;
+using MassTransit.Mediator;
+using TwitchSoft.TwitchBot.MediatR.Models;
 
 namespace TwitchSoft.TwitchBot
 {
     public class TwitchBot
     {
         private readonly ILogger<TwitchBot> logger;
-        private readonly IConfiguration configuration;
-        private readonly IServiceProvider serviceProvider;
-        private readonly IEnumerable<IChatPlugin> chatPlugins;
-        private readonly List<string> JoinedChannels = new List<string>();
+        private readonly ITwitchClient twitchClient;
+        private readonly IMediator mediator;
 
-        private ISendEndpointProvider Bus => serviceProvider.GetService<ISendEndpointProvider>();
-
-        private const string JoinChannelsCommand = "JoinChannelsCommand";
-
-        private BotSettings BotSettings { get; set; }
         private static int LogMessagesCount = 0;
         private static int LowMessagesCount = 0;
         private static int MessagesCountPer10Sec = 0;
 
-        private TwitchClient twitchClient;
-        private HubConnection connection;
         private Timer timer;
 
         public TwitchBot(
             ILogger<TwitchBot> logger, 
-            IOptions<BotSettings> options,
-            IConfiguration configuration,
-            IServiceProvider serviceProvider,
-            IEnumerable<IChatPlugin> chatPlugins)
+            ITwitchClient twitchClient,
+            IMediator mediator)
         {
             this.logger = logger;
-            this.configuration = configuration;
-            this.serviceProvider = serviceProvider;
-            this.chatPlugins = chatPlugins;
-            BotSettings = options.Value;
+            this.twitchClient = twitchClient;
+            this.mediator = mediator;
         }
 
-        public Task Start()
+        public void Start()
         {
             timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
-            return Connect();
+            Connect();
         }
 
-        public async Task Stop()
+        public void Stop()
         {
             timer.Dispose();
             twitchClient.Disconnect();
-            await connection.StopAsync();
         }
 
-        private async Task Connect()
+        private void Connect()
         {
             try
             {
-                InitTwitchBotClient();
+                InitTwitchBotEvents();
                 twitchClient.Connect();
-                await Task.Delay(5000);
-                await InitSignalRClient();
             }
             catch (Exception ex)
             {
@@ -111,7 +81,6 @@ namespace TwitchSoft.TwitchBot
                         logger.LogError(e, "Failed to disconnect");
                     }
 
-                    InitTwitchBotClient();
                     twitchClient.Connect();
                 }
             }
@@ -122,55 +91,8 @@ namespace TwitchSoft.TwitchBot
             LogMessagesCount = 0;
         }
 
-        private async Task InitSignalRClient()
+        private void InitTwitchBotEvents()
         {
-            connection = new HubConnectionBuilder()
-                .WithUrl(configuration.GetValue<string>("Services:TwitchBotOrchestratorHub"))
-                .WithAutomaticReconnect()
-                .Build();
-
-            connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
-
-            connection.Reconnected += Connection_Reconnected;
-
-            connection.Closed += Connection_Closed;
-
-            try
-            {
-                await connection.StartAsync();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occured");
-            }
-
-            logger.LogInformation($"HubInfo: {connection.ConnectionId}, {connection.State}");
-
-            Task Connection_Closed(Exception arg)
-            {
-                logger.LogError(arg, "Hub Connection Closed");
-                return Task.CompletedTask;
-            }
-
-            Task Connection_Reconnected(string arg)
-            {
-                logger.LogInformation("Hub Connection Reconnected", arg);
-                return Task.CompletedTask;
-            }
-        }
-
-        private void InitTwitchBotClient()
-        {
-            ConnectionCredentials credentials = new ConnectionCredentials(BotSettings.BotName, BotSettings.BotOAuthToken);
-            var clientOptions = new ClientOptions
-            {
-                MessagesAllowedInPeriod = 5000,
-                ThrottlingPeriod = TimeSpan.FromSeconds(1)
-            };
-            var customClient = new WebSocketClient(clientOptions);
-            twitchClient = new TwitchClient(customClient);
-            twitchClient.Initialize(credentials, autoReListenOnExceptions: false);
-
             twitchClient.OnDisconnected += Client_OnDisconnected;
             twitchClient.OnConnected += Client_OnConnected;
             twitchClient.OnMessageReceived += Client_OnMessageReceived;
@@ -237,203 +159,67 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
-
-            foreach (var channel in JoinedChannels)
-            {
-                twitchClient.JoinChannel(channel);
-            }
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             MessagesCountPer10Sec++;
-            var chatMessage = new NewTwitchChannelMessage()
+            await mediator.Send(new NewChatMessageDto
             {
-                Id = Guid.Parse(e.ChatMessage.Id),
-                Channel = e.ChatMessage.Channel,
-                Message = e.ChatMessage.Message,
-                User = new User
-                {
-                    UserId = uint.Parse(e.ChatMessage.UserId),
-                    UserName = e.ChatMessage.Username,
-                },
-                IsBroadcaster = e.ChatMessage.IsBroadcaster,
-                IsModerator = e.ChatMessage.IsModerator,
-                IsSubscriber = e.ChatMessage.IsSubscriber,
-                PostedTime = DateTime.UtcNow,
-                UserType = Enum.Parse<UserType>(e.ChatMessage.UserType.ToString())
-            };
-            await Bus.Send(chatMessage);
-
-            foreach (var plugin in chatPlugins)
-            {
-                await plugin.ProcessMessage(e.ChatMessage, twitchClient);
-            }
+                ChatMessage = e.ChatMessage,
+            });
         }
 
         private async void Client_OnNewSubscriber(object sender, OnNewSubscriberArgs e)
         {
-            var subInfo = e.Subscriber;
-            var newSub = new NewSubscriber
+            await mediator.Send(new NewSubscriberDto
             {
-                Channel = e.Channel,
-                Id = Guid.Parse(subInfo.Id),
-                SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
-                Months = 0,
-                SubscriptionPlan = Enum.Parse<SubscriptionPlan>(subInfo.SubscriptionPlan.ToString()),
-                User = new User
-                {
-                    UserId = uint.Parse(subInfo.UserId),
-                    UserName = subInfo.Login,
-                },
-                UserType = Enum.Parse<UserType>(subInfo.UserType.ToString())
-            };
-
-            await Bus.Send(newSub);
+                Subscriber = e.Subscriber,
+            });
         }
 
 
         private async void Client_OnReSubscriber(object sender, OnReSubscriberArgs e)
         {
-            var subInfo = e.ReSubscriber;
-            var newSub = new NewSubscriber
+            await mediator.Send(new NewResubscriberDto
             {
-                Channel = e.Channel,
-                Id = Guid.Parse(subInfo.Id),
-                SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
-                Months = int.Parse(subInfo.MsgParamCumulativeMonths),
-                SubscriptionPlan = Enum.Parse<SubscriptionPlan>(subInfo.SubscriptionPlan.ToString()),
-                User = new User
-                {
-                    UserId = uint.Parse(subInfo.UserId),
-                    UserName = subInfo.Login,
-                },
-                UserType = Enum.Parse<UserType>(subInfo.UserType.ToString())
-            };
-
-            await Bus.Send(newSub);
+                ReSubscriber = e.ReSubscriber,
+            });
         }
 
         private async void Client_OnGiftedSubscription(object sender, OnGiftedSubscriptionArgs e)
         {
-            var subInfo = e.GiftedSubscription;
-            var newSub = new NewSubscriber
+            await mediator.Send(new NewGiftedSubscriptionDto
             {
+                GiftedSubscription = e.GiftedSubscription,
                 Channel = e.Channel,
-                Id = Guid.Parse(subInfo.Id),
-                SubscribedTime = DateTimeHelper.FromUnixTimeToUTC(subInfo.TmiSentTs),
-                Months = subInfo.MsgParamMonths != null ? int.Parse(subInfo.MsgParamMonths) : 0,
-                SubscriptionPlan = (SubscriptionPlan)subInfo.MsgParamSubPlan,
-                User = new User
-                {
-                    UserId = uint.Parse(subInfo.MsgParamRecipientId),
-                    UserName = subInfo.MsgParamRecipientUserName,
-                },
-                UserType = Enum.Parse<UserType>(subInfo.UserType.ToString()),
-                GiftedBy = new User {
-                    UserId = uint.Parse(subInfo.UserId),
-                    UserName = subInfo.Login,
-                }
-            };
-
-            await Bus.Send(newSub);
+            });
         }
 
         private async void Client_OnCommunitySubscription(object sender, OnCommunitySubscriptionArgs e)
         {
-            var comSubInfo = e.GiftedSubscription;
-            var newSub = new NewCommunitySubscription
+            await mediator.Send(new NewCommunitySubscriptionDto
             {
+                CommunitySubscription = e.GiftedSubscription,
                 Channel = e.Channel,
-                Id = Guid.Parse(comSubInfo.Id),
-                Date = DateTimeHelper.FromUnixTimeToUTC(comSubInfo.TmiSentTs),
-                SubscriptionPlan = (SubscriptionPlan)comSubInfo.MsgParamSubPlan,
-                User = new User
-                {
-                    UserId = uint.Parse(comSubInfo.UserId),
-                    UserName = comSubInfo.Login,
-                },
-                GiftCount = comSubInfo.MsgParamMassGiftCount,
-            };
-
-            await Bus.Send(newSub);
+            });
         }
 
         private async void Client_OnUserBanned(object sender, OnUserBannedArgs e)
         {
-            var banInfo = e.UserBan;
-            var newBan = new NewBan
+            await mediator.Send(new NewUserBanDto
             {
-                Channel = banInfo.Channel,
-                Reason = banInfo.BanReason,
-                BannedTime = DateTime.UtcNow,
-                BanType = BanType.Ban,
-                User = new User
-                {
-                    // we have no userId here
-                    UserName = banInfo.Username,
-                },
-            };
-
-            await Bus.Send(newBan);
+                UserBan = e.UserBan,
+            });
         }
 
 
         private async void Client_OnUserTimedout(object sender, OnUserTimedoutArgs e)
         {
-            var banInfo = e.UserTimeout;
-            var newBan = new NewBan
+            await mediator.Send(new NewUserTimeoutDto
             {
-                Channel = banInfo.Channel,
-                Reason = banInfo.TimeoutReason,
-                BannedTime = DateTime.UtcNow,
-                BanType = BanType.Timeout,
-                Duration = banInfo.TimeoutDuration,
-                User = new User
-                {
-                    // we have no userId here
-                    
-                    UserName = banInfo.Username,
-                },
-            };
-
-            await Bus.Send(newBan);
-        }
-
-        public void RefreshJoinedChannels(IEnumerable<string> channels)
-        {
-            logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
-            JoinedChannels.Clear();
-            JoinedChannels.AddRange(channels);
-
-            if (twitchClient.IsConnected)
-            {
-                var joinedChannels = twitchClient.JoinedChannels;
-
-                foreach (var channel in joinedChannels)
-                {
-                    if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        twitchClient.LeaveChannel(channel.Channel);
-                    }
-                }
-
-                foreach (var channel in channels)
-                {
-                    if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        twitchClient.JoinChannel(channel);
-                    }
-                }
-            }
+                UserTimeout = e.UserTimeout,
+            });
         }
     }
 }

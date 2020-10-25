@@ -3,7 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TwitchLib.Client;
+using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 
 namespace TwitchSoft.TwitchBot.ChatPlugins
@@ -92,7 +92,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
         {
             this.logger = logger;
         }
-        public async Task ProcessMessage(ChatMessage chatMessage, TwitchClient twitchClient)
+        public async Task ProcessMessage(ChatMessage chatMessage, ITwitchClient twitchClient)
         {
             if (Regex.IsMatch(chatMessage.Message, "^[!#]\\w+$", RegexOptions.Compiled))
             {

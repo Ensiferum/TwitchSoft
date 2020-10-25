@@ -3,11 +3,10 @@ using TwitchSoft.Shared.Database.Models;
 
 namespace TwitchSoft.Shared.ServiceBus.Models
 {
-    public record NewCommunitySubscription
+    public class NewCommunitySubscription
     {
         public Guid Id { get; set; }
         public string Channel { get; set; }
-        public uint UserId { get; set; }
         public DateTime Date { get; set; }
         public int GiftCount { get; set; }
         public SubscriptionPlan SubscriptionPlan { get; set; }

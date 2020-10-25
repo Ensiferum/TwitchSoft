@@ -3,7 +3,7 @@ using TwitchSoft.Shared.Database.Models;
 
 namespace TwitchSoft.Shared.ServiceBus.Models
 {
-    public record NewBan
+    public class NewBan
     {
         public string Channel { get; set; }
         public string Reason { get; set; }

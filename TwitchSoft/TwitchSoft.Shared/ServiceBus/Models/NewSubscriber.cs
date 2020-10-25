@@ -3,7 +3,7 @@ using TwitchSoft.Shared.Database.Models;
 
 namespace TwitchSoft.Shared.ServiceBus.Models
 {
-    public record NewSubscriber
+    public class NewSubscriber
     {
         public Guid Id { get; set; }
         public UserType UserType { get; set; }
