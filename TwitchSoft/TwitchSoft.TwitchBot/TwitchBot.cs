@@ -38,7 +38,7 @@ namespace TwitchSoft.TwitchBot
 
         public void Start()
         {
-            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
+            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
             Connect();
         }
 
@@ -63,16 +63,18 @@ namespace TwitchSoft.TwitchBot
 
         private void CheckConnection(object state)
         {
-            logger.LogInformation($"Messages per 20 seconds: {MessagesCountPer10Sec}");
+            logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
             MessagesCountPer10Sec = 0;
 
             logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-            logger.LogTrace($"Joined channels:{twitchClient.JoinedChannels.Count}");
+            logger.LogTrace($"Joined channels count:{twitchClient.JoinedChannels.Count}");
+            
             if (LogMessagesCount < 5)
             {
                 LowMessagesCount++;
                 if (LowMessagesCount >= 5)
                 {
+                    logger.LogInformation($"Joined channels. Channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
                     logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
 
                     logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
@@ -119,12 +121,12 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
         {
-            logger.LogInformation($"OnLeftChannel: {e.Channel}");
+            logger.LogTrace($"OnLeftChannel: {e.Channel}");
         }
 
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            logger.LogInformation($"OnJoinedChannel: {e.Channel}");
+            logger.LogTrace($"OnJoinedChannel: {e.Channel}");
         }
 
         private void Client_OnLog(object sender, OnLogArgs e)
@@ -238,31 +240,22 @@ namespace TwitchSoft.TwitchBot
 
             if (twitchClient.IsConnected)
             {
-                var joinedChannels = twitchClient.JoinedChannels;
+                var joinedChannels = twitchClient.JoinedChannels.Select(_ => _.Channel.ToLower()).ToList();
+                var newChannels = channels.Select(chan => chan.ToLower()).ToList();
 
+                var channelsToLeave = joinedChannels.Except(newChannels);
+                var channelsToConnect = newChannels.Except(joinedChannels);
+                logger.LogInformation($"Channels To Connect\r\n{string.Join("\r\n", channelsToConnect.Select(_ => $"+{_}"))}");
+                logger.LogInformation($"Channels To Leave\r\n{string.Join("\r\n", channelsToLeave.Select(_ => $"-{_}"))}");
 
-                foreach (var channel in joinedChannels)
+                foreach (var channel in channelsToLeave)
                 {
-                    if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        twitchClient.LeaveChannel(channel.Channel);
-                    }
+                    twitchClient.LeaveChannel(channel);
                 }
 
-                foreach (var channel in channels)
+                foreach (var channel in channelsToConnect)
                 {
-                    if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        twitchClient.JoinChannel(channel);
-                    }
+                    twitchClient.JoinChannel(channel);
                 }
             }
         }
