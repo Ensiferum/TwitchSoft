@@ -20,11 +20,13 @@ namespace TwitchSoft.TwitchBot
             this.twitchBot = twitchBot;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("TwitchBotService is starting.");
+            var rand = new Random();
+            var secondsToWarmUp = rand.Next(0, 60);
+            await Task.Delay(TimeSpan.FromSeconds(secondsToWarmUp), cancellationToken);
             twitchBot.Start();
-            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
