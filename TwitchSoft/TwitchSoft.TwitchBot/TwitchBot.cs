@@ -38,7 +38,7 @@ namespace TwitchSoft.TwitchBot
 
         public void Start()
         {
-            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
+            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
             Connect();
         }
 
@@ -63,7 +63,7 @@ namespace TwitchSoft.TwitchBot
 
         private void CheckConnection(object state)
         {
-            logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
+            logger.LogInformation($"Messages per 20 seconds: {MessagesCountPer10Sec}");
             MessagesCountPer10Sec = 0;
 
             logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
@@ -76,14 +76,6 @@ namespace TwitchSoft.TwitchBot
                     logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
 
                     logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
-                    try
-                    {
-                        twitchClient.Disconnect();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "Failed to disconnect");
-                    }
                     var policy = Policy.Handle<Exception>()
                         .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                         (exception, timeSpan) =>
@@ -91,7 +83,7 @@ namespace TwitchSoft.TwitchBot
                         logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
                     });
 
-                    policy.Execute(() => twitchClient.Connect());
+                    policy.Execute(() => twitchClient.Reconnect());
                 }
             }
             else
