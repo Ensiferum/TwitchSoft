@@ -21,12 +21,12 @@ namespace TwitchSoft.TwitchBot
 
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            await base.StartAsync(cancellationToken);
             Logger.LogInformation("TwitchBotService is starting.");
             var rand = new Random();
             var secondsToWarmUp = rand.Next(0, 60);
             await Task.Delay(TimeSpan.FromSeconds(secondsToWarmUp), cancellationToken);
             twitchBot.Start();
+            await base.StartAsync(cancellationToken);
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
