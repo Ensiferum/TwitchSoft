@@ -13,6 +13,9 @@ using Microsoft.Extensions.Options;
 using TwitchLib.Client.Models;
 using TwitchLib.Client;
 using AutoMapper;
+using TwitchLib.Communication.Clients;
+using TwitchLib.Communication.Models;
+using System;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -51,7 +54,13 @@ namespace TwitchSoft.TwitchBot
 
                 ConnectionCredentials credentials = new ConnectionCredentials(botSettings.Value.BotName, botSettings.Value.BotOAuthToken);
 
-                var client =  new TwitchClient();
+                var clientOptions = new ClientOptions
+                {
+                    MessagesAllowedInPeriod = 10000,
+                    ThrottlingPeriod = TimeSpan.FromSeconds(1)
+                };
+                var customClient = new WebSocketClient(clientOptions);
+                var client =  new TwitchClient(customClient);
                 client.Initialize(credentials);
                 return client;
             });
