@@ -7,6 +7,9 @@ using System.Threading;
 using TwitchLib.Client.Interfaces;
 using TwitchSoft.TwitchBot.MediatR.Models;
 using MediatR;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Polly;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -19,6 +22,7 @@ namespace TwitchSoft.TwitchBot
         private static int LogMessagesCount = 0;
         private static int LowMessagesCount = 0;
         private static int MessagesCountPer10Sec = 0;
+        private readonly List<string> JoinedChannels = new List<string>();
 
         private Timer timer;
 
@@ -80,8 +84,14 @@ namespace TwitchSoft.TwitchBot
                     {
                         logger.LogError(e, "Failed to disconnect");
                     }
+                    var policy = Policy.Handle<Exception>()
+                        .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                        (exception, timeSpan) =>
+                    {
+                        logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
+                    });
 
-                    twitchClient.Connect();
+                    policy.Execute(() => twitchClient.Connect());
                 }
             }
             else
@@ -121,7 +131,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            logger.LogTrace($"OnJoinedChannel: {e.Channel}");
+            logger.LogInformation($"OnJoinedChannel: {e.Channel}");
         }
 
         private void Client_OnLog(object sender, OnLogArgs e)
@@ -159,6 +169,8 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
+
+            RefreshJoinedChannels(JoinedChannels);
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -220,6 +232,42 @@ namespace TwitchSoft.TwitchBot
             {
                 UserTimeout = e.UserTimeout,
             });
+        }
+
+        public void RefreshJoinedChannels(IEnumerable<string> channels)
+        {
+            logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
+            JoinedChannels.Clear();
+            JoinedChannels.AddRange(channels);
+
+            if (twitchClient.IsConnected)
+            {
+                var joinedChannels = twitchClient.JoinedChannels;
+
+                foreach (var channel in joinedChannels)
+                {
+                    if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.LeaveChannel(channel.Channel);
+                    }
+                }
+
+                foreach (var channel in channels)
+                {
+                    if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.JoinChannel(channel);
+                    }
+                }
+            }
         }
     }
 }
