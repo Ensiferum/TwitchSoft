@@ -5,8 +5,8 @@ using TwitchLib.Communication.Events;
 using System.Linq;
 using System.Threading;
 using TwitchLib.Client.Interfaces;
-using MassTransit.Mediator;
 using TwitchSoft.TwitchBot.MediatR.Models;
+using MediatR;
 
 namespace TwitchSoft.TwitchBot
 {
