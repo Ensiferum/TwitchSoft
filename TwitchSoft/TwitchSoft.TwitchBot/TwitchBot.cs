@@ -90,6 +90,7 @@ namespace TwitchSoft.TwitchBot
             {
                 LowMessagesCount = 0;
             }
+            RefreshJoinedChannels(JoinedChannels);
             LogMessagesCount = 0;
         }
 
