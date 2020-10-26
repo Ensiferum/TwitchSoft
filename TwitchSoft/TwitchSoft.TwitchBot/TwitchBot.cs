@@ -19,12 +19,10 @@ namespace TwitchSoft.TwitchBot
         private readonly ITwitchClient twitchClient;
         private readonly IMediator mediator;
 
-        private static int LogMessagesCount = 0;
-        private static int LowMessagesCount = 0;
-        private static int MessagesCountPer10Sec = 0;
+        //private static int LogMessagesCount = 0;
+        //private static int LowMessagesCount = 0;
+        //private static int MessagesCountPer10Sec = 0;
         private readonly List<string> JoinedChannels = new List<string>();
-
-        private Timer timer;
 
         public TwitchBot(
             ILogger<TwitchBot> logger, 
@@ -38,13 +36,12 @@ namespace TwitchSoft.TwitchBot
 
         public void Start()
         {
-            timer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
             Connect();
         }
 
         public void Stop()
         {
-            timer.Dispose();
+            //timer.Dispose();
             twitchClient.Disconnect();
         }
 
@@ -61,40 +58,40 @@ namespace TwitchSoft.TwitchBot
             }
         }
 
-        private void CheckConnection(object state)
-        {
-            logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
-            MessagesCountPer10Sec = 0;
+        //private void CheckConnection(object state)
+        //{
+        //    logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
+        //    MessagesCountPer10Sec = 0;
 
-            logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-            logger.LogTrace($"Joined channels count:{twitchClient.JoinedChannels.Count}");
+        //    logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
+        //    logger.LogTrace($"Joined channels count:{twitchClient.JoinedChannels.Count}");
             
-            if (LogMessagesCount < 5)
-            {
-                LowMessagesCount++;
-                if (LowMessagesCount >= 5)
-                {
-                    logger.LogInformation($"Joined channels. Channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
-                    logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
+        //    if (LogMessagesCount < 5)
+        //    {
+        //        LowMessagesCount++;
+        //        if (LowMessagesCount >= 5)
+        //        {
+        //            logger.LogInformation($"Joined channels. Channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
+        //            logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
 
-                    logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
-                    var policy = Policy.Handle<Exception>()
-                        .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                        (exception, timeSpan) =>
-                    {
-                        logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
-                    });
+        //            logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
+        //            var policy = Policy.Handle<Exception>()
+        //                .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        //                (exception, timeSpan) =>
+        //            {
+        //                logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
+        //            });
 
-                    policy.Execute(() => twitchClient.Reconnect());
-                }
-            }
-            else
-            {
-                LowMessagesCount = 0;
-            }
-            //RefreshJoinedChannels(JoinedChannels);
-            LogMessagesCount = 0;
-        }
+        //            policy.Execute(() => twitchClient.Reconnect());
+        //        }
+        //    }
+        //    else
+        //    {
+        //        LowMessagesCount = 0;
+        //    }
+        //    //RefreshJoinedChannels(JoinedChannels);
+        //    LogMessagesCount = 0;
+        //}
 
         private void InitTwitchBotEvents()
         {
@@ -132,7 +129,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             logger.LogTrace(e.Data);
-            LogMessagesCount++;
+            //LogMessagesCount++;
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
@@ -170,7 +167,7 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            MessagesCountPer10Sec++;
+            //MessagesCountPer10Sec++;
             await mediator.Send(new NewChatMessageDto
             {
                 ChatMessage = e.ChatMessage,
