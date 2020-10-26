@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace TwitchSoft.TwitchBot
 {
-    public class TwitchBotService : BackgroundService
+    public class TwitchBotService : IHostedService, IDisposable
     {
         private readonly TwitchBot twitchBot;
+        private Timer _timer;
 
         private ILogger<TwitchBotService> Logger { get; }
         public TwitchBotService(
@@ -19,26 +20,34 @@ namespace TwitchSoft.TwitchBot
             this.twitchBot = twitchBot;
         }
 
-        public override async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("TwitchBotService is starting.");
             var rand = new Random();
             var secondsToWarmUp = rand.Next(0, 60);
             await Task.Delay(TimeSpan.FromSeconds(secondsToWarmUp), cancellationToken);
             twitchBot.Start();
-            await base.StartAsync(cancellationToken);
+
+            _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
         }
 
-        public override async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
+            _timer?.Change(Timeout.Infinite, 0);
+
             Logger.LogInformation("TwitchBotService is stopping.");
             twitchBot.Stop();
-            await base.StopAsync(cancellationToken);
+            return Task.CompletedTask;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public void Dispose()
         {
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            _timer?.Dispose();
+        }
+
+        private void DoWork(object state)
+        {
+            Logger.LogInformation("TriggerRefreshJoinedChannels");
             twitchBot.TriggerRefreshJoinedChannels();
         }
     }
