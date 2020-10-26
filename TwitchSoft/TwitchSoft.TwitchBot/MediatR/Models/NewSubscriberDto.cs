@@ -6,5 +6,6 @@ namespace TwitchSoft.TwitchBot.MediatR.Models
     public record NewSubscriberDto : IRequest
     {
         public Subscriber Subscriber { get; init; }
+        public string Channel { get; init; }
     }
 }

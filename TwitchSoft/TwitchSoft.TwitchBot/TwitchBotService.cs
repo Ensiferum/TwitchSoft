@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TwitchSoft.TwitchBot
 {
-    public class TwitchBotService : IHostedService
+    public class TwitchBotService : BackgroundService
     {
         private readonly TwitchBot twitchBot;
 
@@ -20,8 +19,9 @@ namespace TwitchSoft.TwitchBot
             this.twitchBot = twitchBot;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
+            await base.StartAsync(cancellationToken);
             Logger.LogInformation("TwitchBotService is starting.");
             var rand = new Random();
             var secondsToWarmUp = rand.Next(0, 60);
@@ -29,11 +29,17 @@ namespace TwitchSoft.TwitchBot
             twitchBot.Start();
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("TwitchBotService is stopping.");
             twitchBot.Stop();
-            return Task.CompletedTask;
+            await base.StopAsync(cancellationToken);
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            twitchBot.TriggerRefreshJoinedChannels();
         }
     }
 }

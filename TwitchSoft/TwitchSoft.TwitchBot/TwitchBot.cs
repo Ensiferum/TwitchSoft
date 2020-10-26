@@ -3,13 +3,10 @@ using System;
 using TwitchLib.Client.Events;
 using TwitchLib.Communication.Events;
 using System.Linq;
-using System.Threading;
 using TwitchLib.Client.Interfaces;
 using TwitchSoft.TwitchBot.MediatR.Models;
 using MediatR;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using Polly;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -179,6 +176,7 @@ namespace TwitchSoft.TwitchBot
             await mediator.Send(new NewSubscriberDto
             {
                 Subscriber = e.Subscriber,
+                Channel = e.Channel,
             });
         }
 
@@ -225,6 +223,11 @@ namespace TwitchSoft.TwitchBot
             {
                 UserTimeout = e.UserTimeout,
             });
+        }
+
+        public void TriggerRefreshJoinedChannels()
+        {
+            RefreshJoinedChannels(JoinedChannels);
         }
 
         public void RefreshJoinedChannels(IEnumerable<string> channels, bool withClear = false)
