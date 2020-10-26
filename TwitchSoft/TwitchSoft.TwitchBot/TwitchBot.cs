@@ -143,7 +143,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected", e);
-            twitchClient.Disconnect();
+            RefreshJoinedChannels(JoinedChannels);
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -234,11 +234,14 @@ namespace TwitchSoft.TwitchBot
             });
         }
 
-        public void RefreshJoinedChannels(IEnumerable<string> channels)
+        public void RefreshJoinedChannels(IEnumerable<string> channels, bool withClear = false)
         {
             logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
-            JoinedChannels.Clear();
-            JoinedChannels.AddRange(channels);
+            if (withClear)
+            {
+                JoinedChannels.Clear();
+                JoinedChannels.AddRange(channels);
+            }
 
             if (twitchClient.IsConnected)
             {

@@ -71,7 +71,7 @@ namespace TwitchSoft.TwitchBot
         public void RefreshJoinedChannels(IEnumerable<string> channels)
         {
             logger.LogInformation($"HubEvent: RefreshJoinedChannels triggered");
-            twitchBot.RefreshJoinedChannels(channels);
+            twitchBot.RefreshJoinedChannels(channels, withClear: true);
         }
     }
 }
