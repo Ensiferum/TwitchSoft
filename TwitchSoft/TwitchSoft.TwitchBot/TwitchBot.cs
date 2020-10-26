@@ -191,6 +191,7 @@ namespace TwitchSoft.TwitchBot
             await mediator.Send(new NewResubscriberDto
             {
                 ReSubscriber = e.ReSubscriber,
+                Channel = e.Channel,
             });
         }
 
