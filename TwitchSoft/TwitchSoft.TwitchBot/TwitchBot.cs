@@ -90,7 +90,7 @@ namespace TwitchSoft.TwitchBot
             {
                 LowMessagesCount = 0;
             }
-            RefreshJoinedChannels(JoinedChannels);
+            //RefreshJoinedChannels(JoinedChannels);
             LogMessagesCount = 0;
         }
 
@@ -239,6 +239,7 @@ namespace TwitchSoft.TwitchBot
             if (twitchClient.IsConnected)
             {
                 var joinedChannels = twitchClient.JoinedChannels;
+
 
                 foreach (var channel in joinedChannels)
                 {
