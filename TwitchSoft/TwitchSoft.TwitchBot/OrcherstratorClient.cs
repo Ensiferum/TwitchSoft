@@ -29,7 +29,7 @@ namespace TwitchSoft.TwitchBot
                 .WithAutomaticReconnect()
                 .Build();
 
-            connection.On<IEnumerable<string>>(JoinChannelsCommand, channels => RefreshJoinedChannels(channels));
+            connection.On<IEnumerable<string>>(JoinChannelsCommand, async channels => await RefreshJoinedChannels(channels));
 
             connection.Reconnected += Connection_Reconnected;
 
@@ -70,34 +70,43 @@ namespace TwitchSoft.TwitchBot
             return connection.StopAsync(cancellationToken);
         }
 
-        public void RefreshJoinedChannels(IEnumerable<string> channels)
+        public async Task RefreshJoinedChannels(IEnumerable<string> channels)
         {
             logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
 
-            var joinedChannels = twitchClient.JoinedChannels;
-
-            foreach (var channel in joinedChannels)
+            if (twitchClient.IsConnected)
             {
-                if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-                else
-                {
-                    twitchClient.LeaveChannel(channel.Channel);
-                }
-            }
+                logger.LogInformation($"Twitch Client is connected");
+                var joinedChannels = twitchClient.JoinedChannels;
 
-            foreach (var channel in channels)
+                foreach (var channel in joinedChannels)
+                {
+                    if (channels.Any(_ => _.Equals(channel.Channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.LeaveChannel(channel.Channel);
+                    }
+                }
+
+                foreach (var channel in channels)
+                {
+                    if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        twitchClient.JoinChannel(channel);
+                    }
+                }
+            } else
             {
-                if (joinedChannels.Any(_ => _.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-                else
-                {
-                    twitchClient.JoinChannel(channel);
-                }
+                logger.LogInformation($"Twitch Client is not connected. Delaying...");
+                await Task.Delay(5000);
+                await RefreshJoinedChannels(channels);
             }
         }
     }
