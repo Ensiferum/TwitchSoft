@@ -206,7 +206,14 @@ namespace TwitchSoft.TwitchBot
                 var channelsToLeave = joinedChannels.Except(newChannels);
                 var channelsToConnect = newChannels.Except(joinedChannels);
 
+
                 var logChannels = channelsToConnect.Select(_ => $"+{_}").Union(channelsToLeave.Select(_ => $"-{_}"));
+
+                if (!logChannels.Any())
+                {
+                    return;
+                }
+
                 logger.LogInformation($"New Channels:\r\n{string.Join("\r\n", logChannels)}");
 
                 foreach (var channel in channelsToLeave)
