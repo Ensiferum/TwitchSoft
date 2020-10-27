@@ -113,7 +113,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             logger.LogInformation($"Bot is disconnected", e);
-            twitchClient.Reconnect();
+            twitchClient.Connect();
         }
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
