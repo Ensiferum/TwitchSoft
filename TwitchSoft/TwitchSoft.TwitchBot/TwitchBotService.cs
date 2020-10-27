@@ -23,12 +23,9 @@ namespace TwitchSoft.TwitchBot
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("TwitchBotService is starting.");
-            //var rand = new Random();
-            //var secondsToWarmUp = rand.Next(0, 60);
-            //await Task.Delay(TimeSpan.FromSeconds(secondsToWarmUp), cancellationToken);
             twitchBot.Start();
 
-            _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(600));
+            _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
         }
@@ -47,10 +44,10 @@ namespace TwitchSoft.TwitchBot
             _timer?.Dispose();
         }
 
-        private void DoWork(object state)
+        private async void DoWork(object state)
         {
             Logger.LogInformation("TriggerRefreshJoinedChannels");
-            twitchBot.TriggerRefreshJoinedChannels();
+            await twitchBot.TriggerChannelsJoin();
         }
     }
 }

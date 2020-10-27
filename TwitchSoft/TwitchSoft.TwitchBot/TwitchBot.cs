@@ -7,6 +7,7 @@ using TwitchLib.Client.Interfaces;
 using TwitchSoft.TwitchBot.MediatR.Models;
 using MediatR;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -59,7 +60,6 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnJoinedChannel += Client_OnJoinedChannel;
             twitchClient.OnLeftChannel += Client_OnLeftChannel;
 
-            twitchClient.OnMessageThrottled += Client_OnMessageThrottled;
             twitchClient.OnConnectionError += Client_OnConnectionError;
             twitchClient.OnError += Client_OnError;
             twitchClient.OnReconnected += Client_OnReconnected;
@@ -92,7 +92,6 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogWarning("OnReconnected", e);
-            RefreshJoinedChannels(JoinedChannels);
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -105,11 +104,6 @@ namespace TwitchSoft.TwitchBot
             logger.LogError($"ConnectionError\r\nMessage:{e.Error.Message}");
         }
 
-        private void Client_OnMessageThrottled(object sender, OnMessageThrottledEventArgs e)
-        {
-            logger.LogWarning($"MessageThrottled\r\nMessage:{e.Message}\tSentMessageCount:{e.SentMessageCount}");
-        }
-
         private void Client_OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             logger.LogInformation($"Bot is disconnected", e);
@@ -119,8 +113,6 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogInformation($"Connected to {e.AutoJoinChannel}");
-
-            RefreshJoinedChannels(JoinedChannels);
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -185,24 +177,13 @@ namespace TwitchSoft.TwitchBot
             });
         }
 
-        public void TriggerRefreshJoinedChannels()
+        public async Task TriggerChannelsJoin()
         {
-            RefreshJoinedChannels(JoinedChannels);
-        }
-
-        public void RefreshJoinedChannels(IEnumerable<string> channels, bool withClear = false)
-        {
-            if (withClear)
-            {
-                logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
-                JoinedChannels.Clear();
-                JoinedChannels.AddRange(channels);
-            }
-
+            const int DelayMs = 50;
             if (twitchClient.IsConnected)
             {
                 var joinedChannels = twitchClient.JoinedChannels.Select(_ => _.Channel.ToLower()).ToList();
-                var newChannels = channels.Select(chan => chan.ToLower()).ToList();
+                var newChannels = JoinedChannels.Select(chan => chan.ToLower()).ToList();
 
                 var channelsToLeave = joinedChannels.Except(newChannels);
                 var channelsToConnect = newChannels.Except(joinedChannels);
@@ -220,17 +201,26 @@ namespace TwitchSoft.TwitchBot
                 foreach (var channel in channelsToLeave)
                 {
                     twitchClient.LeaveChannel(channel);
+                    await Task.Delay(DelayMs);
                 }
 
                 foreach (var channel in channelsToConnect)
                 {
                     twitchClient.JoinChannel(channel);
+                    await Task.Delay(DelayMs);
                 }
             }
             else
             {
                 twitchClient.Reconnect();
             }
+        }
+
+        public void SetChannels(IEnumerable<string> channels)
+        {
+            logger.LogInformation($"SetChannels. Channels: {string.Join(", ", channels)}");
+            JoinedChannels.Clear();
+            JoinedChannels.AddRange(channels);
         }
     }
 }
