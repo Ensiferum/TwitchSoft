@@ -227,6 +227,10 @@ namespace TwitchSoft.TwitchBot
                     twitchClient.JoinChannel(channel);
                 }
             }
+            else
+            {
+                twitchClient.Reconnect();
+            }
         }
     }
 }
