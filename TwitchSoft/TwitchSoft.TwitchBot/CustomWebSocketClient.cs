@@ -180,7 +180,7 @@ namespace TwitchSoft.TwitchBot
                 while (IsConnected && _networkServicesRunning)
                 {
                     WebSocketReceiveResult result;
-                    var buffer = new byte[1024*4];
+                    var buffer = new byte[4096];
 
                     try
                     {
