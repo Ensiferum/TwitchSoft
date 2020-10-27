@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 fullnameOverride: twitchsofttwitchbot
-replicaCount: 4
+replicaCount: 1
 image:
   repository: twitchsoft.azurecr.io/twitchsofttwitchbot
   tag: latest
