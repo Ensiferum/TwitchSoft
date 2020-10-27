@@ -16,9 +16,6 @@ namespace TwitchSoft.TwitchBot
         private readonly ITwitchClient twitchClient;
         private readonly IMediator mediator;
 
-        //private static int LogMessagesCount = 0;
-        //private static int LowMessagesCount = 0;
-        //private static int MessagesCountPer10Sec = 0;
         private readonly List<string> JoinedChannels = new List<string>();
 
         public TwitchBot(
@@ -38,7 +35,6 @@ namespace TwitchSoft.TwitchBot
 
         public void Stop()
         {
-            //timer.Dispose();
             twitchClient.Disconnect();
         }
 
@@ -54,41 +50,6 @@ namespace TwitchSoft.TwitchBot
                 logger.LogError(ex, "Connecting error");
             }
         }
-
-        //private void CheckConnection(object state)
-        //{
-        //    logger.LogInformation($"Messages per 10 seconds: {MessagesCountPer10Sec}");
-        //    MessagesCountPer10Sec = 0;
-
-        //    logger.LogTrace($"Checking connection, MessagesCount: {LogMessagesCount}");
-        //    logger.LogTrace($"Joined channels count:{twitchClient.JoinedChannels.Count}");
-            
-        //    if (LogMessagesCount < 5)
-        //    {
-        //        LowMessagesCount++;
-        //        if (LowMessagesCount >= 5)
-        //        {
-        //            logger.LogInformation($"Joined channels. Channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
-        //            logger.LogWarning($"{LogMessagesCount} log messages, trying to reconnect");
-
-        //            logger.LogInformation($"Connected channels: {string.Join(", ", twitchClient.JoinedChannels.Select(_ => _.Channel))}");
-        //            var policy = Policy.Handle<Exception>()
-        //                .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-        //                (exception, timeSpan) =>
-        //            {
-        //                logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
-        //            });
-
-        //            policy.Execute(() => twitchClient.Reconnect());
-        //        }
-        //    }
-        //    else
-        //    {
-        //        LowMessagesCount = 0;
-        //    }
-        //    //RefreshJoinedChannels(JoinedChannels);
-        //    LogMessagesCount = 0;
-        //}
 
         private void InitTwitchBotEvents()
         {
@@ -126,7 +87,6 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             logger.LogTrace(e.Data);
-            //LogMessagesCount++;
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
@@ -164,7 +124,6 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            //MessagesCountPer10Sec++;
             await mediator.Send(new NewChatMessageDto
             {
                 ChatMessage = e.ChatMessage,
@@ -232,9 +191,9 @@ namespace TwitchSoft.TwitchBot
 
         public void RefreshJoinedChannels(IEnumerable<string> channels, bool withClear = false)
         {
-            logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
             if (withClear)
             {
+                logger.LogInformation($"RefreshJoinedChannels triggered. Channels: {string.Join(", ", channels)}");
                 JoinedChannels.Clear();
                 JoinedChannels.AddRange(channels);
             }
@@ -246,8 +205,9 @@ namespace TwitchSoft.TwitchBot
 
                 var channelsToLeave = joinedChannels.Except(newChannels);
                 var channelsToConnect = newChannels.Except(joinedChannels);
-                logger.LogInformation($"Channels To Connect\r\n{string.Join("\r\n", channelsToConnect.Select(_ => $"+{_}"))}");
-                logger.LogInformation($"Channels To Leave\r\n{string.Join("\r\n", channelsToLeave.Select(_ => $"-{_}"))}");
+
+                var logChannels = channelsToConnect.Select(_ => $"+{_}").Union(channelsToLeave.Select(_ => $"-{_}"));
+                logger.LogInformation($"New Channels:\r\n{string.Join("\r\n", logChannels)}");
 
                 foreach (var channel in channelsToLeave)
                 {

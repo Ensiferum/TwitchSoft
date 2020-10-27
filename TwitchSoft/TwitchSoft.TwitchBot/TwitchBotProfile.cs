@@ -34,6 +34,12 @@ namespace TwitchSoft.TwitchBot
                 .ForMember(dest => dest.GiftedBy, opt => opt.Ignore())
                 .IncludeAllDerived();
 
+            CreateMap<Subscriber, NewSubscriber>();
+
+            CreateMap<NewSubscriberDto, NewSubscriber>()
+                .IncludeMembers(src => src.Subscriber)
+                .ForMember(dest => dest.GiftedBy, opt => opt.Ignore());
+
             CreateMap<ReSubscriber, NewSubscriber>()
                 .ForMember(dest => dest.Months, opt => opt.MapFrom(src => int.Parse(src.MsgParamCumulativeMonths)))
                 .ForMember(dest => dest.GiftedBy, opt => opt.Ignore());

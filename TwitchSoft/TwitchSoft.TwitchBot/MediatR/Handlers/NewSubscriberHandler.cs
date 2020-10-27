@@ -23,7 +23,7 @@ namespace TwitchSoft.TwitchBot.MediatR.Handlers
 
         protected override async Task Handle(NewSubscriberDto request, CancellationToken cancellationToken)
         {
-            var newSubscriber = mapper.Map<NewSubscriber>(request.Subscriber);
+            var newSubscriber = mapper.Map<NewSubscriber>(request);
 
             await sendEndpointProvider.Send(newSubscriber, cancellationToken: cancellationToken);
         }
