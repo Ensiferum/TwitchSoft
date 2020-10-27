@@ -59,7 +59,7 @@ namespace TwitchSoft.TwitchBot
                     MessagesAllowedInPeriod = 10000,
                     ThrottlingPeriod = TimeSpan.FromSeconds(1)
                 };
-                var customClient = new CustomWebSocketClient(clientOptions);
+                var customClient = new WebSocketClient(clientOptions);
                 var client =  new TwitchClient(customClient);
                 client.Initialize(credentials);
                 return client;
