@@ -9,7 +9,8 @@ namespace TwitchSoft.TwitchBot
     public class TwitchBotService : IHostedService, IDisposable
     {
         private readonly TwitchBot twitchBot;
-        private Timer _timer;
+        private Timer _channelsJoinedCheckerTimer;
+        private Timer _connectionCheckerTimer;
 
         private ILogger<TwitchBotService> Logger { get; }
         public TwitchBotService(
@@ -25,14 +26,16 @@ namespace TwitchSoft.TwitchBot
             Logger.LogInformation("TwitchBotService is starting.");
             twitchBot.Start();
 
-            _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
+            _channelsJoinedCheckerTimer = new Timer(CheckJoinedChannels, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
+            _connectionCheckerTimer = new Timer(CheckConnection, null, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(10));
 
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _timer?.Change(Timeout.Infinite, 0);
+            _channelsJoinedCheckerTimer?.Change(Timeout.Infinite, 0);
+            _connectionCheckerTimer?.Change(Timeout.Infinite, 0);
 
             Logger.LogInformation("TwitchBotService is stopping.");
             twitchBot.Stop();
@@ -41,13 +44,19 @@ namespace TwitchSoft.TwitchBot
 
         public void Dispose()
         {
-            _timer?.Dispose();
+            _channelsJoinedCheckerTimer?.Dispose();
         }
 
-        private async void DoWork(object state)
+        private async void CheckJoinedChannels(object state)
         {
-            Logger.LogInformation("TriggerRefreshJoinedChannels");
+            Logger.LogInformation("CheckJoinedChannels");
             await twitchBot.TriggerChannelsJoin();
+        }
+
+        private void CheckConnection(object state)
+        {
+            Logger.LogInformation("CheckConnection");
+            twitchBot.CheckIfStillConnected();
         }
     }
 }

@@ -8,6 +8,7 @@ using TwitchSoft.TwitchBot.MediatR.Models;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Polly;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -16,6 +17,8 @@ namespace TwitchSoft.TwitchBot
         private readonly ILogger<TwitchBot> logger;
         private readonly ITwitchClient twitchClient;
         private readonly IMediator mediator;
+
+        private int EventsCount;
 
         private readonly List<string> JoinedChannels = new List<string>();
 
@@ -87,6 +90,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             logger.LogInformation($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
+            EventsCount++;
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
@@ -221,6 +225,37 @@ namespace TwitchSoft.TwitchBot
             logger.LogInformation($"SetChannels. Channels: {string.Join(", ", channels)}");
             JoinedChannels.Clear();
             JoinedChannels.AddRange(channels);
+        }
+
+        public void CheckIfStillConnected()
+        {
+            logger.LogInformation($"Log Events count: {EventsCount}");
+
+            if (EventsCount == 0)
+            {
+                logger.LogInformation($"Trying to reconnect.");
+                try
+                {
+                    twitchClient.Disconnect();
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Failed to disconnect");
+                }
+
+                var policy = Policy.Handle<Exception>()
+                    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    (exception, timeSpan) =>
+                    {
+                        logger.LogError($"Policy logging. Wait: {timeSpan.TotalSeconds}\r\n{exception.Message}\r\n{exception.StackTrace}");
+                    });
+
+                policy.Execute(() => twitchClient.Connect());
+            }
+            else
+            {
+                EventsCount = 0;
+            }
         }
     }
 }
