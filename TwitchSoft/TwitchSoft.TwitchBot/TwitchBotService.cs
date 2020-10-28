@@ -45,6 +45,7 @@ namespace TwitchSoft.TwitchBot
         public void Dispose()
         {
             _channelsJoinedCheckerTimer?.Dispose();
+            _connectionCheckerTimer?.Dispose();
         }
 
         private async void CheckJoinedChannels(object state)
