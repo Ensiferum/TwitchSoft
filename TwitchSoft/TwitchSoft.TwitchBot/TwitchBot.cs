@@ -86,7 +86,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLog(object sender, OnLogArgs e)
         {
-            logger.LogTrace(e.Data);
+            logger.LogInformation($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
