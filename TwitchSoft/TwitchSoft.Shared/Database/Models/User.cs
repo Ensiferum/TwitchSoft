@@ -10,6 +10,7 @@ namespace TwitchSoft.Shared.Database.Models
         public uint Id { get; set; }
         public string Username { get; set; }
         public bool JoinChannel { get; set; }
+        public bool IsBanned { get; set; }
         [Write(false)]
         public List<Subscription> UserSubscriptions { get; set; }
         [Write(false)]
