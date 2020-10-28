@@ -143,7 +143,7 @@ WHERE Username = @name
             {
                 return await connection.QueryAsync<User>(@"
 SELECT * FROM Users
-WHERE JoinChannel = 1
+WHERE JoinChannel = 1 AND IsBanned = 0
 ");
             }
         }
