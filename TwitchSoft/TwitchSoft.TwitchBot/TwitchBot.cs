@@ -227,7 +227,7 @@ namespace TwitchSoft.TwitchBot
             JoinedChannels.AddRange(channels);
         }
 
-        public void CheckIfStillConnected()
+        public async Task CheckIfStillConnected()
         {
             logger.LogInformation($"Log Events count: {EventsCount}");
 
@@ -251,6 +251,7 @@ namespace TwitchSoft.TwitchBot
                     });
 
                 policy.Execute(() => twitchClient.Connect());
+                await TriggerChannelsJoin();
             }
             else
             {
