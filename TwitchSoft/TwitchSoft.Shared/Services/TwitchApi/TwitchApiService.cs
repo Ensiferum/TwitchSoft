@@ -11,7 +11,7 @@ namespace TwitchSoft.Shared.Services.TwitchApi
 {
     public class TwitchApiService : ITwitchApiService
     {
-        private TwitchAPI api;
+        private readonly TwitchAPI api;
         public TwitchApiService(IOptions<BotSettings> options)
         {
             api = new TwitchAPI();

@@ -46,11 +46,11 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
                     clientToConnect.Value.Add(channelname);
                     await clients.Client(clientToConnect.Key).JoinChannelsCommand(clientToConnect.Value);
                 }
-            } else
+            }
+            else
             {
                 logger.LogInformation("No active bots connected");
             }
-            
         }
 
         public async Task TriggerReconnect()

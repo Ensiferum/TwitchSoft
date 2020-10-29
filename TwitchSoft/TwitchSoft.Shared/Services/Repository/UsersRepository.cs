@@ -115,6 +115,18 @@ WHEN NOT MATCHED THEN
             }
         }
 
+        public async Task SetChannelIsBanned(string channelName, bool isBanned)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                await connection.ExecuteAsync(@"
+UPDATE Users
+SET IsBanned = @isBanned
+WHERE Username = @channelName
+", new { channelName, isBanned });
+            }
+        }
+
         public async Task<User> GetUserById(uint id)
         {
             using (var connection = new SqlConnection(ConnectionString))
@@ -172,5 +184,7 @@ WHERE JoinChannel = 1 AND IsBanned = 0
                 return userIsTracking;
             }
         }
+
+        
     }
 }

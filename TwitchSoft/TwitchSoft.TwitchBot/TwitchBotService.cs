@@ -27,7 +27,7 @@ namespace TwitchSoft.TwitchBot
             twitchBot.Start();
 
             _channelsJoinedCheckerTimer = new Timer(CheckJoinedChannels, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
-            _connectionCheckerTimer = new Timer(CheckConnection, null, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(10));
+            _connectionCheckerTimer = new Timer(CheckConnection, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(10));
 
             return Task.CompletedTask;
         }

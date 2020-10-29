@@ -9,6 +9,7 @@ using MediatR;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Polly;
+using System.Text.RegularExpressions;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -89,8 +90,24 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnLog(object sender, OnLogArgs e)
         {
-            logger.LogInformation($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
             EventsCount++;
+            logger.LogInformation($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
+
+            if (e.Data.StartsWith("Received: @msg-id=msg_channel_suspended"))
+            {
+                var regex = Regex.Match(e.Data, @"^Received: @msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #(?<channel>\w*) :This channel has been suspended\.$");
+                var channelName = regex.Groups["channel"].Value;
+
+                logger.LogWarning($"Channel was suspended: {channelName}");
+
+                _ = mediator.Send(new SetChannelBanned
+                {
+                    Channel = channelName,
+                    IsBanned = true,
+                });
+
+                JoinedChannels.Remove(channelName);
+            }
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
@@ -187,7 +204,7 @@ namespace TwitchSoft.TwitchBot
             if (twitchClient.IsConnected)
             {
                 var joinedChannels = twitchClient.JoinedChannels.Select(_ => _.Channel.ToLower()).ToList();
-                var newChannels = JoinedChannels.Select(chan => chan.ToLower()).ToList();
+                var newChannels = JoinedChannels.ToList();
 
                 var channelsToLeave = joinedChannels.Except(newChannels);
                 var channelsToConnect = newChannels.Except(joinedChannels);
@@ -224,7 +241,8 @@ namespace TwitchSoft.TwitchBot
         {
             logger.LogInformation($"SetChannels. Channels: {string.Join(", ", channels)}");
             JoinedChannels.Clear();
-            JoinedChannels.AddRange(channels);
+            JoinedChannels.AddRange(channels.Select(chan => chan.ToLower()));
+            _ = TriggerChannelsJoin();
         }
 
         public async Task CheckIfStillConnected()
