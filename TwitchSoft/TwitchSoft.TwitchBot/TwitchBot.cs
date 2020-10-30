@@ -198,9 +198,8 @@ namespace TwitchSoft.TwitchBot
             });
         }
 
-        public async Task TriggerChannelsJoin()
+        public Task TriggerChannelsJoin()
         {
-            const int DelayMs = 50;
             if (twitchClient.IsConnected)
             {
                 var joinedChannels = twitchClient.JoinedChannels.Select(_ => _.Channel.ToLower()).ToList();
@@ -214,7 +213,7 @@ namespace TwitchSoft.TwitchBot
 
                 if (!logChannels.Any())
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 logger.LogInformation($"New Channels:\r\n{string.Join("\r\n", logChannels)}");
@@ -222,19 +221,18 @@ namespace TwitchSoft.TwitchBot
                 foreach (var channel in channelsToLeave)
                 {
                     twitchClient.LeaveChannel(channel);
-                    await Task.Delay(DelayMs);
                 }
 
                 foreach (var channel in channelsToConnect)
                 {
                     twitchClient.JoinChannel(channel);
-                    await Task.Delay(DelayMs);
                 }
             }
             else
             {
                 twitchClient.Reconnect();
             }
+            return Task.CompletedTask;
         }
 
         public void SetChannels(IEnumerable<string> channels)

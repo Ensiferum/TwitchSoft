@@ -91,7 +91,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
                 var channelsToJoin = channelGroups.ElementAt(i);
                 botConnectionInfo.Value.AddRange(channelsToJoin);
 
-                logger?.LogInformation($"Client channels. Client: {botConnectionInfo.Key}. Channels: {string.Join(", ", botConnectionInfo.Value)}");
+                logger?.LogInformation($"Client channels. Client: {botConnectionInfo.Key}. Channels: {string.Join(", ", channelsToJoin)}");
 
                 await clients.Client(botConnectionInfo.Key).JoinChannelsCommand(channelsToJoin);
             }
