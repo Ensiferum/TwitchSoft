@@ -16,7 +16,6 @@ namespace TwitchSoft.Shared.Services.Repository.Interfaces
         Task<User> GetUserByName(string name);
         Task<bool> AddChannelToTrack(UserTwitch channel);
         Task<IEnumerable<User>> GetUsersByIds(IEnumerable<uint> ids);
-
         Task SetChannelIsBanned(string channelName, bool isBanned);
     }
 }

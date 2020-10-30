@@ -26,13 +26,10 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
             this.logger = logger;
         }
 
-        public static IEnumerable<IEnumerable<T>> Split<T>(IEnumerable<T> array, int size)
+        public static IEnumerable<IEnumerable<T>> Split<T>(IEnumerable<T> array, int numOfParts)
         {
             int i = 0;
-            var splits = from item in array
-                         group item by i++ % size into part
-                         select part.AsEnumerable();
-            return splits;
+            return array.GroupBy(x => i++ % numOfParts);
         }
 
         public static async Task AddChannel(IHubClients<IOrchestrationClient> clients, string channelname, ILogger logger)
@@ -79,6 +76,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
         {
             await RefreshChannels(Clients, channels, logger);
         }
+
         public static async Task RefreshChannels(IHubClients<IOrchestrationClient> clients, IEnumerable<string> channels, ILogger logger)
         {
             var botsCount = ConnectionChannelList.Count;

@@ -25,8 +25,11 @@ namespace TwitchSoft.Maintenance.Jobs
         }
         public async Task Invoke()
         {
+            string fromId = "74812507"; //ensthor
             logger.LogInformation($"Start executing job: {nameof(EnsthorFollowsJoin)}");
-            var follows = await twitchApiService.GetFollowsForUser("74812507", null); //ensthor
+            var follows = await twitchApiService.GetFollowsForUser(fromId, null); 
+
+            logger?.LogInformation($"Follows for {fromId}. Channels: {string.Join(", ", follows.Select(_ => _.ToUserName.ToLower()))}");
 
             await usersRepository.CreateOrUpdateUsers(follows.Select(f => new User
             {

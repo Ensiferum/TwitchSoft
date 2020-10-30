@@ -56,7 +56,7 @@ namespace TwitchSoft.TelegramBot
         {
             telegramBotClient.StopReceiving();
         }
-
+        
         private void InitTelegramBotClient()
         {
             telegramBotClient = new TelegramBotClient(BotSettings.BotOAuthToken);

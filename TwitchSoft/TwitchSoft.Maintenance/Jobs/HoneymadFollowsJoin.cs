@@ -25,8 +25,11 @@ namespace TwitchSoft.Maintenance.Jobs
         }
         public async Task Invoke()
         {
+            string fromId = "40298003"; //honeymad
             logger.LogInformation($"Start executing job: {nameof(HoneymadFollowsJoin)}");
-            var follows = await twitchApiService.GetFollowsForUser("40298003", null); //honeymad
+            var follows = await twitchApiService.GetFollowsForUser(fromId, null); 
+
+            logger?.LogInformation($"Follows for {fromId}. Channels: {string.Join(", ", follows.Select(_ => _.ToUserName.ToLower()))}");
 
             await usersRepository.CreateOrUpdateUsers(follows.Select(f => new User
             {
