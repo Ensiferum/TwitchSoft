@@ -50,11 +50,7 @@ namespace TwitchSoft.TelegramBot
                         var userName = messageSplitted.ElementAtOrDefault(1);
                         if (string.IsNullOrEmpty(userName))
                         {
-                            usersState[chatId] = BotState.WaitingForUserName;
-                            await telegramBotClient.SendTextMessageAsync(
-                                chatId: chatId,
-                                text: "Enter username please"
-                            );
+                            await RequestAdditionalData(chatId, "Enter username please", BotState.WaitingForUserName);
                             return;
                         }
                         await GetUserMessages(chatId, userName);
@@ -63,11 +59,7 @@ namespace TwitchSoft.TelegramBot
                         channelName = messageSplitted.ElementAtOrDefault(1);
                         if (string.IsNullOrEmpty(channelName))
                         {
-                            usersState[chatId] = BotState.WaitingForNewChannel;
-                            await telegramBotClient.SendTextMessageAsync(
-                                chatId: chatId,
-                                text: "Enter channel please"
-                            );
+                            await RequestAdditionalData(chatId, "Enter channel please", BotState.WaitingForNewChannel);
                             return;
                         }
                         await AddNewChannel(chatId, channelName);
@@ -79,11 +71,7 @@ namespace TwitchSoft.TelegramBot
                         channelName = messageSplitted.ElementAtOrDefault(1);
                         if (string.IsNullOrEmpty(channelName))
                         {
-                            usersState[chatId] = BotState.WaitingForSubscribersCountChannelName;
-                            await telegramBotClient.SendTextMessageAsync(
-                                chatId: chatId,
-                                text: "Enter channel please"
-                            );
+                            await RequestAdditionalData(chatId, "Enter channel please", BotState.WaitingForSubscribersCountChannelName);
                             return;
                         }
                         await GetSubscribersCount(chatId, channelName);
@@ -92,11 +80,7 @@ namespace TwitchSoft.TelegramBot
                         var searchText = messageSplitted.ElementAtOrDefault(1);
                         if (string.IsNullOrEmpty(searchText))
                         {
-                            usersState[chatId] = BotState.WaitingForMessage;
-                            await telegramBotClient.SendTextMessageAsync(
-                                chatId: chatId,
-                                text: "Enter search text please"
-                            );
+                            await RequestAdditionalData(chatId, "Enter search text please", BotState.WaitingForMessage);
                             return;
                         }
                         await SearchText(chatId, searchText);
@@ -151,6 +135,9 @@ namespace TwitchSoft.TelegramBot
                         break;
                     case BotCommands.SubscribersCount:
                         await GetSubscribersCount(chatId.ToString(), messageSplitted.ElementAtOrDefault(1));
+                        break;
+                    case BotCommands.TopBySubscribers:
+                        await ListTopBySubscribers(chatId.ToString(), messageSplitted.ElementAtOrDefault(1));
                         break;
                     case BotCommands.SearchText:
                         await SearchText(chatId.ToString(), messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
@@ -255,6 +242,15 @@ namespace TwitchSoft.TelegramBot
                 ChatId = chatId,
                 ChannelName = channelName,
             });
+        }
+
+        public async Task RequestAdditionalData(string chatId, string messageText, BotState newBotState)
+        {
+            usersState[chatId] = newBotState;
+            await telegramBotClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: messageText
+            );
         }
     }
 }
