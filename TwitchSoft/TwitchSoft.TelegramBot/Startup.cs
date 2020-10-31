@@ -34,6 +34,7 @@ namespace TwitchSoft.TelegramBot
 
             services.AddScoped<ITwitchApiService, TwitchApiService>();
             services.AddSingleton<TelegramBot>();
+            services.AddSingleton<MessageProcessor>();
 
             services
                 .Configure<BotSettings>(Configuration.GetSection($"Telegram:{nameof(BotSettings)}"))
