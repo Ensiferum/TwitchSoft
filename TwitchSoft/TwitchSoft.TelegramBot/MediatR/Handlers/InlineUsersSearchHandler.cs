@@ -45,7 +45,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                                 new[] {
                                     InlineKeyboardButton.WithCallbackData(
                                         "Show subs count",
-                                        $"{BotCommands.Subscribers} {Username}")
+                                        $"{BotCommands.SubscribersCount} {Username}")
                                 }
                         })
                 };

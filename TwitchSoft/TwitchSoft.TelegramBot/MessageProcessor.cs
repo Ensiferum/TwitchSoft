@@ -37,6 +37,7 @@ namespace TwitchSoft.TelegramBot
             try
             {
                 var chatId = message.Chat.Id.ToString();
+                string channelName;
 
                 logger.LogInformation($"Received: {message.Text} from: {message.Chat.Username}.");
 
@@ -56,14 +57,10 @@ namespace TwitchSoft.TelegramBot
                             );
                             return;
                         }
-                        await mediator.Send(new UserMessagesCommand
-                        {
-                            ChatId = chatId,
-                            Username = userName,
-                        });
+                        await GetUserMessages(chatId, userName);
                         break;
                     case BotCommands.AddChannel:
-                        var channelName = messageSplitted.ElementAtOrDefault(1);
+                        channelName = messageSplitted.ElementAtOrDefault(1);
                         if (string.IsNullOrEmpty(channelName))
                         {
                             usersState[chatId] = BotState.WaitingForNewChannel;
@@ -73,17 +70,23 @@ namespace TwitchSoft.TelegramBot
                             );
                             return;
                         }
-                        await mediator.Send(new NewChannelCommand
-                        {
-                            ChatId = chatId,
-                            ChannelName = channelName,
-                        });
+                        await AddNewChannel(chatId, channelName);
                         break;
-                    case BotCommands.Subscribers:
-                        await mediator.Send(new TopSubscribersCommand
+                    case BotCommands.TopBySubscribers:
+                        await ListTopBySubscribers(chatId);
+                        break;
+                    case BotCommands.SubscribersCount:
+                        channelName = messageSplitted.ElementAtOrDefault(1);
+                        if (string.IsNullOrEmpty(channelName))
                         {
-                            ChatId = chatId,
-                        });
+                            usersState[chatId] = BotState.WaitingForSubscribersCountChannelName;
+                            await telegramBotClient.SendTextMessageAsync(
+                                chatId: chatId,
+                                text: "Enter channel please"
+                            );
+                            return;
+                        }
+                        await GetSubscribersCount(chatId, channelName);
                         break;
                     case BotCommands.SearchText:
                         var searchText = messageSplitted.ElementAtOrDefault(1);
@@ -96,17 +99,10 @@ namespace TwitchSoft.TelegramBot
                             );
                             return;
                         }
-                        await mediator.Send(new SearchTextCommand
-                        {
-                            ChatId = chatId,
-                            SearchText = searchText,
-                        });
+                        await SearchText(chatId, searchText);
                         break;
                     default:
-                        await mediator.Send(new UnknownCommand
-                        {
-                            ChatId = chatId,
-                        });
+                        await SendUnknownCommand(chatId);
 
                         logger.LogWarning($"Received unknown command: {message.Text}");
                         break;
@@ -151,27 +147,13 @@ namespace TwitchSoft.TelegramBot
                 switch (messageSplitted.First())
                 {
                     case BotCommands.UserMessages:
-                        await mediator.Send(new UserMessagesCommand
-                        {
-                            ChatId = chatId.ToString(),
-                            Username = messageSplitted.ElementAtOrDefault(1),
-                            SkipString = messageSplitted.ElementAtOrDefault(2)
-                        });
+                        await GetUserMessages(chatId.ToString(), messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
                         break;
-                    case BotCommands.Subscribers:
-                        await mediator.Send(new TopSubscribersCommand
-                        {
-                            ChatId = chatId.ToString(),
-                            ParamString = messageSplitted.ElementAtOrDefault(1),
-                        });
+                    case BotCommands.SubscribersCount:
+                        await GetSubscribersCount(chatId.ToString(), messageSplitted.ElementAtOrDefault(1));
                         break;
                     case BotCommands.SearchText:
-                        await mediator.Send(new SearchTextCommand
-                        {
-                            ChatId = chatId.ToString(),
-                            SearchText = messageSplitted.ElementAtOrDefault(1),
-                            SkipString = messageSplitted.ElementAtOrDefault(2)
-                        });
+                        await SearchText(chatId.ToString(), messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
                         break;
                     default:
                         logger.LogWarning($"Received unknown command: {message} from: {callbackQuery.From.Username}.");
@@ -202,34 +184,77 @@ namespace TwitchSoft.TelegramBot
                 switch (userState)
                 {
                     case BotState.WaitingForUserName:
-                        var userName = message.Text;
-                        await mediator.Send(new UserMessagesCommand
-                        {
-                            ChatId = chatId,
-                            Username = userName
-                        });
+                        await GetUserMessages(chatId, message.Text);
                         break;
                     case BotState.WaitingForNewChannel:
-                        var channelName = message.Text;
-                        await mediator.Send(new NewChannelCommand
-                        {
-                            ChatId = chatId,
-                            ChannelName = channelName
-                        });
+                        await AddNewChannel(chatId, message.Text);
                         break;
                     case BotState.WaitingForMessage:
-                        var searchText = message.Text;
-                        await mediator.Send(new SearchTextCommand
-                        {
-                            ChatId = chatId,
-                            SearchText = searchText
-                        });
+                        await SearchText(chatId, message.Text);
+                        break;
+                    case BotState.WaitingForSubscribersCountChannelName:
+                        await GetSubscribersCount(chatId, message.Text);
                         break;
                 }
                 _ = usersState.TryRemove(chatId, out _);
                 return true;
             }
             return false;
+        }
+
+        public async Task SendUnknownCommand(string chatId)
+        {
+            await mediator.Send(new UnknownCommand
+            {
+                ChatId = chatId,
+            });
+        }
+
+        public async Task GetUserMessages(string chatId, string userName, string skipString = null)
+        {
+            await mediator.Send(new UserMessagesCommand
+            {
+                ChatId = chatId,
+                Username = userName,
+                SkipString = skipString
+            });
+        }
+
+        public async Task AddNewChannel(string chatId, string channelName)
+        {
+            await mediator.Send(new NewChannelCommand
+            {
+                ChatId = chatId,
+                ChannelName = channelName
+            });
+        }
+
+        public async Task SearchText(string chatId, string searchText, string skipString = null)
+        {
+            await mediator.Send(new SearchTextCommand
+            {
+                ChatId = chatId,
+                SearchText = searchText,
+                SkipString = skipString
+            });
+        }
+
+        public async Task ListTopBySubscribers(string chatId, string skipString = null)
+        {
+            await mediator.Send(new TopBySubscribersCommand
+            {
+                ChatId = chatId,
+                SkipString = skipString,
+            });
+        }
+
+        public async Task GetSubscribersCount(string chatId, string channelName)
+        {
+            await mediator.Send(new SubscribersCountCommand
+            {
+                ChatId = chatId,
+                ChannelName = channelName,
+            });
         }
     }
 }

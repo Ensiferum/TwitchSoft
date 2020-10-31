@@ -6,5 +6,6 @@
         WaitingForUserName,
         WaitingForMessage,
         WaitingForNewChannel,
+        WaitingForSubscribersCountChannelName,
     }
 }
