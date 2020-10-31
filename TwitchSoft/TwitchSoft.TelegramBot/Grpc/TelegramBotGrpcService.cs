@@ -1,23 +1,29 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using MediatR;
+using TwitchSoft.TelegramBot.MediatR.Models;
 using static TelegramBotGrpc;
 
 namespace TwitchSoft.TelegramBot.Grpc
 {
     public class TelegramBotGrpcService : TelegramBotGrpcBase
     {
-        private readonly TelegramBot telegramBot;
+        private readonly IMediator mediator;
+        private readonly IMapper mapper;
 
 
-        public TelegramBotGrpcService(TelegramBot telegramBot)
+        public TelegramBotGrpcService(IMediator mediator, IMapper mapper)
         {
-            this.telegramBot = telegramBot;
+            this.mediator = mediator;
+            this.mapper = mapper;
         }
 
         public override async Task<Empty> SentDayDigest(DigestInfoRequest request, ServerCallContext context)
         {
-            await telegramBot.SentDigest(request);
+            var umd = mapper.Map<UserMessagesDigest>(request);
+            await mediator.Send(umd);
             return new Empty();
         }
     }

@@ -10,6 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 using static TwitchBotOrchestratorGrpc;
 using System;
+using Telegram.Bot;
+using Microsoft.Extensions.Options;
+using MediatR;
+using AutoMapper;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -40,6 +44,17 @@ namespace TwitchSoft.TelegramBot
 
             services.AddCache(Configuration);
             services.AddElasticSearch(Configuration);
+
+            services.AddSingleton<ITelegramBotClient>(sp =>
+            {
+                var botSettings = sp.GetService<IOptions<BotSettings>>();
+
+                return new TelegramBotClient(botSettings.Value.BotOAuthToken);
+            });
+
+            services.AddMediatR(typeof(Startup));
+
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddGrpcClient<TwitchBotOrchestratorGrpcClient>(o =>
             {

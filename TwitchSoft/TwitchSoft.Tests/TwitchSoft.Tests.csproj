@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TwitchSoft.TelegramBot\TwitchSoft.TelegramBot.csproj" />
     <ProjectReference Include="..\TwitchSoft.TwitchBot\TwitchSoft.TwitchBot.csproj" />
   </ItemGroup>
 

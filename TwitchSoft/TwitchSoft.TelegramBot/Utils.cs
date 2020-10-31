@@ -12,15 +12,13 @@ namespace TwitchSoft.TelegramBot
             {
                 if (skip > 0)
                 {
-                    inlineButtons.Add(
-                        InlineKeyboardButton
+                    inlineButtons.Add(InlineKeyboardButton
                         .WithCallbackData($"Prev {itemsLimitCount}", $"{command} {parameter} {(skip - itemsLimitCount > 0 ? skip - itemsLimitCount : 0)}")
                     );
                 }
                 if (itemsCount == itemsLimitCount)
                 {
-                    inlineButtons.Add(
-                        InlineKeyboardButton
+                    inlineButtons.Add(InlineKeyboardButton
                         .WithCallbackData($"Next {itemsLimitCount}", $"{command} {parameter} {skip + itemsLimitCount}")
                     );
                 }
@@ -28,19 +26,16 @@ namespace TwitchSoft.TelegramBot
                 if (skip >= itemsLimitCount)
                 {
                     inlineButtons.Add(InlineKeyboardButton
-                    .WithCallbackData($"Reset", $"{command} {parameter}"));
+                        .WithCallbackData($"Reset", $"{command} {parameter}"));
                 }
                 else
                 {
                     inlineButtons.Add(InlineKeyboardButton
-                    .WithCallbackData($"Refresh", $"{command} {parameter}"));
+                        .WithCallbackData($"Refresh", $"{command} {parameter}"));
                 }
             }
 
-            return new InlineKeyboardMarkup(new[]
-                    {
-                        inlineButtons
-                    });
+            return new InlineKeyboardMarkup(new[] { inlineButtons });
         }
     }
 }

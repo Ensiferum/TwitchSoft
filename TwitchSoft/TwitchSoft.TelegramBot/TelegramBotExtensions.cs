@@ -9,6 +9,7 @@ namespace TwitchSoft.TelegramBot
 {
     public static class TelegramBotExtensions
     {
+        public const int TELEGRAM_MESSAGE_LIMIT = 4096;
         public static List<string> GenerateReplyMessages(this IEnumerable<ChatMessageModelForDisplaying> messages)
         {
             var messagesFormatted = messages.OrderBy(_ => _.PostedTime)
@@ -33,7 +34,7 @@ namespace TwitchSoft.TelegramBot
                 var prevMessageList = replyMessagesTemp.ToArray();
                 replyMessagesTemp.Add(message);
                 var generatedMessage = string.Join("\r\n", replyMessagesTemp);
-                if (generatedMessage.Length > TelegramBotCommandProcessor.TELEGRAM_MESSAGE_LIMIT)
+                if (generatedMessage.Length > TELEGRAM_MESSAGE_LIMIT)
                 {
                     replyMessages.Add(string.Join("\r\n", prevMessageList));
                     replyMessagesTemp.Clear();

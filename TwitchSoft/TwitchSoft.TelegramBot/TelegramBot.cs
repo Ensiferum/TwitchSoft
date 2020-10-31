@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -8,28 +8,29 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
-using TwitchSoft.Shared.Services.Models.Telegram;
+using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot
 {
     public class TelegramBot
     {
         private readonly ILogger<TelegramBot> logger;
-        private readonly IServiceScopeFactory scopeFactory;
-        private readonly BotSettings BotSettings;
+        private readonly ITelegramBotClient telegramBotClient;
+        private readonly IMediator mediator;
+        private readonly IMapper mapper;
 
-        private TelegramBotClient telegramBotClient;
-        private TelegramBotCommandProcessor telegramBotCommandProcessor;
         private readonly ConcurrentDictionary<string, BotState> usersState = new ConcurrentDictionary<string, BotState>();
 
         public TelegramBot(
-            ILogger<TelegramBot> logger, 
-            IOptions<BotSettings> options, 
-            IServiceScopeFactory scopeFactory)
+            ILogger<TelegramBot> logger,
+            ITelegramBotClient telegramBotClient,
+            IMediator mediator,
+            IMapper mapper)
         {
             this.logger = logger;
-            this.scopeFactory = scopeFactory;
-            BotSettings = options.Value;
+            this.telegramBotClient = telegramBotClient;
+            this.mediator = mediator;
+            this.mapper = mapper;
         }
 
         public void Start()
@@ -43,12 +44,7 @@ namespace TwitchSoft.TelegramBot
         }
         private void Connect()
         {
-            if (telegramBotClient != null && telegramBotClient.IsReceiving == true)
-            {
-                telegramBotClient.StopReceiving();
-            }
-
-            InitTelegramBotClient();
+            InitTelegramBotEvents();
             telegramBotClient.StartReceiving();
         }
 
@@ -57,24 +53,13 @@ namespace TwitchSoft.TelegramBot
             telegramBotClient.StopReceiving();
         }
         
-        private void InitTelegramBotClient()
+        private void InitTelegramBotEvents()
         {
-            telegramBotClient = new TelegramBotClient(BotSettings.BotOAuthToken);
-
-            telegramBotCommandProcessor = new TelegramBotCommandProcessor(
-                telegramBotClient, 
-                scopeFactory);
-
             telegramBotClient.OnMessage += Bot_OnMessage;
             telegramBotClient.OnMessageEdited += Bot_OnMessage;
             telegramBotClient.OnCallbackQuery += Bot_OnCallbackQuery;
             telegramBotClient.OnInlineQuery += Bot_OnInlineQuery;
             telegramBotClient.OnReceiveError += Bot_OnReceiveError;
-        }
-
-        public Task SentDigest(DigestInfoRequest digestInfo)
-        {
-            return telegramBotCommandProcessor.ProcessUserMessagesDigest(digestInfo.ChatId, digestInfo.Username);
         }
 
         private void Bot_OnReceiveError(object sender, ReceiveErrorEventArgs e)
@@ -86,12 +71,10 @@ namespace TwitchSoft.TelegramBot
         {
             try
             {
-                var queryText = e.InlineQuery.Query;
-                var inlineQueryId = e.InlineQuery.Id;
+                logger.LogInformation($"Bot_OnInlineQuery: {e.InlineQuery.Query}");
 
-                logger.LogInformation($"Bot_OnInlineQuery: {queryText}");
-
-                await telegramBotCommandProcessor.ProcessInlineQueryCommand(inlineQueryId, queryText);
+                var ius = mapper.Map<InlineUsersSearch>(e.InlineQuery);
+                await mediator.Send(ius);
 
             }
             catch (Exception ex)
@@ -155,13 +138,26 @@ namespace TwitchSoft.TelegramBot
             switch (messageSplitted.First())
             {
                 case BotCommands.UserMessages:
-                    await telegramBotCommandProcessor.ProcessUserMessagesCommand(chatId, messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
+                    await mediator.Send(new UserMessagesCommand { 
+                        ChatId = chatId.ToString(),
+                        Username = messageSplitted.ElementAtOrDefault(1),
+                        SkipString = messageSplitted.ElementAtOrDefault(2)
+                    });
                     break;
                 case BotCommands.Subscribers:
-                    await telegramBotCommandProcessor.ProcessSubscribersCommand(chatId, messageSplitted.ElementAtOrDefault(1));
+                    await mediator.Send(new TopSubscribersCommand
+                    {
+                        ChatId = chatId.ToString(),
+                        ParamString = messageSplitted.ElementAtOrDefault(1),
+                    });
                     break;
                 case BotCommands.SearchText:
-                    await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
+                    await mediator.Send(new SearchTextCommand
+                    {
+                        ChatId = chatId.ToString(),
+                        SearchText = messageSplitted.ElementAtOrDefault(1),
+                        SkipString = messageSplitted.ElementAtOrDefault(2)
+                    });
                     break;
                 default:
                     logger.LogWarning($"Received unknown command: {message} from: {e.CallbackQuery.From.Username}.");
@@ -186,7 +182,10 @@ namespace TwitchSoft.TelegramBot
                         );
                         return;
                     }
-                    await telegramBotCommandProcessor.ProcessUserMessagesCommand(chatId, userName);
+                    await mediator.Send(new UserMessagesCommand { 
+                        ChatId = chatId,
+                        Username = userName,
+                    });
                     break;
                 case BotCommands.AddChannel:
                     var channelName = messageSplitted.ElementAtOrDefault(1);
@@ -199,10 +198,17 @@ namespace TwitchSoft.TelegramBot
                         );
                         return;
                     }
-                    await telegramBotCommandProcessor.ProcessNewChannelCommand(chatId, channelName);
+                    await mediator.Send(new NewChannelCommand
+                    {
+                        ChatId = chatId,
+                        ChannelName = channelName,
+                    });
                     break;
                 case BotCommands.Subscribers:
-                    await telegramBotCommandProcessor.ProcessSubscribersCommand(chatId);
+                    await mediator.Send(new TopSubscribersCommand
+                    {
+                        ChatId = chatId,
+                    });
                     break;
                 case BotCommands.SearchText:
                     var searchText = messageSplitted.ElementAtOrDefault(1);
@@ -215,10 +221,17 @@ namespace TwitchSoft.TelegramBot
                         );
                         return;
                     }
-                    await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, searchText);
+                    await mediator.Send(new SearchTextCommand
+                    {
+                        ChatId = chatId,
+                        SearchText = searchText,
+                    });
                     break;
                 default:
-                    await telegramBotCommandProcessor.ProcessUnknownCommand(chatId);
+                    await mediator.Send(new UnknownCommand
+                    {
+                        ChatId = chatId,
+                    });
 
                     logger.LogWarning($"Received unknown command: {message.Text}");
                     break;
@@ -236,15 +249,27 @@ namespace TwitchSoft.TelegramBot
                 {
                     case BotState.WaitingForUserName:
                         var userName = message.Text;
-                        await telegramBotCommandProcessor.ProcessUserMessagesCommand(chatId, userName);
+                        await mediator.Send(new UserMessagesCommand
+                        {
+                            ChatId = chatId,
+                            Username = userName
+                        }); 
                         break;
                     case BotState.WaitingForNewChannel:
                         var channelName = message.Text;
-                        await telegramBotCommandProcessor.ProcessNewChannelCommand(chatId, channelName);
+                        await mediator.Send(new NewChannelCommand
+                        {
+                            ChatId = chatId,
+                            ChannelName = channelName
+                        });
                         break;
                     case BotState.WaitingForMessage:
                         var searchText = message.Text;
-                        await telegramBotCommandProcessor.ProcessSearchTextCommand(chatId, searchText);
+                        await mediator.Send(new SearchTextCommand
+                        {
+                            ChatId = chatId,
+                            SearchText = searchText
+                        });
                         break;
                 }
                 _ = usersState.TryRemove(chatId, out _);
