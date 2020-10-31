@@ -80,6 +80,8 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
         public static async Task RefreshChannels(IHubClients<IOrchestrationClient> clients, IEnumerable<string> channels, ILogger logger)
         {
             var botsCount = ConnectionChannelList.Count;
+            logger?.LogInformation($"All Channels to connect: {string.Join(", ", channels)}");
+
             var channelGroups = Split(channels, botsCount);
 
             logger?.LogInformation($"Hub Clients connected: {botsCount}");
