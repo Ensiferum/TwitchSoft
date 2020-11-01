@@ -21,7 +21,8 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
 Usage:
 {BotCommands.UserMessages} [username] - покажет сообщения для пользователя
 {BotCommands.AddChannel} [channel] - добавляет канал для отслеживания
-{BotCommands.SubscribersCount} - выводит топ 100 каналов по кол-ву сабов
+{BotCommands.SubscribersCount} [channel] - выводит кол-во сабов для канала
+{BotCommands.TopBySubscribers} - выводит топ каналов по кол-ву сабов
 {BotCommands.SearchText} [text] - поиск по тексту сообщений";
 
             await telegramBotClient.SendTextMessageAsync(
