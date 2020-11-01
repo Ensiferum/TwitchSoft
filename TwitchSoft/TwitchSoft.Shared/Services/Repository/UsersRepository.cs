@@ -85,7 +85,7 @@ ON us.Id = tus.Id
 WHEN MATCHED THEN
     UPDATE 
     SET us.Username = tus.Username, 
-        us.JoinChannel = tus.JoinChannel
+        us.JoinChannel = IIF(us.JoinChannel = 1, us.JoinChannel, tus.JoinChannel)
 WHEN NOT MATCHED THEN
     INSERT (Id, Username, JoinChannel)
     VALUES (tus.Id, tus.Username, tus.JoinChannel);
