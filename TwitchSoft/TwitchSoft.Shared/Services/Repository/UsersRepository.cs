@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
+using TwitchSoft.Shared.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using UserTwitch = TwitchLib.Api.Helix.Models.Users.User;
 
@@ -31,14 +32,14 @@ WHERE Username IN @userNames", new { userNames });
             }
         }
 
-        public async Task<IEnumerable<(uint Id, string Username)>> SearchUsers(string userNamePart, int count = 10)
+        public async Task<IEnumerable<SimpleUserModel>> SearchUsers(string userNamePart, int count = 10)
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
-                return await connection.QueryAsync<(uint Id, string Username)>(@"
+                return await connection.QueryAsync<SimpleUserModel>(@"
 SELECT TOP (@count) Id, Username FROM Users
-WHERE Username = @userNamePart
-ORDER BY Id", new { userNamePart, count });
+WHERE Username LIKE @userNamePart
+ORDER BY Id", new { userNamePart = $"{userNamePart}%", count });
             }
         }
 
