@@ -46,7 +46,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                         chatId: chatId,
                         text: $"{messageHeader}\r\n{messageBody}",
                         parseMode: ParseMode.Html,
-                        replyMarkup: Utils.GenerateNavigationMarkup(BotCommands.SubscribersCount, string.Empty, count, skip, channelSubs.Count()),
+                        replyMarkup: Utils.GenerateNavigationMarkup(BotCommands.TopBySubscribers, string.Empty, count, skip, channelSubs.Count()),
                         cancellationToken: cancellationToken
                     );
         }
