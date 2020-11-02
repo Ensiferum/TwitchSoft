@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -18,7 +19,15 @@ namespace TwitchSoft.TelegramBot
         private readonly IMediator mediator;
         private readonly IMapper mapper;
 
-        private readonly ConcurrentDictionary<string, BotState> usersState = new ConcurrentDictionary<string, BotState>();
+        public static readonly Dictionary<BotCommand, string> CommandsWithRequiredParameters = new Dictionary<BotCommand, string>
+            {
+                { BotCommand.UserMessages, "username" },
+                { BotCommand.AddChannel, "channel" },
+                { BotCommand.SubscribersCount, "channel" },
+                { BotCommand.SearchText, "text" },
+            };
+
+        private readonly ConcurrentDictionary<string, BotCommand> usersPrevCommands = new ConcurrentDictionary<string, BotCommand>();
 
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
@@ -37,64 +46,27 @@ namespace TwitchSoft.TelegramBot
             try
             {
                 var chatId = message.Chat.Id.ToString();
-                string channelName;
+                var messageText = message?.Text ?? string.Empty;
+
+                var messageSplitted = (message?.Text ?? string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var command = messageSplitted.FirstOrDefault();
+                var parameters = messageSplitted.Skip(1).ToArray();
 
                 logger.LogInformation($"Received: {message.Text} from: {message.Chat.Username}.");
 
-                if (await TryHandleUserState(chatId, message)) return;
-
-                var messageSplitted = (message?.Text ?? string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                switch (messageSplitted.FirstOrDefault())
+                if (messageText.StartsWith("/") == false && usersPrevCommands.TryGetValue(chatId, out BotCommand botCommand))
                 {
-                    case BotCommands.UserMessages:
-                        var userName = messageSplitted.ElementAtOrDefault(1);
-                        if (string.IsNullOrEmpty(userName))
-                        {
-                            await RequestAdditionalData(chatId, "Enter username please", BotState.WaitingForUserName);
-                            return;
-                        }
-                        await GetUserMessages(chatId, userName);
-                        break;
-                    case BotCommands.AddChannel:
-                        channelName = messageSplitted.ElementAtOrDefault(1);
-                        if (string.IsNullOrEmpty(channelName))
-                        {
-                            await RequestAdditionalData(chatId, "Enter channel please", BotState.WaitingForNewChannel);
-                            return;
-                        }
-                        await AddNewChannel(chatId, channelName);
-                        break;
-                    case BotCommands.TopBySubscribers:
-                        await ListTopBySubscribers(chatId);
-                        break;
-                    case BotCommands.SubscribersCount:
-                        channelName = messageSplitted.ElementAtOrDefault(1);
-                        if (string.IsNullOrEmpty(channelName))
-                        {
-                            await RequestAdditionalData(chatId, "Enter channel please", BotState.WaitingForSubscribersCountChannelName);
-                            return;
-                        }
-                        await GetSubscribersCount(chatId, channelName);
-                        break;
-                    case BotCommands.SearchText:
-                        var searchText = messageSplitted.ElementAtOrDefault(1);
-                        if (string.IsNullOrEmpty(searchText))
-                        {
-                            await RequestAdditionalData(chatId, "Enter search text please", BotState.WaitingForMessage);
-                            return;
-                        }
-                        await SearchText(chatId, searchText);
-                        break;
-                    default:
-                        await SendUnknownCommand(chatId);
-
-                        logger.LogWarning($"Received unknown command: {message.Text}");
-                        break;
-
+                    command = $"/{botCommand}";
+                    parameters = messageSplitted.ToArray();
                 }
-                //add following commands
-                //online, etc
 
+                _ = usersPrevCommands.TryRemove(chatId, out _);
+
+                await ProcessQuery(new ChatInfo
+                {
+                    ChatId = chatId,
+                    Username = message.Chat.Username
+                }, command, parameters);
             }
             catch (Exception ex)
             {
@@ -128,24 +100,15 @@ namespace TwitchSoft.TelegramBot
 
                 var messageSplitted = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 var chatId = callbackQuery.Message != null ? callbackQuery.Message.Chat.Id : callbackQuery.From.Id;
-                switch (messageSplitted.First())
+
+                var command = messageSplitted.FirstOrDefault();
+                var parameters = messageSplitted.Skip(1).ToArray();
+
+                await ProcessQuery(new ChatInfo
                 {
-                    case BotCommands.UserMessages:
-                        await GetUserMessages(chatId.ToString(), messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
-                        break;
-                    case BotCommands.SubscribersCount:
-                        await GetSubscribersCount(chatId.ToString(), messageSplitted.ElementAtOrDefault(1));
-                        break;
-                    case BotCommands.TopBySubscribers:
-                        await ListTopBySubscribers(chatId.ToString(), messageSplitted.ElementAtOrDefault(1));
-                        break;
-                    case BotCommands.SearchText:
-                        await SearchText(chatId.ToString(), messageSplitted.ElementAtOrDefault(1), messageSplitted.ElementAtOrDefault(2));
-                        break;
-                    default:
-                        logger.LogWarning($"Received unknown command: {message} from: {callbackQuery.From.Username}.");
-                        break;
-                }
+                    ChatId = chatId.ToString(),
+                    Username = callbackQuery.From.Username
+                }, command, parameters);
 
                 try
                 {
@@ -164,29 +127,40 @@ namespace TwitchSoft.TelegramBot
             }
         }
 
-        private async Task<bool> TryHandleUserState(string chatId, Message message)
+        private async Task ProcessQuery(ChatInfo chatInfo, string command, string[] parameters)
         {
-            if (usersState.TryGetValue(chatId, out BotState userState) && message.Text?.StartsWith("/") == false)
+            if (Enum.TryParse(command.TrimStart('/'), true, out BotCommand botCommand))
             {
-                switch (userState)
+                if (CommandsWithRequiredParameters.ContainsKey(botCommand) && parameters.Length == 0)
                 {
-                    case BotState.WaitingForUserName:
-                        await GetUserMessages(chatId, message.Text);
+                    await RequestAdditionalData(chatInfo.ChatId, botCommand);
+                    return;
+                }
+
+                switch (botCommand)
+                {
+                    case BotCommand.UserMessages:
+                        await GetUserMessages(chatInfo.ChatId, parameters.ElementAtOrDefault(0), parameters.ElementAtOrDefault(1));
                         break;
-                    case BotState.WaitingForNewChannel:
-                        await AddNewChannel(chatId, message.Text);
+                    case BotCommand.SubscribersCount:
+                        await GetSubscribersCount(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
                         break;
-                    case BotState.WaitingForMessage:
-                        await SearchText(chatId, message.Text);
+                    case BotCommand.TopBySubscribers:
+                        await ListTopBySubscribers(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
                         break;
-                    case BotState.WaitingForSubscribersCountChannelName:
-                        await GetSubscribersCount(chatId, message.Text);
+                    case BotCommand.SearchText:
+                        await SearchText(chatInfo.ChatId, parameters.ElementAtOrDefault(0), parameters.ElementAtOrDefault(1));
+                        break;
+                    case BotCommand.AddChannel:
+                        await AddNewChannel(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
                         break;
                 }
-                _ = usersState.TryRemove(chatId, out _);
-                return true;
             }
-            return false;
+            else
+            {
+                await SendUnknownCommand(chatInfo.ChatId);
+                logger.LogWarning($"Received unknown command from {chatInfo.Username}:\r\n{string.Join(" ", parameters.Prepend(command))}");
+            }
         }
 
         public async Task SendUnknownCommand(string chatId)
@@ -244,13 +218,20 @@ namespace TwitchSoft.TelegramBot
             });
         }
 
-        public async Task RequestAdditionalData(string chatId, string messageText, BotState newBotState)
+        public async Task RequestAdditionalData(string chatId, BotCommand prevBotCommand)
         {
-            usersState[chatId] = newBotState;
-            await telegramBotClient.SendTextMessageAsync(
-                chatId: chatId,
-                text: messageText
-            );
+            usersPrevCommands[chatId] = prevBotCommand;
+            await mediator.Send(new RequestAdditionalInfoCommand
+            {
+                ChatId = chatId,
+                ParamName = CommandsWithRequiredParameters[prevBotCommand]
+            });
+        }
+
+        private record ChatInfo
+        {
+            public string ChatId { get; init; }
+            public string Username { get; init; }
         }
     }
 }
