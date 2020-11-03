@@ -46,14 +46,16 @@ namespace TwitchSoft.TelegramBot
 
                 var messageSplitted = (message?.Text ?? string.Empty).Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 var command = messageSplitted.FirstOrDefault();
-                var parameters = string.Join(" ", messageSplitted.Skip(1));
+                var parameters = messageSplitted.Length > 1 ?
+                    new[] { string.Join(" ", messageSplitted.Skip(1)) } :
+                    Enumerable.Empty<string>();
 
                 logger.LogInformation($"Received: {message.Text} from: {message.Chat.Username}.");
 
                 if (messageText.StartsWith("/") == false && usersPrevCommands.TryGetValue(chatId, out BotCommand botCommand))
                 {
                     command = $"/{botCommand}";
-                    parameters = messageText;
+                    parameters = new[] { messageText };
                 }
 
                 _ = usersPrevCommands.TryRemove(chatId, out _);
@@ -62,7 +64,7 @@ namespace TwitchSoft.TelegramBot
                 {
                     ChatId = chatId,
                     Username = message.Chat.Username
-                }, command, parameters);
+                }, command, parameters.ToArray());
             }
             catch (Exception ex)
             {
@@ -98,13 +100,15 @@ namespace TwitchSoft.TelegramBot
                 var chatId = callbackQuery.Message != null ? callbackQuery.Message.Chat.Id : callbackQuery.From.Id;
 
                 var command = messageSplitted.FirstOrDefault();
-                var parameters = messageSplitted.Skip(1).FirstOrDefault()?.Split(InlineUtils.InlineParamSeparator, StringSplitOptions.RemoveEmptyEntries);
+                var parameters = messageSplitted.Length > 1 ? 
+                    messageSplitted.Skip(1).FirstOrDefault().Split(InlineUtils.InlineParamSeparator, StringSplitOptions.RemoveEmptyEntries) :
+                    Enumerable.Empty<string>();
 
                 await ProcessQuery(new ChatInfo
                 {
                     ChatId = chatId.ToString(),
                     Username = callbackQuery.From.Username
-                }, command, parameters);
+                }, command, parameters.ToArray());
 
                 try
                 {
@@ -123,9 +127,9 @@ namespace TwitchSoft.TelegramBot
             }
         }
 
-        private async Task ProcessQuery(ChatInfo chatInfo, string command, params string[] parameters)
+        private async Task ProcessQuery(ChatInfo chatInfo, string command, string[] parameters)
         {
-            if (Enum.TryParse(command.TrimStart('/'), true, out BotCommand botCommand))
+            if (command.StartsWith("/") && Enum.TryParse(command.TrimStart('/'), true, out BotCommand botCommand))
             {
                 var tgCommand = tgCommands.FirstOrDefault(_ => _.BotCommand == botCommand);
                 if (tgCommand == null)
