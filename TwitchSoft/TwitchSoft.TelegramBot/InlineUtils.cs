@@ -3,8 +3,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TwitchSoft.TelegramBot
 {
-    public static class Utils
+    public static class InlineUtils
     {
+        public const string InlineParamSeparator = ":";
         public static InlineKeyboardMarkup GenerateNavigationMarkup(string command, string parameter, int itemsLimitCount, int skip, int itemsCount)
         {
             var inlineButtons = new List<InlineKeyboardButton>();
@@ -13,13 +14,13 @@ namespace TwitchSoft.TelegramBot
                 if (skip > 0)
                 {
                     inlineButtons.Add(InlineKeyboardButton
-                        .WithCallbackData($"Prev {itemsLimitCount}", $"{command} {parameter} {(skip - itemsLimitCount > 0 ? skip - itemsLimitCount : 0)}")
+                        .WithCallbackData($"Prev {itemsLimitCount}", $"{command} {parameter}{InlineParamSeparator}{(skip - itemsLimitCount > 0 ? skip - itemsLimitCount : 0)}")
                     );
                 }
                 if (itemsCount == itemsLimitCount)
                 {
                     inlineButtons.Add(InlineKeyboardButton
-                        .WithCallbackData($"Next {itemsLimitCount}", $"{command} {parameter} {skip + itemsLimitCount}")
+                        .WithCallbackData($"Next {itemsLimitCount}", $"{command} {parameter}{InlineParamSeparator}{skip + itemsLimitCount}")
                     );
                 }
 

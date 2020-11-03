@@ -30,7 +30,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
         {
             var chatId = request.ChatId;
             var userName = request.Username;
-            var skipString = request.SkipString;
+            var skip = request.Skip;
             var userIds = await usersRepository.GetUserIds(userName);
             if (!userIds.Any())
             {
@@ -44,11 +44,6 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             }
 
             var count = 50;
-            var skip = 0;
-            if (!string.IsNullOrWhiteSpace(skipString))
-            {
-                skip = int.Parse(skipString);
-            };
             var messages = await eSService.GetMessages(userIds.First().Value, skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
@@ -69,7 +64,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                     parseMode: ParseMode.Html,
                     disableWebPagePreview: true,
                     replyMarkup: i == replyMessages.Count - 1
-                        ? Utils.GenerateNavigationMarkup(BotCommands.UserMessages, userName, count, skip, messages.Count)
+                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.UserMessages, userName, count, skip, messages.Count)
                         : null,
                     cancellationToken: cancellationToken
                 );

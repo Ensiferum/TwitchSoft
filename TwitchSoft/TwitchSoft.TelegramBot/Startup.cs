@@ -14,6 +14,7 @@ using Telegram.Bot;
 using Microsoft.Extensions.Options;
 using MediatR;
 using AutoMapper;
+using TwitchSoft.TelegramBot.TgCommands;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -52,6 +53,12 @@ namespace TwitchSoft.TelegramBot
 
                 return new TelegramBotClient(botSettings.Value.BotOAuthToken);
             });
+
+            services.AddTransient<BaseTgCommand, ListTopBySubscribersTgCommand>();
+            services.AddTransient<BaseTgCommand, AddNewChannelTgCommand>();
+            services.AddTransient<BaseTgCommand, GetSubscribersCountTgCommand>();
+            services.AddTransient<BaseTgCommand, GetUserMessagesTgCommand>();
+            services.AddTransient<BaseTgCommand, SearchTextTgCommand>();
 
             services.AddMediatR(typeof(Startup));
 

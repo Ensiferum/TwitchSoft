@@ -1,29 +1,32 @@
 ﻿using MediatR;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using TwitchSoft.TelegramBot.MediatR.Models;
+using TwitchSoft.TelegramBot.TgCommands;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
     public class UnknownCommandHandler : AsyncRequestHandler<UnknownCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
+        private readonly IEnumerable<BaseTgCommand> tgCommands;
 
-        public UnknownCommandHandler(ITelegramBotClient telegramBotClient)
+        public UnknownCommandHandler(
+            ITelegramBotClient telegramBotClient, 
+            IEnumerable<BaseTgCommand> tgCommands)
         {
             this.telegramBotClient = telegramBotClient;
+            this.tgCommands = tgCommands;
         }
 
         protected override async Task Handle(UnknownCommand request, CancellationToken cancellationToken)
         {
             string usage = $@"
 Usage:
-{BotCommands.UserMessages} [username] - покажет сообщения для пользователя
-{BotCommands.AddChannel} [channel] - добавляет канал для отслеживания
-{BotCommands.SubscribersCount} [channel] - выводит кол-во сабов для канала
-{BotCommands.TopBySubscribers} - выводит топ каналов по кол-ву сабов
-{BotCommands.SearchText} [text] - поиск по тексту сообщений";
+{string.Join("\n", tgCommands.Select(com => com.ToString()))}";
 
             await telegramBotClient.SendTextMessageAsync(
                 request.ChatId,

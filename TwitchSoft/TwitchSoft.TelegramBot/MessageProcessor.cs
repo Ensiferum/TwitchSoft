@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TwitchSoft.TelegramBot.MediatR.Models;
+using TwitchSoft.TelegramBot.TgCommands;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -18,27 +19,22 @@ namespace TwitchSoft.TelegramBot
         private readonly ITelegramBotClient telegramBotClient;
         private readonly IMediator mediator;
         private readonly IMapper mapper;
-
-        public static readonly Dictionary<BotCommand, string> CommandsWithRequiredParameters = new Dictionary<BotCommand, string>
-            {
-                { BotCommand.UserMessages, "username" },
-                { BotCommand.AddChannel, "channel" },
-                { BotCommand.SubscribersCount, "channel" },
-                { BotCommand.SearchText, "text" },
-            };
+        private readonly IEnumerable<BaseTgCommand> tgCommands;
 
         private readonly ConcurrentDictionary<string, BotCommand> usersPrevCommands = new ConcurrentDictionary<string, BotCommand>();
 
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
             ITelegramBotClient telegramBotClient,
-            IMediator mediator, 
-            IMapper mapper)
+            IMediator mediator,
+            IMapper mapper, 
+            IEnumerable<BaseTgCommand> tgCommands)
         {
             this.logger = logger;
             this.telegramBotClient = telegramBotClient;
             this.mediator = mediator;
             this.mapper = mapper;
+            this.tgCommands = tgCommands;
         }
 
         public async Task ProcessMessage(Message message)
@@ -48,16 +44,16 @@ namespace TwitchSoft.TelegramBot
                 var chatId = message.Chat.Id.ToString();
                 var messageText = message?.Text ?? string.Empty;
 
-                var messageSplitted = (message?.Text ?? string.Empty).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var messageSplitted = (message?.Text ?? string.Empty).Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 var command = messageSplitted.FirstOrDefault();
-                var parameters = messageSplitted.Skip(1).ToArray();
+                var parameters = string.Join(" ", messageSplitted.Skip(1));
 
                 logger.LogInformation($"Received: {message.Text} from: {message.Chat.Username}.");
 
                 if (messageText.StartsWith("/") == false && usersPrevCommands.TryGetValue(chatId, out BotCommand botCommand))
                 {
                     command = $"/{botCommand}";
-                    parameters = messageSplitted.ToArray();
+                    parameters = messageText;
                 }
 
                 _ = usersPrevCommands.TryRemove(chatId, out _);
@@ -98,11 +94,11 @@ namespace TwitchSoft.TelegramBot
 
                 logger.LogInformation($"Received callback query: {message} from: {callbackQuery.From.Username}.");
 
-                var messageSplitted = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var messageSplitted = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 var chatId = callbackQuery.Message != null ? callbackQuery.Message.Chat.Id : callbackQuery.From.Id;
 
                 var command = messageSplitted.FirstOrDefault();
-                var parameters = messageSplitted.Skip(1).ToArray();
+                var parameters = messageSplitted.Skip(1).FirstOrDefault()?.Split(InlineUtils.InlineParamSeparator, StringSplitOptions.RemoveEmptyEntries);
 
                 await ProcessQuery(new ChatInfo
                 {
@@ -127,34 +123,25 @@ namespace TwitchSoft.TelegramBot
             }
         }
 
-        private async Task ProcessQuery(ChatInfo chatInfo, string command, string[] parameters)
+        private async Task ProcessQuery(ChatInfo chatInfo, string command, params string[] parameters)
         {
             if (Enum.TryParse(command.TrimStart('/'), true, out BotCommand botCommand))
             {
-                if (CommandsWithRequiredParameters.ContainsKey(botCommand) && parameters.Length == 0)
+                var tgCommand = tgCommands.FirstOrDefault(_ => _.BotCommand == botCommand);
+                if (tgCommand == null)
                 {
-                    await RequestAdditionalData(chatInfo.ChatId, botCommand);
+                    logger.LogWarning($"{botCommand} is not handled. Add handler for this command");
                     return;
                 }
 
-                switch (botCommand)
+                if (tgCommand is ParameterizedTgCommand paramTgCommand && paramTgCommand.IsValidParameters(parameters) == false)
                 {
-                    case BotCommand.UserMessages:
-                        await GetUserMessages(chatInfo.ChatId, parameters.ElementAtOrDefault(0), parameters.ElementAtOrDefault(1));
-                        break;
-                    case BotCommand.SubscribersCount:
-                        await GetSubscribersCount(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
-                        break;
-                    case BotCommand.TopBySubscribers:
-                        await ListTopBySubscribers(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
-                        break;
-                    case BotCommand.SearchText:
-                        await SearchText(chatInfo.ChatId, parameters.ElementAtOrDefault(0), parameters.ElementAtOrDefault(1));
-                        break;
-                    case BotCommand.AddChannel:
-                        await AddNewChannel(chatInfo.ChatId, parameters.ElementAtOrDefault(0));
-                        break;
+                    usersPrevCommands[chatInfo.ChatId] = botCommand;
+                    await paramTgCommand.RequestAdditionalParameters(chatInfo.ChatId);
+                    return;
                 }
+
+                await tgCommand.Execute(chatInfo.ChatId, parameters);
             }
             else
             {
@@ -168,63 +155,6 @@ namespace TwitchSoft.TelegramBot
             await mediator.Send(new UnknownCommand
             {
                 ChatId = chatId,
-            });
-        }
-
-        public async Task GetUserMessages(string chatId, string userName, string skipString = null)
-        {
-            await mediator.Send(new UserMessagesCommand
-            {
-                ChatId = chatId,
-                Username = userName,
-                SkipString = skipString
-            });
-        }
-
-        public async Task AddNewChannel(string chatId, string channelName)
-        {
-            await mediator.Send(new NewChannelCommand
-            {
-                ChatId = chatId,
-                ChannelName = channelName
-            });
-        }
-
-        public async Task SearchText(string chatId, string searchText, string skipString = null)
-        {
-            await mediator.Send(new SearchTextCommand
-            {
-                ChatId = chatId,
-                SearchText = searchText,
-                SkipString = skipString
-            });
-        }
-
-        public async Task ListTopBySubscribers(string chatId, string skipString = null)
-        {
-            await mediator.Send(new TopBySubscribersCommand
-            {
-                ChatId = chatId,
-                SkipString = skipString,
-            });
-        }
-
-        public async Task GetSubscribersCount(string chatId, string channelName)
-        {
-            await mediator.Send(new SubscribersCountCommand
-            {
-                ChatId = chatId,
-                ChannelName = channelName,
-            });
-        }
-
-        public async Task RequestAdditionalData(string chatId, BotCommand prevBotCommand)
-        {
-            usersPrevCommands[chatId] = prevBotCommand;
-            await mediator.Send(new RequestAdditionalInfoCommand
-            {
-                ChatId = chatId,
-                ParamName = CommandsWithRequiredParameters[prevBotCommand]
             });
         }
 

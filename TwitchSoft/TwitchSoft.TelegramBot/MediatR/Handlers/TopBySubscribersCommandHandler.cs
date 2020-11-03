@@ -24,14 +24,8 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
         protected override async Task Handle(TopBySubscribersCommand request, CancellationToken cancellationToken)
         {
             var chatId = request.ChatId;
-            var skipString = request.SkipString;
-
+            var skip = request.Skip;
             var count = 10;
-            var skip = 0;
-            if (!string.IsNullOrWhiteSpace(skipString))
-            {
-                skip = int.Parse(skipString);
-            };
 
             var dateFormat = "MMMM dd";
             var from = DateTime.UtcNow.AddMonths(-1).ConvertToMyTimezone().ToString(dateFormat);
@@ -46,7 +40,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                         chatId: chatId,
                         text: $"{messageHeader}\r\n{messageBody}",
                         parseMode: ParseMode.Html,
-                        replyMarkup: Utils.GenerateNavigationMarkup(BotCommands.TopBySubscribers, string.Empty, count, skip, channelSubs.Count()),
+                        replyMarkup: InlineUtils.GenerateNavigationMarkup(BotCommands.TopBySubscribers, string.Empty, count, skip, channelSubs.Count()),
                         cancellationToken: cancellationToken
                     );
         }

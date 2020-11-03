@@ -1,10 +1,6 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Args;
-using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot
 {

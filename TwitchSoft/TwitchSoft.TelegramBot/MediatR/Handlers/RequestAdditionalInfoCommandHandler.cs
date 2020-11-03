@@ -19,7 +19,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
         {
             await telegramBotClient.SendTextMessageAsync(
                 chatId: request.ChatId,
-                text: $"Enter parameter [{request.ParamName}]",
+                text: $"Enter parameter [{request.ParamName}] value",
                 cancellationToken: cancellationToken
             );
         }

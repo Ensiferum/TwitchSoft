@@ -43,7 +43,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                     parseMode: ParseMode.Html,
                     disableWebPagePreview: true,
                     replyMarkup: i == replyMessages.Count - 1
-                        ? Utils.GenerateNavigationMarkup(BotCommands.UserMessages, request.Username, count, 0, messages.Count)
+                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.UserMessages, request.Username, count, 0, messages.Count)
                         : null,
                     cancellationToken: cancellationToken
                 );
