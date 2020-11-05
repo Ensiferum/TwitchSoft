@@ -108,6 +108,22 @@ namespace TwitchSoft.TwitchBot
 
                 JoinedChannels.Remove(channelName);
             }
+
+            if (e.Data.StartsWith("Received: @msg-id=msg_banned"))
+            {
+                var regex = Regex.Match(e.Data, @"^Received: @msg-id=msg_banned :tmi.twitch.tv NOTICE #(?<channel>\w*) :You are permanently banned from talking in");
+                var channelName = regex.Groups["channel"].Value;
+
+                logger.LogWarning($"Bot was banned from channel: {channelName}");
+
+                _ = mediator.Send(new SetChannelBanned
+                {
+                    Channel = channelName,
+                    IsBanned = true,
+                });
+
+                JoinedChannels.Remove(channelName);
+            }
         }
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
