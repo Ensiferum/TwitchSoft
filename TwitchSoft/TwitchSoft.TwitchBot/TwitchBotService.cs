@@ -50,13 +50,13 @@ namespace TwitchSoft.TwitchBot
 
         private async void CheckJoinedChannels(object state)
         {
-            Logger.LogInformation("CheckJoinedChannels");
+            Logger.LogTrace("CheckJoinedChannels");
             await twitchBot.TriggerChannelsJoin();
         }
 
         private async void CheckConnection(object state)
         {
-            Logger.LogInformation("CheckConnection");
+            Logger.LogTrace("CheckConnection");
             await twitchBot.CheckIfStillConnected();
         }
     }

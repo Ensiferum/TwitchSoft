@@ -31,7 +31,7 @@ namespace TwitchSoft.Shared.Services.Helpers
             }
             else
             {
-                logger.LogInformation("Missing channelId in cache", channelId);
+                logger.LogTrace($"Missing channelId {channelId} in cache");
                 var user = await usersRepository.GetUserById(channelId);
                 memoryCache.Set(channelId, user.Username);
                 return user.Username;
@@ -46,7 +46,7 @@ namespace TwitchSoft.Shared.Services.Helpers
             }
             else
             {
-                logger.LogInformation("Missing channelName in cache", channelName);
+                logger.LogTrace($"Missing channelName {channelName} in cache");
                 var user = await usersRepository.GetUserByName(channelName);
                 memoryCache.Set(channelName, user.Id);
                 return user.Id;
