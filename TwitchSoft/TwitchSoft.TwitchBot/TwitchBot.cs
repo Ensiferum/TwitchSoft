@@ -91,7 +91,7 @@ namespace TwitchSoft.TwitchBot
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             EventsCount++;
-            logger.LogInformation($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
+            logger.LogTrace($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
 
             if (e.Data.StartsWith("Received: @msg-id=msg_channel_suspended"))
             {
@@ -128,7 +128,7 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnReconnected(object sender, OnReconnectedEventArgs e)
         {
-            logger.LogWarning("OnReconnected", e);
+            logger.LogInformation("OnReconnected", e);
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
@@ -143,13 +143,13 @@ namespace TwitchSoft.TwitchBot
 
         private void Client_OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
-            logger.LogInformation($"Bot is disconnected", e);
+            logger.LogTrace($"Bot is disconnected", e);
             twitchClient.Connect();
         }
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
-            logger.LogInformation($"Connected to {e.AutoJoinChannel}");
+            logger.LogTrace($"Connected to {e.AutoJoinChannel}");
         }
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -261,7 +261,7 @@ namespace TwitchSoft.TwitchBot
 
         public async Task CheckIfStillConnected()
         {
-            logger.LogInformation($"Log Events count: {EventsCount}");
+            logger.LogTrace($"Log Events count: {EventsCount}");
 
             if (EventsCount == 0)
             {
