@@ -9,17 +9,17 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7-develop.3014" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7-develop.3014" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7-develop.3026" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7-develop.3026" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0-rc.2.20475.17" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0-rc.2.20475.5" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0-rc.2.20475.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.1.0" />
     <PackageReference Include="Polly" Version="7.2.1" />
