@@ -58,6 +58,8 @@ spec:
                 name: ts-secret
             - configMapRef:
                 name: log-config
+            - configMapRef:
+                name: raffle-ignored-commands
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.imagePullSecrets }}

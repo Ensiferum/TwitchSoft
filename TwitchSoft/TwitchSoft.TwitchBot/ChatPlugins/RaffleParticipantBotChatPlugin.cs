@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TwitchLib.Client.Interfaces;
@@ -11,97 +12,25 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
     public class RaffleParticipantBotChatPlugin : IChatPlugin
     {
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
+        private readonly string[] ignoredCommands;
 
-        private static readonly ReadOnlyCollection<string> IgnoreCommands = new ReadOnlyCollection<string> (
-            new string[] {
-                "!discord", 
-                "!buy", 
-                "!love",
-                "!comands",
-                "!lettuce",
-                "!uptime",
-                "!yes",
-                "!trails",
-                "!binds",
-                "!modpack",
-                "!settings",
-                "!akm",
-                "!followage",
-                "!followerage",
-                "!follwage",
-                "!specs",
-                "!help",
-                "!twitter",
-                "!vote",
-                "!mods",
-                "!play",
-                "!leave",
-                "!сборки",
-                "!стрим",
-                "!любовь",
-                "!лагуны",
-                "!m4",
-                "!бочка",
-                "!sa",
-                "!пс",
-                "!rtx",
-                "!сан",
-                "!тргг",
-                "!rgg",
-                "!song",
-                "!poll",
-                "!трек",
-                "!game",
-                "!гав",
-                "!fs",
-                "!val",
-                "!hk",
-                "!goty",
-                "!up",
-                "!sub",
-                "!магазин",
-                "!настройки",
-                "!ak",
-                "!maps",
-                "!schedule",
-                "!video",
-                "!bracket",
-                "!tie",
-                "!bathroom",
-                "!primary",
-                "!fine",
-                "!spawn",
-                "!slot",
-                "!mouse",
-                "!sacrifice",
-                "!playlist",
-                "!sens",
-                "!drops",
-                "!ебальник",
-                "!drop",
-                "!lasthit",
-                "!iq",
-                "!time",
-                "!followagee",
-                "!mp7",
-                "!monitor"
-            }
-        );
-
-        public RaffleParticipantBotChatPlugin(ILogger<RaffleParticipantBotChatPlugin> logger)
+        public RaffleParticipantBotChatPlugin(ILogger<RaffleParticipantBotChatPlugin> logger, IConfiguration configuration)
         {
             this.logger = logger;
+            this.ignoredCommands = configuration
+                .GetValue<string>("ChatPlugins:RaffleParticipantBotChatPlugin:IgnoredCommands")?
+                .Split(";", StringSplitOptions.RemoveEmptyEntries).Select(_ => $"!{_}".ToLower()).ToArray();
         }
         public async Task ProcessMessage(ChatMessage chatMessage, ITwitchClient twitchClient)
         {
             if (Regex.IsMatch(chatMessage.Message, "^[!#]\\w+$", RegexOptions.Compiled))
             {
-                if (IgnoreCommands.Contains(chatMessage.Message.ToLower()))
+                if (ignoredCommands.Contains(chatMessage.Message.ToLower()))
                 {
                     return;
                 }
 
-                Random rand = new Random();
+                Random rand = new();
                 if (rand.Next(300) == 1)
                 {
                     logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {chatMessage.Message}");
