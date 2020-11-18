@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7-develop.3026" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7-develop.3026" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7-develop.3035" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7-develop.3035" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
