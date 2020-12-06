@@ -22,10 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\TwitchSoft.TelegramBot\Proto\TelegramBot.proto" GrpcServices="Client">
+    <Protobuf Include="..\TwitchSoft.TelegramBot\Protos\TelegramBot.proto" GrpcServices="Client">
       <Link>Protos\TelegramBot.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\TwitchSoft.TwitchBotOrchestrator\Proto\TwitchBotOrchestrator.proto" GrpcServices="Client">
+    <Protobuf Include="..\TwitchSoft.TwitchBotOrchestrator\Protos\TwitchBotOrchestrator.proto" GrpcServices="Client">
       <Link>Protos\TwitchBotOrchestrator.proto</Link>
     </Protobuf>
   </ItemGroup>
