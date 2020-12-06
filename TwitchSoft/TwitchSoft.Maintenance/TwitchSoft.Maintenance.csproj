@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Coravel" Version="4.0.2" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.32.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.34.0-pre1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
@@ -18,5 +19,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TwitchSoft.Shared\TwitchSoft.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\TwitchSoft.TelegramBot\Proto\TelegramBot.proto" GrpcServices="Client">
+      <Link>Protos\TelegramBot.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\TwitchSoft.TwitchBotOrchestrator\Proto\TwitchBotOrchestrator.proto" GrpcServices="Client">
+      <Link>Protos\TwitchBotOrchestrator.proto</Link>
+    </Protobuf>
   </ItemGroup>
 </Project>

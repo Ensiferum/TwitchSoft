@@ -7,8 +7,6 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="nlog.config" />
-    <None Remove="Protos\TelegramBot.proto" />
-    <None Remove="Protos\TwitchBotOrchestrator.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,11 +53,6 @@
     <PackageReference Include="TwitchLib.Api" Version="3.1.4-CI-20201204-31" />
     <PackageReference Include="TwitchLib.Api.Core" Version="3.1.4-CI-20201204-31" />
     <PackageReference Include="TwitchLib.Api.Helix" Version="3.1.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protos\TelegramBot.proto" />
-    <Protobuf Include="Protos\TwitchBotOrchestrator.proto" />
   </ItemGroup>
 
 </Project>
