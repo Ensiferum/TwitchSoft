@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.0.7-develop.3035" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="7.0.7-develop.3035" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.0-develop.3059" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.0-develop.3059" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.1.0" />
     <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="TwitchLib.Client" Version="3.1.6-CI-20201008-9" />
+    <PackageReference Include="TwitchLib.Client" Version="3.1.6-CI-20201202-12" />
   </ItemGroup>
 
   <ItemGroup>
