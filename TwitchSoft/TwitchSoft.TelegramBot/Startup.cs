@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using MediatR;
 using AutoMapper;
 using TwitchSoft.TelegramBot.TgCommands;
+using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -57,6 +58,7 @@ namespace TwitchSoft.TelegramBot
             services.AddTransient<BaseTgCommand, ListTopBySubscribersTgCommand>();
             services.AddTransient<BaseTgCommand, AddNewChannelTgCommand>();
             services.AddTransient<BaseTgCommand, GetSubscribersCountTgCommand>();
+            services.AddTransient<BaseTgCommand, DailyNewSubscribersCountTgCommand>();
             services.AddTransient<BaseTgCommand, GetUserMessagesTgCommand>();
             services.AddTransient<BaseTgCommand, SearchTextTgCommand>();
 

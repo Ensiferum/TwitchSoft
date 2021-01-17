@@ -20,20 +20,16 @@ namespace TwitchSoft.Shared.Services.Repository
 
         public async Task SaveSubscriberAsync(params Subscription[] subscriptions)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                await connection.InsertAsync(subscriptions);
-            }
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.InsertAsync(subscriptions);
         }
 
         public async Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription)
         {
             try
             {
-                using (var connection = new SqlConnection(ConnectionString))
-                {
-                    await connection.InsertAsync(communitySubscription);
-                }
+                using var connection = new SqlConnection(ConnectionString);
+                await connection.InsertAsync(communitySubscription);
             }
             catch (Exception ex)
             {
@@ -41,11 +37,11 @@ namespace TwitchSoft.Shared.Services.Repository
             }
         }
 
-        public async Task<IEnumerable<ChannelSubs>> GetTopChannelsBySubscribers(int skip, int count)
+        public async Task<IEnumerable<ChannelSubs>> GetSubscribersCount(int skip, int count, DateTime? fromDate = null)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryAsync<ChannelSubs>(@"
+            fromDate ??= DateTime.UtcNow.AddMonths(-1);
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<ChannelSubs>(@"
 SELECT us.Username as Channel, COUNT(*) AS SubsCount FROM Subscriptions sub
 JOIN Users us ON sub.ChannelId = us.Id
 WHERE sub.SubscribedTime >= @date
@@ -53,20 +49,17 @@ GROUP BY us.Username
 ORDER BY SubsCount DESC
 OFFSET @skip ROWS
 FETCH NEXT @count ROWS ONLY
-", new { count, skip, date = DateTime.UtcNow.AddMonths(-1) });
-            }
+", new { count, skip, date = fromDate });
         }
 
         public async Task<int> GetSubscribersCountFor(string channel)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.ExecuteScalarAsync<int>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.ExecuteScalarAsync<int>(@"
 SELECT COUNT(*) FROM Subscriptions sub
 JOIN Users us ON sub.ChannelId = us.Id
 WHERE us.Username = @channel AND sub.SubscribedTime >= @date
 ", new { channel, date = DateTime.UtcNow.AddMonths(-1) });
-            }
         }
     }
 }
