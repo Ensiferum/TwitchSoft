@@ -24,7 +24,7 @@ namespace TwitchSoft.TelegramBot.TgCommands
                 skip = skipVal;
             }
 
-            await mediator.Send(new TopBySubscribersCommand
+            await mediator.Send(new DailyNewSubscribersCountCommand
             {
                 ChatId = chatId,
                 Skip = skip,

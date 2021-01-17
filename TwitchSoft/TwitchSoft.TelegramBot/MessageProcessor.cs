@@ -21,7 +21,7 @@ namespace TwitchSoft.TelegramBot
         private readonly IMapper mapper;
         private readonly IEnumerable<BaseTgCommand> tgCommands;
 
-        private readonly ConcurrentDictionary<string, BotCommand> usersPrevCommands = new ConcurrentDictionary<string, BotCommand>();
+        private readonly ConcurrentDictionary<string, BotCommand> usersPrevCommands = new();
 
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
