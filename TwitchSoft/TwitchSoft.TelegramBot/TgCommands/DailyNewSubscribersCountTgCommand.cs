@@ -12,7 +12,7 @@ namespace TwitchSoft.TelegramBot.TgCommands
         {
 
         }
-        public override BotCommand BotCommand => BotCommand.NewSubscribersCountDaily;
+        public override BotCommand BotCommand => BotCommand.DailyNewSubs;
 
         public override string Description => "Кол-во новых сабов за день по каналам";
 

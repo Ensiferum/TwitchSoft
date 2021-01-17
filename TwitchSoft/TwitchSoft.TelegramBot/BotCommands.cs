@@ -14,7 +14,7 @@
         public const string UserMessages = "/usermessages";
         public const string SubscribersCount = "/subscriberscount";
         public const string TopBySubscribers = "/topbysubscribers";
-        public const string NewSubscribersCountDaily = "/dailynewsubs";
+        public const string DailyNewSubs = "/dailynewsubs";
     }
 
     public enum BotCommand
@@ -24,6 +24,6 @@
         UserMessages,
         SubscribersCount,
         TopBySubscribers,
-        NewSubscribersCountDaily
+        DailyNewSubs
     }
 }
