@@ -39,9 +39,9 @@ namespace TwitchSoft.TelegramBot
 
         public async Task ProcessMessage(Message message)
         {
+            var chatId = message.Chat.Id.ToString();
             try
             {
-                var chatId = message.Chat.Id.ToString();
                 var messageText = message?.Text ?? string.Empty;
 
                 var messageSplitted = (message?.Text ?? string.Empty).Split(" ", StringSplitOptions.RemoveEmptyEntries);
@@ -69,6 +69,7 @@ namespace TwitchSoft.TelegramBot
             catch (Exception ex)
             {
                 logger.LogError(ex, "ProcessMessage");
+                await SendErrorMessage(ex, chatId);
             }
         }
 
@@ -90,6 +91,7 @@ namespace TwitchSoft.TelegramBot
 
         public async Task ProcessCallbackQuery(CallbackQuery callbackQuery)
         {
+            var chatId = callbackQuery.Message != null ? callbackQuery.Message.Chat.Id : callbackQuery.From.Id;
             try
             {
                 var message = callbackQuery.Data;
@@ -97,7 +99,6 @@ namespace TwitchSoft.TelegramBot
                 logger.LogInformation($"Received callback query: {message} from: {callbackQuery.From.Username}.");
 
                 var messageSplitted = message.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                var chatId = callbackQuery.Message != null ? callbackQuery.Message.Chat.Id : callbackQuery.From.Id;
 
                 var command = messageSplitted.FirstOrDefault();
                 var parameters = messageSplitted.Length > 1 ? 
@@ -124,6 +125,7 @@ namespace TwitchSoft.TelegramBot
             catch (Exception ex)
             {
                 logger.LogError(ex, "ProcessCallbackQuery");
+                await SendErrorMessage(ex, chatId);
             }
         }
 
@@ -152,6 +154,13 @@ namespace TwitchSoft.TelegramBot
                 await SendUnknownCommand(chatInfo.ChatId);
                 logger.LogWarning($"Received unknown command from {chatInfo.Username}:\r\n{string.Join(" ", parameters.Prepend(command))}");
             }
+        }
+
+        private Task SendErrorMessage(Exception ex, ChatId chatId)
+        {
+            return telegramBotClient.SendTextMessageAsync(
+                chatId,
+                $"Error occured: {ex.Message}");
         }
 
         public async Task SendUnknownCommand(string chatId)
