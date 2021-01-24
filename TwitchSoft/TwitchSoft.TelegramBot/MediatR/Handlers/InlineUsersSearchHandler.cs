@@ -1,60 +1,52 @@
 ﻿using MediatR;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using TwitchSoft.Shared.ElasticSearch.Interfaces;
-using TwitchSoft.Shared.Services.Repository.Interfaces;
+using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
     public class InlineUsersSearchHandler : AsyncRequestHandler<InlineUsersSearch>
     {
-        private readonly IUsersRepository usersRepository;
+        private readonly ITwitchApiService twitchApiService;
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly IESService eSService;
 
         public InlineUsersSearchHandler(
-            IUsersRepository usersRepository,
-            ITelegramBotClient telegramBotClient, 
-            IESService eSService)
+            ITwitchApiService twitchApiService,
+            ITelegramBotClient telegramBotClient)
         {
-            this.usersRepository = usersRepository;
+            this.twitchApiService = twitchApiService;
             this.telegramBotClient = telegramBotClient;
-            this.eSService = eSService;
         }
 
         protected override async Task Handle(InlineUsersSearch request, CancellationToken cancellationToken)
         {
             var searchUserText = request.SearchUserText.ToLower();
-            var usersDB = usersRepository.SearchUsers(searchUserText);
-            var usersES = eSService.SearchUsers(searchUserText);
-
-            var uniqUsers = (await usersDB).Union(await usersES).Distinct();
+            var channels = await twitchApiService.SearchChannels(searchUserText);
 
             var results = new List<InlineQueryResultArticle>();
-            foreach (var user in uniqUsers)
+            foreach (var user in channels)
             {
                 var article = new InlineQueryResultArticle(
                     id: user.Id.ToString(),
-                    title: user.UserName,
-                    inputMessageContent: new InputTextMessageContent(user.UserName))
+                    title: user.DisplayName,
+                    inputMessageContent: new InputTextMessageContent(user.DisplayName))
                 {
                     ReplyMarkup = new InlineKeyboardMarkup(new[]
                         {
                                 new[] {
                                     InlineKeyboardButton.WithCallbackData(
                                         "Show messages",
-                                        $"{BotCommands.UserMessages} {user.UserName}")
+                                        $"{BotCommands.UserMessages} {user.Name}")
                                 },
                                 new[] {
                                     InlineKeyboardButton.WithCallbackData(
                                         "Show subs count",
-                                        $"{BotCommands.SubscribersCount} {user.UserName}")
+                                        $"{BotCommands.SubscribersCount} {user.Name}")
                                 }
                         })
                 };

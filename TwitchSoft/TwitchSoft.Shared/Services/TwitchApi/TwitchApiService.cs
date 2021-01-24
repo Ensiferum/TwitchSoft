@@ -25,6 +25,12 @@ namespace TwitchSoft.Shared.Services.TwitchApi
             return users.Users.FirstOrDefault();
         }
 
+        public async Task<TwitchLib.Api.V5.Models.Channels.Channel[]> SearchChannels(string namePart)
+        {
+            var channels = await api.V5.Search.SearchChannelsAsync(namePart, 10);
+            return channels.Channels;
+        }
+
         public async Task<List<Follow>> GetFollowsForUser(string fromId, string toId)
         {
             var countToFetch = 100;

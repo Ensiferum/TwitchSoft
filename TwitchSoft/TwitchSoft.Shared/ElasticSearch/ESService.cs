@@ -110,27 +110,5 @@ namespace TwitchSoft.Shared.ElasticSearch
                 Channel = _.ChannelName
             }).ToList();
         }
-
-        public async Task<IEnumerable<SimpleUserModel>> SearchUsers(string userNamePart, int count = 10)
-        {
-            var searchResponse = await elasticClient.SearchAsync<ChatMessage>(s => s
-                                    .Query(query => query
-                                        .Wildcard(w => w
-                                            .Field(c => c.UserName.Suffix("keyword"))
-                                            .Value($"{userNamePart}*")
-                                        ))
-                                    .Collapse(c => c
-                                        .Field(c => c.UserName.Suffix("keyword")))
-                                    .Size(count)
-                                    .Sort(s => s
-                                        .Descending(_ => _.UserName.Suffix("keyword")))
-                                    );
-
-            return searchResponse.Documents.Select(_ => new SimpleUserModel
-            {
-                Id = _.UserId,
-                UserName = _.UserName,
-            });
-        }
     }
 }

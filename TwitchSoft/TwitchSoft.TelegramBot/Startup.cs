@@ -15,7 +15,6 @@ using Microsoft.Extensions.Options;
 using MediatR;
 using AutoMapper;
 using TwitchSoft.TelegramBot.TgCommands;
-using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot
 {
