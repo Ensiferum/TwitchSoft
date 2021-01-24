@@ -48,7 +48,8 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                                         "Show subs count",
                                         $"{BotCommands.SubscribersCount} {user.Name}")
                                 }
-                        })
+                        }),
+                    ThumbUrl = user.Logo
                 };
                 results.Add(article);
             }
