@@ -21,7 +21,7 @@ namespace TwitchSoft.Maintenance.Jobs
 
             var response = await eSService.RemoveOldMessages(30);
 
-            logger.LogInformation($"Cleaned {response.Total} messages");
+            logger.LogInformation($"Removed {response.Total} messages");
 
             logger.LogInformation($"End executing job: {nameof(OldMessagesCleaner)}");
         }
