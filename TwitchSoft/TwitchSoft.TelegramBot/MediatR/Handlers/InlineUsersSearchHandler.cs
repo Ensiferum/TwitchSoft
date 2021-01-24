@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -32,7 +33,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             foreach (var user in channels)
             {
                 var article = new InlineQueryResultArticle(
-                    id: user.Id.ToString(),
+                    id: user.Id,
                     title: user.DisplayName,
                     inputMessageContent: new InputTextMessageContent(user.DisplayName))
                 {
@@ -49,7 +50,8 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                                         $"{BotCommands.SubscribersCount} {user.Name}")
                                 }
                         }),
-                    ThumbUrl = user.Logo
+                    ThumbUrl = user.Logo,
+                    Description = $"Followers: {user.Followers}"
                 };
                 results.Add(article);
             }

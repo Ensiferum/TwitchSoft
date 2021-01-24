@@ -11,6 +11,6 @@ namespace TwitchSoft.Shared.Services.TwitchApi
         Task<User> GetChannelByName(string channelName);
         Task<List<Follow>> GetFollowsForUser(string fromId, string toId);
         Task<List<Stream>> GetTopStreams();
-        Task<Channel[]> SearchChannels(string namePart);
+        Task<IEnumerable<Channel>> SearchChannels(string namePart);
     }
 }
