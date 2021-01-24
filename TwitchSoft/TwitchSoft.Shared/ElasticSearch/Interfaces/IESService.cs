@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Nest;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TwitchSoft.Shared.Models;
 using TwitchSoft.Shared.Services.Models;
 
 namespace TwitchSoft.Shared.ElasticSearch.Interfaces
@@ -10,6 +10,7 @@ namespace TwitchSoft.Shared.ElasticSearch.Interfaces
     {
         Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, int skip = 0, int count = 25);
         Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, DateTime from, int count = 25);
+        Task<DeleteByQueryResponse> RemoveOldMessages(int days);
         Task<List<ChatMessageModelForDisplaying>> SearchMessages(string searchText, int skip, int count);
     }
 }

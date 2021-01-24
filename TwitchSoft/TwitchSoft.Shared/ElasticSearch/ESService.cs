@@ -110,5 +110,18 @@ namespace TwitchSoft.Shared.ElasticSearch
                 Channel = _.ChannelName
             }).ToList();
         }
+
+        public async Task<DeleteByQueryResponse> RemoveOldMessages(int days)
+        {
+            var response = await elasticClient.DeleteByQueryAsync<ChatMessage>(_ =>
+                                    _.Query(q => q
+                                        .DateRange(r => r
+                                            .Field(f => f.PostedTime)
+                                            .LessThanOrEquals(DateTime.UtcNow.AddDays(-days))
+                                        )
+                                    ));
+
+            return response;
+        }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using static TelegramBotGrpc;
 using System;
 using static TwitchBotOrchestratorGrpc;
+using TwitchSoft.Shared.ElasticSearch;
 
 namespace TwitchSoft.Maintenance
 {
@@ -40,6 +41,7 @@ namespace TwitchSoft.Maintenance
             services.AddTransient<EnsthorFollowsJoin>();
             services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
+            services.AddTransient<OldMessagesCleaner>();
 
             services.AddGrpcClient<TelegramBotGrpcClient>(options =>
             {
@@ -50,6 +52,8 @@ namespace TwitchSoft.Maintenance
             {
                 options.Address = new Uri(Configuration.GetValue<string>("Services:TwitchBotOrchestrator"));
             });
+
+            services.AddElasticSearch(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -67,6 +71,10 @@ namespace TwitchSoft.Maintenance
                 scheduler
                     .Schedule<ChannelsRefresher>()
                     .EveryFifteenMinutes();
+
+                scheduler
+                    .Schedule<OldMessagesCleaner>()
+                    .Hourly();
 
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
