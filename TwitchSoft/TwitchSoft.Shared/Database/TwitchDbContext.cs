@@ -70,6 +70,10 @@ namespace TwitchSoft.Shared.Database
                 .HasIndex(u => new { u.UserId })
                 .IncludeProperties(u => new { u.SubscribedTime });
 
+            modelBuilder.Entity<Subscription>()
+                .HasIndex(u => new { u.ChannelId })
+                .IncludeProperties(u => new { u.SubscribedTime });
+
             modelBuilder.Entity<UserBan>()
                 .Property(u => u.Reason)
                 .HasMaxLength(140);
@@ -83,8 +87,14 @@ namespace TwitchSoft.Shared.Database
                 .HasMaxLength(60);
 
             modelBuilder.Entity<UserBan>()
-                .HasIndex(u => new { u.Id })
-                .IncludeProperties(u => new { u.UserName, u.Channel, u.BannedTime });
+                .HasIndex(u => u.Id)
+                .IsUnique();
+
+            modelBuilder.Entity<UserBan>()
+                .HasIndex(u => new { u.UserName });
+
+            modelBuilder.Entity<UserBan>()
+                .HasIndex(u => new { u.Channel });
 
             modelBuilder.Entity<CommunitySubscription>()
                 .HasOne(u => u.User)
