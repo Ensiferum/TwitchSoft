@@ -22,35 +22,37 @@ namespace TwitchSoft.Shared.Services.Repository
 
         public async Task<Dictionary<string, uint>> GetUserIds(params string[] userNames)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                var result = await connection.QueryAsync<(uint Id, string Username)>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            var result = await connection.QueryAsync<(uint Id, string Username)>(@"
 SELECT Id, Username FROM Users
 WHERE Username IN @userNames", new { userNames });
 
-                return result.ToDictionary(_ => _.Username, _ => _.Id);
-            }
+            return result.ToDictionary(_ => _.Username, _ => _.Id);
         }
 
         public async Task<IEnumerable<SimpleUserModel>> SearchUsers(string userNamePart, int count = 10)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryAsync<SimpleUserModel>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<SimpleUserModel>(@"
 SELECT TOP (@count) Id, Username FROM Users
 WHERE Username LIKE @userNamePart
 ORDER BY Id", new { userNamePart = $"{userNamePart}%", count });
-            }
         }
 
         public async Task<IEnumerable<User>> GetUsersByIds(IEnumerable<uint> ids)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryAsync<User>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<User>(@"
 SELECT * FROM Users
 WHERE Id IN @ids", new { ids });
-            }
+        }
+
+        public async Task<IEnumerable<User>> GetBannedChannels()
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<User>(@"
+SELECT * FROM Users
+WHERE IsBanned = 1");
         }
 
         public async Task CreateOrUpdateUsers(params User[] users)
@@ -66,20 +68,19 @@ WHERE Id IN @ids", new { ids });
                 return;
             }
 
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                await connection.OpenAsync();
-                SqlTransaction trans = connection.BeginTransaction();
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+            SqlTransaction trans = connection.BeginTransaction();
 
-                await connection.ExecuteAsync(@$"
+            await connection.ExecuteAsync(@$"
 CREATE TABLE #TempUsers (Id bigint, Username nvarchar(60), JoinChannel bit) 
 ", transaction: trans);
 
-                await connection.ExecuteAsync(@$"
+            await connection.ExecuteAsync(@$"
 INSERT INTO #TempUsers (Id, Username, JoinChannel) VALUES (@Id, @Username, @JoinChannel)
 ", users, trans);
 
-                await connection.ExecuteAsync(@$"
+            await connection.ExecuteAsync(@$"
 MERGE Users us
 USING #TempUsers tus
 ON us.Id = tus.Id
@@ -92,15 +93,13 @@ WHEN NOT MATCHED THEN
     VALUES (tus.Id, tus.Username, tus.JoinChannel);
 ", transaction: trans);
 
-                await trans.CommitAsync();
-            }
+            await trans.CommitAsync();
         }
 
         public async Task CreateOrUpdateUser(User user)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                await connection.ExecuteAsync(@$"MERGE INTO Users
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.ExecuteAsync(@$"MERGE INTO Users
                 USING 
                 (
                    SELECT   {user.Id} as Id,
@@ -113,79 +112,76 @@ WHEN NOT MATCHED THEN
                 WHEN NOT MATCHED THEN
                     INSERT (Id, Username)
                     VALUES ({user.Id}, '{user.Username}');");
-            }
         }
 
         public async Task SetChannelIsBanned(string channelName, bool isBanned)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                await connection.ExecuteAsync(@"
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.ExecuteAsync(@"
 UPDATE Users
 SET IsBanned = @isBanned
 WHERE Username = @channelName
 ", new { channelName, isBanned });
-            }
+        }
+
+        public async Task SetChannelIsBanned(uint userId, bool isBanned)
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.ExecuteAsync(@"
+UPDATE Users
+SET IsBanned = @isBanned
+WHERE Id = @userId
+", new { userId, isBanned });
         }
 
         public async Task<User> GetUserById(uint id)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryFirstOrDefaultAsync<User>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryFirstOrDefaultAsync<User>(@"
 SELECT * FROM Users
 WHERE Id = @id
 ", new { id });
-            }
         }
 
         public async Task<User> GetUserByName(string name)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryFirstOrDefaultAsync<User>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryFirstOrDefaultAsync<User>(@"
 SELECT * FROM Users
 WHERE Username = @name
 ", new { name });
-            }
         }
 
         public async Task<IEnumerable<User>> GetChannelsToTrack()
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                return await connection.QueryAsync<User>(@"
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<User>(@"
 SELECT * FROM Users
 WHERE JoinChannel = 1 AND IsBanned = 0
 ");
-            }
         }
 
         public async Task<bool> AddChannelToTrack(UserTwitch channel)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using var connection = new SqlConnection(ConnectionString);
+            var user = await connection.GetAsync<User>(Int64.Parse(channel.Id));
+            var userIsTracking = user?.JoinChannel == true;
+            if (user == null)
             {
-                var user = await connection.GetAsync<User>(Int64.Parse(channel.Id));
-                var userIsTracking = user?.JoinChannel == true;
-                if (user == null)
+                await connection.InsertAsync(new User
                 {
-                    await connection.InsertAsync(new User
-                    {
-                        Id = uint.Parse(channel.Id),
-                        Username = channel.Login,
-                        JoinChannel = true,
-                    });
-                }
-                else
-                {
-
-                    user.JoinChannel = true;
-                    await connection.UpdateAsync(user);
-                }
-                return userIsTracking;
+                    Id = uint.Parse(channel.Id),
+                    Username = channel.Login,
+                    JoinChannel = true,
+                });
             }
-        }
+            else
+            {
 
-        
+                user.JoinChannel = true;
+                await connection.UpdateAsync(user);
+            }
+            return userIsTracking;
+        }
     }
 }

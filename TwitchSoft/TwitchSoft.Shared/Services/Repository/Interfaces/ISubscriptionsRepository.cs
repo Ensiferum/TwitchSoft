@@ -12,5 +12,6 @@ namespace TwitchSoft.Shared.Services.Repository.Interfaces
         Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription);
         Task<IEnumerable<ChannelSubs>> GetSubscribersCount(int skip, int count, DateTime? fromDate = null);
         Task<int> GetSubscribersCountFor(string channel);
+        Task<int> GetSubscribersCountOnDay(uint channelId, DateTime date);
     }
 }

@@ -19,18 +19,12 @@ namespace TwitchSoft.Shared.Database
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserBan> UserBans { get; set; }
         public DbSet<CommunitySubscription> CommunitySubscriptions { get; set; }
+        public DbSet<SubscriptionStatistic> SubscriptionStatistics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Id)
-                .IsUnique(true);
-
-            modelBuilder.Entity<User>()
                 .HasIndex(u => new { u.JoinChannel });
-
-            modelBuilder.Entity<User>()
-                .HasKey(u => u.Id);
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Username)
@@ -54,13 +48,6 @@ namespace TwitchSoft.Shared.Database
                 .HasOne(u => u.GiftedByUser)
                 .WithMany(u => u.UserSubscriptionGifts)
                 .HasForeignKey(c => c.GiftedBy);
-
-            modelBuilder.Entity<Subscription>()
-                .HasIndex(u => u.Id)
-                .IsUnique();
-
-            modelBuilder.Entity<Subscription>()
-                .HasKey(u => u.Id);
 
             modelBuilder.Entity<Subscription>()
                 .Property(u => u.Id)
@@ -87,10 +74,6 @@ namespace TwitchSoft.Shared.Database
                 .HasMaxLength(60);
 
             modelBuilder.Entity<UserBan>()
-                .HasIndex(u => u.Id)
-                .IsUnique();
-
-            modelBuilder.Entity<UserBan>()
                 .HasIndex(u => new { u.UserName });
 
             modelBuilder.Entity<UserBan>()
@@ -107,16 +90,17 @@ namespace TwitchSoft.Shared.Database
                 .HasForeignKey(c => c.ChannelId);
 
             modelBuilder.Entity<CommunitySubscription>()
-                .HasIndex(u => u.Id)
-                .IsUnique();
-
-            modelBuilder.Entity<CommunitySubscription>()
-                .HasKey(u => u.Id);
-
-            modelBuilder.Entity<CommunitySubscription>()
                 .HasIndex(u => new { u.UserId })
                 .IncludeProperties(s => new { s.Date });
 
+            modelBuilder.Entity<SubscriptionStatistic>()
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(s => new { s.Date });
+
+            modelBuilder.Entity<SubscriptionStatistic>()
+                .HasOne(u => u.User)
+                .WithMany(u => u.UserSubscriptionStatistics)
+                .HasForeignKey(c => c.UserId);
         }
     }
 }

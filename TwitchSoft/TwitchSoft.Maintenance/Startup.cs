@@ -42,6 +42,8 @@ namespace TwitchSoft.Maintenance
             services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
             services.AddTransient<OldMessagesCleaner>();
+            services.AddTransient<ChannelsBanRefresher>();
+            services.AddTransient<SubscriptionDailyCountCalculator>();
 
             services.AddGrpcClient<TelegramBotGrpcClient>(options =>
             {
@@ -78,7 +80,15 @@ namespace TwitchSoft.Maintenance
 
                 scheduler
                     .Schedule<SentDailyMessageDigest>()
-                    .Cron("00 7,13,19 * * *");
+                    .Cron("0 7,13,19 * * *"); // every day at 7,13,19 utc 
+
+                scheduler
+                    .Schedule<ChannelsBanRefresher>()
+                    .Cron("0 12 * * 1"); // every monday at 12 utc
+
+                scheduler
+                    .Schedule<SubscriptionDailyCountCalculator>()
+                    .Cron("0 10 * * *"); // every day at 10 utc
             }).LogScheduledTaskProgress(app.ApplicationServices.GetService<ILogger<IScheduler>>());
         }
     }

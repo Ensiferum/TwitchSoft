@@ -61,5 +61,14 @@ JOIN Users us ON sub.ChannelId = us.Id
 WHERE us.Username = @channel AND sub.SubscribedTime >= @date
 ", new { channel, date = DateTime.UtcNow.AddMonths(-1) });
         }
+
+        public async Task<int> GetSubscribersCountOnDay(uint channelId, DateTime date)
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.ExecuteScalarAsync<int>(@"
+SELECT COUNT(*) FROM Subscriptions sub
+WHERE sub.ChannelId = @channelId AND sub.SubscribedTime BETWEEN @from AND @to
+", new { channelId, from = date, to = date.AddDays(1).AddMilliseconds(-1) });
+        }
     }
 }

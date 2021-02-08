@@ -21,5 +21,7 @@ namespace TwitchSoft.Shared.Database.Models
         public List<Subscription> ChannelSubscriptions { get; set; }
         [Write(false)]
         public List<CommunitySubscription> ChannelCommunitySubscriptions { get; set; }
+        [Write(false)]
+        public List<SubscriptionStatistic> UserSubscriptionStatistics { get; set; }
     }
 }
