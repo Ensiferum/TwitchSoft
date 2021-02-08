@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchLib.Api;
-using TwitchLib.Api.Helix.Models.Streams;
-using TwitchLib.Api.Helix.Models.Users;
+using TwitchLib.Api.Helix.Models.Streams.GetStreams;
+using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
+using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchSoft.Shared.Services.Models.Twitch;
 
 namespace TwitchSoft.Shared.Services.TwitchApi

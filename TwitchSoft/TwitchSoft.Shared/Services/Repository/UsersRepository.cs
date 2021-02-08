@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
-using UserTwitch = TwitchLib.Api.Helix.Models.Users.User;
+using UserTwitch = TwitchLib.Api.Helix.Models.Users.GetUsers.User;
 
 namespace TwitchSoft.Shared.Services.Repository
 {

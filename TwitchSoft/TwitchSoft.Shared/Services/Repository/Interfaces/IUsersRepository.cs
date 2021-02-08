@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Models;
 using User = TwitchSoft.Shared.Database.Models.User;
-using UserTwitch = TwitchLib.Api.Helix.Models.Users.User;
+using UserTwitch = TwitchLib.Api.Helix.Models.Users.GetUsers.User;
 
 namespace TwitchSoft.Shared.Services.Repository.Interfaces
 {
