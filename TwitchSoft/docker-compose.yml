@@ -59,6 +59,17 @@ services:
         aliases:
           - ts-twitchbotorchestrator
 
+  twitchsoft.publicapi:
+    image: ${DOCKER_REGISTRY}twitchsoftpublicapi:latest
+    build:
+      context: .
+      dockerfile: TwitchSoft.PublicApi/Dockerfile
+    restart: unless-stopped
+    networks: 
+      twitchsoft:
+        aliases:
+          - ts-publicapi
+
 networks: 
   twitchsoft: 
     external: true
