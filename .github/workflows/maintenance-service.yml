@@ -1,0 +1,56 @@
+name: Maintenance Service deploy
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'TwitchSoft/TwitchSoft.Shared/**'
+    - 'TwitchSoft/TwitchSoft.Maintenance/**'
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+  CLUSTER_RESOURCE_GROUP: ${{ secrets.CLUSTER_RESOURCE_GROUP }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-maitenance:
+    name: Maintenance service build
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Azure Container Registry login
+    - name: ACR Login
+      uses: Azure/docker-login@v1
+      with:
+        login-server: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # Build & Push image to ACR
+    - name: Build image
+      run: |
+        docker build -f TwitchSoft/TwitchSoft.Maintenance/Dockerfile -t ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:${{ env.IMAGE_TAG }} TwitchSoft
+    - name: Push image
+      run: |
+        docker push ${{ env.DOCKER_REGISTRY }}/twitchsoftmaintenance:${{ env.IMAGE_TAG }}
+    
+    # Install helm
+    - name: Helm tool installer
+      uses: Azure/setup-helm@v1
+    
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+
+    # Upgrade chart
+    - name: Helm Upgrade
+      run: |
+        helm upgrade ts-maintenance ./TwitchSoft/TwitchSoft.Maintenance/charts/twitchsoftmaintenance/ --set image.tag=${{ env.IMAGE_TAG }}
