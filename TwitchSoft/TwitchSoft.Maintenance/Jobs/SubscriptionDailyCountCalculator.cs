@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Maintenance.Jobs
@@ -30,20 +29,10 @@ namespace TwitchSoft.Maintenance.Jobs
         {
             logger.LogInformation($"Start executing job: {nameof(SubscriptionDailyCountCalculator)}");
 
-            var channels = await usersRepository.GetChannelsToTrack();
+            var todayUtc = DateTime.UtcNow.Date;
+            var yesterdayUtc = todayUtc.AddDays(-1);
 
-            foreach (var channel in channels)
-            {
-                var yesterdayDateUtc = DateTime.UtcNow.AddDays(-1).Date;
-                var dailySubCount = await subscriptionsRepository.GetSubscribersCountOnDay(channel.Id, yesterdayDateUtc);
-
-                await subscriptionStatisticsRepository.SaveStatistic(new SubscriptionStatistic
-                {
-                    UserId = channel.Id,
-                    Date = yesterdayDateUtc,
-                    Count = dailySubCount
-                });
-            }
+            await subscriptionStatisticsRepository.CalculateStatisticsForDates(yesterdayUtc, todayUtc);
 
             logger.LogInformation($"End executing job: {nameof(SubscriptionDailyCountCalculator)}");
         }
