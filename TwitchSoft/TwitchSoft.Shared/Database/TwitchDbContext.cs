@@ -94,8 +94,7 @@ namespace TwitchSoft.Shared.Database
                 .IncludeProperties(s => new { s.Date });
 
             modelBuilder.Entity<SubscriptionStatistic>()
-                .HasIndex(u => new { u.UserId })
-                .IncludeProperties(s => new { s.Date });
+                .HasKey(u => new { u.UserId, u.Date });
 
             modelBuilder.Entity<SubscriptionStatistic>()
                 .HasOne(u => u.User)

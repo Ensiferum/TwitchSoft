@@ -47,12 +47,10 @@ BEGIN
 
 		PRINT 'Calculation finished For Channel ' + CAST(@ChannelId AS NVARCHAR(MAX))
 
-		WAITFOR DELAY '00:00:00:100'
-
 		FETCH NEXT FROM channels_cursor
 		INTO @ChannelId
 	END
-	WAITFOR DELAY '00:00:01'
+	WAITFOR DELAY '00:00:00:010'
 
 	CLOSE channels_cursor;  
 	DEALLOCATE channels_cursor;  

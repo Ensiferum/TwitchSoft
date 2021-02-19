@@ -9,6 +9,8 @@ namespace TwitchSoft.Shared
     {
         public static void ConfigureShared(this IServiceCollection services)
         {
+            SqlMapper.Settings.CommandTimeout = 120; //override execution timeout for all queries
+
             SqlMapper.AddTypeMap(typeof(uint), System.Data.DbType.Int64);
 
             services.AddScoped<IUsersRepository, UsersRepository>();
