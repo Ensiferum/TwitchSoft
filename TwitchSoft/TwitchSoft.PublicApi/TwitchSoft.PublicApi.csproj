@@ -16,4 +16,8 @@
     <ProjectReference Include="..\TwitchSoft.Shared\TwitchSoft.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

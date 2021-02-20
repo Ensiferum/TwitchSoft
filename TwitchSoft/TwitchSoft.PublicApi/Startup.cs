@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using TwitchSoft.Shared;
+using TwitchSoft.Shared.ElasticSearch;
 
 namespace TwitchSoft.PublicApi
 {
@@ -21,6 +22,7 @@ namespace TwitchSoft.PublicApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureShared();
+            services.AddElasticSearch(Configuration);
 
             services.AddHealthChecks();
 
@@ -37,9 +39,10 @@ namespace TwitchSoft.PublicApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TwitchSoft.PublicApi v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TwitchSoft.PublicApi v1"));
 
             //app.UseHttpsRedirection();
 
