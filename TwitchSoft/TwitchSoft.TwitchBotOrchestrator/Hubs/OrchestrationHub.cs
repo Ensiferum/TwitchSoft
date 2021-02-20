@@ -15,14 +15,14 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
         private static ConcurrentDictionary<string, List<string>> ConnectionChannelList = new ConcurrentDictionary<string, List<string>>();
         private static DebounceDispatcher DebounceDispatcher = new DebounceDispatcher(10000);
 
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
         private readonly ILogger<OrchestrationHub> logger;
 
         public OrchestrationHub(
-            IUsersRepository usersRepository,
+            IUserRepository userRepository,
             ILogger<OrchestrationHub> logger)
         {
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
             this.logger = logger;
         }
 
@@ -52,7 +52,7 @@ namespace TwitchSoft.TwitchBotOrchestrator.Hubs
 
         public async Task TriggerReconnect()
         {
-            var channels = await usersRepository.GetChannelsToTrack();
+            var channels = await userRepository.GetChannelsToTrack();
             await JoinChannelsCommand(channels.Select(_ => _.Username));
         }
 

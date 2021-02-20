@@ -14,9 +14,9 @@ using UserTwitch = TwitchLib.Api.Helix.Models.Users.GetUsers.User;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class UsersRepository : BaseRepository, IUsersRepository
+    public class UserRepository : BaseRepository, IUserRepository
     {
-        public UsersRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
+        public UserRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
         {
         }
 

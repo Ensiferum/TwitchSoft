@@ -12,17 +12,17 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     public class UserMessagesCommandHandler : AsyncRequestHandler<UserMessagesCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly IUsersRepository usersRepository;
-        private readonly IMessagesRepository messagesRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMessageRepository messageRepository;
 
         public UserMessagesCommandHandler(
             ITelegramBotClient telegramBotClient, 
-            IUsersRepository usersRepository, 
-            IMessagesRepository messagesRepository)
+            IUserRepository userRepository, 
+            IMessageRepository messageRepository)
         {
             this.telegramBotClient = telegramBotClient;
-            this.usersRepository = usersRepository;
-            this.messagesRepository = messagesRepository;
+            this.userRepository = userRepository;
+            this.messageRepository = messageRepository;
         }
 
         protected override async Task Handle(UserMessagesCommand request, CancellationToken cancellationToken)
@@ -30,7 +30,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var chatId = request.ChatId;
             var userName = request.Username;
             var skip = request.Skip;
-            var userIds = await usersRepository.GetUserIds(userName);
+            var userIds = await userRepository.GetUserIds(userName);
             if (!userIds.Any())
             {
                 await telegramBotClient.SendTextMessageAsync(
@@ -43,7 +43,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             }
 
             var count = 50;
-            var messages = await messagesRepository.GetMessages(userIds.First().Value, skip, count);
+            var messages = await messageRepository.GetMessages(userIds.First().Value, skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
             if (!replyMessages.Any())

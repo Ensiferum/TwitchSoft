@@ -6,7 +6,7 @@ using TwitchSoft.Shared.Services.Models;
 
 namespace TwitchSoft.Shared.Services.Repository.Interfaces
 {
-    public interface ISubscriptionsRepository
+    public interface ISubscriptionRepository
     {
         Task SaveSubscriberAsync(params Subscription[] subscription);
         Task SaveCommunitySubscribtionAsync(CommunitySubscription communitySubscription);

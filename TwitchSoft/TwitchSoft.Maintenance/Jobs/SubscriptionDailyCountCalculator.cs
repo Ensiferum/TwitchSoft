@@ -9,20 +9,20 @@ namespace TwitchSoft.Maintenance.Jobs
     public class SubscriptionDailyCountCalculator : IInvocable
     {
         private readonly ILogger<SubscriptionDailyCountCalculator> logger;
-        private readonly IUsersRepository usersRepository;
-        private readonly ISubscriptionsRepository subscriptionsRepository;
-        private readonly ISubscriptionStatisticsRepository subscriptionStatisticsRepository;
+        private readonly IUserRepository userRepository;
+        private readonly ISubscriptionRepository subscriptionRepository;
+        private readonly ISubscriptionStatisticRepository subscriptionStatisticRepository;
 
         public SubscriptionDailyCountCalculator(
             ILogger<SubscriptionDailyCountCalculator> logger,
-            IUsersRepository usersRepository,
-            ISubscriptionsRepository subscriptionsRepository, 
-            ISubscriptionStatisticsRepository subscriptionStatisticsRepository)
+            IUserRepository userRepository,
+            ISubscriptionRepository subscriptionRepository, 
+            ISubscriptionStatisticRepository subscriptionStatisticRepository)
         {
             this.logger = logger;
-            this.usersRepository = usersRepository;
-            this.subscriptionsRepository = subscriptionsRepository;
-            this.subscriptionStatisticsRepository = subscriptionStatisticsRepository;
+            this.userRepository = userRepository;
+            this.subscriptionRepository = subscriptionRepository;
+            this.subscriptionStatisticRepository = subscriptionStatisticRepository;
         }
 
         public async Task Invoke()
@@ -32,7 +32,7 @@ namespace TwitchSoft.Maintenance.Jobs
             var todayUtc = DateTime.UtcNow.Date;
             var yesterdayUtc = todayUtc.AddDays(-1);
 
-            await subscriptionStatisticsRepository.CalculateStatisticsForDates(yesterdayUtc, todayUtc);
+            await subscriptionStatisticRepository.CalculateStatisticsForDates(yesterdayUtc, todayUtc);
 
             logger.LogInformation($"End executing job: {nameof(SubscriptionDailyCountCalculator)}");
         }

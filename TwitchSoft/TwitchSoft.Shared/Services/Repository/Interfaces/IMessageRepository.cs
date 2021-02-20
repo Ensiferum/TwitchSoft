@@ -7,7 +7,7 @@ using TwitchSoft.Shared.Services.Models;
 
 namespace TwitchSoft.Shared.Services.Repository.Interfaces
 {
-    public interface IMessagesRepository
+    public interface IMessageRepository
     {
         Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, int skip = 0, int count = 25);
         Task<List<ChatMessageModelForDisplaying>> GetMessages(uint userId, DateTime from, int count = 25);

@@ -6,7 +6,7 @@ using UserTwitch = TwitchLib.Api.Helix.Models.Users.GetUsers.User;
 
 namespace TwitchSoft.Shared.Services.Repository.Interfaces
 {
-    public interface IUsersRepository
+    public interface IUserRepository
     {
         Task<Dictionary<string, uint>> GetUserIds(params string[] userNames);
         Task CreateOrUpdateUsers(params User[] users);

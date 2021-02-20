@@ -8,18 +8,18 @@ namespace TwitchSoft.Maintenance.Jobs
     public class OldMessagesCleaner : IInvocable
     {
         private readonly ILogger<OldMessagesCleaner> logger;
-        private readonly IMessagesRepository messagesRepository;
+        private readonly IMessageRepository messageRepository;
 
-        public OldMessagesCleaner(ILogger<OldMessagesCleaner> logger, IMessagesRepository messagesRepository)
+        public OldMessagesCleaner(ILogger<OldMessagesCleaner> logger, IMessageRepository messageRepository)
         {
             this.logger = logger;
-            this.messagesRepository = messagesRepository;
+            this.messageRepository = messageRepository;
         }
         public async Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(OldMessagesCleaner)}");
 
-            var response = await messagesRepository.RemoveOldMessages(30);
+            var response = await messageRepository.RemoveOldMessages(30);
 
             logger.LogInformation($"Removed {response.Total} messages");
 

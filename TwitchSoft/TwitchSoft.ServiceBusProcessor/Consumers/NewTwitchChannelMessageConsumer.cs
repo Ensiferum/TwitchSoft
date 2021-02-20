@@ -10,14 +10,14 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
     {
         private readonly IChannelsCache channelsCache;
-        private readonly IMessagesRepository messagesRepository;
+        private readonly IMessageRepository messageRepository;
 
         public NewTwitchChannelMessageConsumer(
             IChannelsCache channelsCache,
-            IMessagesRepository messagesRepository)
+            IMessageRepository messageRepository)
         {
             this.channelsCache = channelsCache;
-            this.messagesRepository = messagesRepository;
+            this.messageRepository = messageRepository;
         }
 
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
@@ -40,7 +40,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 PostedTime = chatMessage.PostedTime,
             };
 
-            await messagesRepository.SaveMessage(chatMessageES);
+            await messageRepository.SaveMessage(chatMessageES);
         }
     }
 }

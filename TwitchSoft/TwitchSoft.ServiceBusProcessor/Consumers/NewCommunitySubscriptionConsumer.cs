@@ -12,18 +12,18 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     public class NewCommunitySubscriptionConsumer : IConsumer<NewCommunitySubscription>
     {
         private readonly ILogger<NewCommunitySubscriptionConsumer> logger;
-        private readonly ISubscriptionsRepository subscriptionsRepository;
-        private readonly IUsersRepository usersRepository;
+        private readonly ISubscriptionRepository subscriptionRepository;
+        private readonly IUserRepository usersRepository;
         private readonly IChannelsCache channelsCache;
 
         public NewCommunitySubscriptionConsumer(
             ILogger<NewCommunitySubscriptionConsumer> logger,
-            ISubscriptionsRepository subscriptionsRepository,
-            IUsersRepository usersRepository,
+            ISubscriptionRepository subscriptionRepository,
+            IUserRepository usersRepository,
             IChannelsCache channelsCache)
         {
             this.logger = logger;
-            this.subscriptionsRepository = subscriptionsRepository;
+            this.subscriptionRepository = subscriptionRepository;
             this.usersRepository = usersRepository;
             this.channelsCache = channelsCache;
         }
@@ -36,7 +36,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 Username = comSubInfo.User.UserName,
                 Id = comSubInfo.User.UserId
             });
-            await subscriptionsRepository.SaveCommunitySubscribtionAsync(new CommunitySubscription
+            await subscriptionRepository.SaveCommunitySubscribtionAsync(new CommunitySubscription
             {
                 Id = comSubInfo.Id,
                 ChannelId = await channelsCache.GetChannelIdByName(comSubInfo.Channel),

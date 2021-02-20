@@ -12,9 +12,9 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class SubscriptionsRepository : BaseRepository, ISubscriptionsRepository
+    public class SubscriptionRepository : BaseRepository, ISubscriptionRepository
     {
-        public SubscriptionsRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
+        public SubscriptionRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
         {
         }
 

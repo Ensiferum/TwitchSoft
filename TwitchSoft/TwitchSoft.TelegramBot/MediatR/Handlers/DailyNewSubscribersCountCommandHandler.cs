@@ -14,11 +14,11 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     public class DailyNewSubscribersCountCommandHandler : AsyncRequestHandler<DailyNewSubscribersCountCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly ISubscriptionsRepository subscriptionsRepository;
-        public DailyNewSubscribersCountCommandHandler(ITelegramBotClient telegramBotClient, ISubscriptionsRepository subscriptionsRepository)
+        private readonly ISubscriptionRepository subscriptionRepository;
+        public DailyNewSubscribersCountCommandHandler(ITelegramBotClient telegramBotClient, ISubscriptionRepository subscriptionRepository)
         {
             this.telegramBotClient = telegramBotClient;
-            this.subscriptionsRepository = subscriptionsRepository;
+            this.subscriptionRepository = subscriptionRepository;
         }
 
         protected override async Task Handle(DailyNewSubscribersCountCommand request, CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var from = DateTime.UtcNow.AddDays(-1);
             var to = DateTime.UtcNow;
 
-            var channelSubs = await subscriptionsRepository.GetSubscribersCount(skip, count, from);
+            var channelSubs = await subscriptionRepository.GetSubscribersCount(skip, count, from);
 
             var fromString = from.ConvertToMyTimezone().ToString(dateFormat);
             var toString = to.ConvertToMyTimezone().ToString(dateFormat);

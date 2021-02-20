@@ -14,16 +14,16 @@ namespace TwitchSoft.TwitchBotOrcherstration.Grpc
     public class TwitchBotOrchestrationGrpcService : TwitchBotOrchestratorGrpcBase
     {
         private readonly IHubContext<OrchestrationHub, IOrchestrationClient> hub;
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
         private readonly ILogger<TwitchBotOrchestrationGrpcService> logger;
 
         public TwitchBotOrchestrationGrpcService(
             IHubContext<OrchestrationHub, IOrchestrationClient> hub,
-            IUsersRepository usersRepository,
+            IUserRepository userRepository,
             ILogger<TwitchBotOrchestrationGrpcService> logger)
         {
             this.hub = hub;
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
             this.logger = logger;
         }
         public override async Task<Empty> JoinChannel(JoinChannelRequest request, ServerCallContext context)
@@ -34,7 +34,7 @@ namespace TwitchSoft.TwitchBotOrcherstration.Grpc
 
         public override async Task<Empty> RefreshChannels(Empty request, ServerCallContext context)
         {
-            var channels = await usersRepository.GetChannelsToTrack();
+            var channels = await userRepository.GetChannelsToTrack();
             await OrchestrationHub.RefreshChannels(hub.Clients, channels.Select(_ => _.Username), logger);
             return new Empty();
         }

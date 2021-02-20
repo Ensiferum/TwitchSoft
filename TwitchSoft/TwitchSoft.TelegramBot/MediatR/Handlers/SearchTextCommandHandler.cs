@@ -12,12 +12,12 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     public class SearchTextCommandHandler : AsyncRequestHandler<SearchTextCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly IMessagesRepository messagesRepository;
+        private readonly IMessageRepository messageRepository;
 
-        public SearchTextCommandHandler(ITelegramBotClient telegramBotClient, IMessagesRepository messagesRepository)
+        public SearchTextCommandHandler(ITelegramBotClient telegramBotClient, IMessageRepository messageRepository)
         {
             this.telegramBotClient = telegramBotClient;
-            this.messagesRepository = messagesRepository;
+            this.messageRepository = messageRepository;
         }
 
         protected override async Task Handle(SearchTextCommand request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var skip = request.Skip;
 
             var count = 50;
-            var messages = await messagesRepository.SearchMessages(searchText.ToLower(), skip, count);
+            var messages = await messageRepository.SearchMessages(searchText.ToLower(), skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
             if (!replyMessages.Any())

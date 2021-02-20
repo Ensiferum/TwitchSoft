@@ -14,18 +14,18 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     {
         private readonly ITwitchApiService twitchApiService;
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
         private readonly TwitchBotOrchestratorGrpcClient twitchBotOrchestratorClient;
 
         public NewChannelCommandHandler(
             ITwitchApiService twitchApiService,
             ITelegramBotClient telegramBotClient,
-            IUsersRepository usersRepository, 
+            IUserRepository userRepository, 
             TwitchBotOrchestratorGrpcClient twitchBotOrchestratorClient)
         {
             this.twitchApiService = twitchApiService;
             this.telegramBotClient = telegramBotClient;
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
             this.twitchBotOrchestratorClient = twitchBotOrchestratorClient;
         }
 
@@ -46,7 +46,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                 return;
             }
 
-            var alreadyExist = await usersRepository.AddChannelToTrack(channel);
+            var alreadyExist = await userRepository.AddChannelToTrack(channel);
             if (alreadyExist)
             {
                 await telegramBotClient.SendTextMessageAsync(

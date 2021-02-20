@@ -12,16 +12,16 @@ namespace TwitchSoft.Maintenance.Jobs
     {
         private readonly ILogger<HoneymadFollowsJoin> logger;
         private readonly ITwitchApiService twitchApiService;
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
 
         public HoneymadFollowsJoin(
             ILogger<HoneymadFollowsJoin> logger,
             ITwitchApiService twitchApiService,
-            IUsersRepository usersRepository)
+            IUserRepository userRepository)
         {
             this.logger = logger;
             this.twitchApiService = twitchApiService;
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
         }
         public async Task Invoke()
         {
@@ -31,7 +31,7 @@ namespace TwitchSoft.Maintenance.Jobs
 
             logger?.LogInformation($"Follows for {fromId}. Channels: {string.Join(", ", follows.Select(_ => _.ToUserName.ToLower()))}");
 
-            await usersRepository.CreateOrUpdateUsers(follows.Select(f => new User
+            await userRepository.CreateOrUpdateUsers(follows.Select(f => new User
             {
                 Id = uint.Parse(f.ToUserId),
                 Username = f.ToUserName.ToLower(),

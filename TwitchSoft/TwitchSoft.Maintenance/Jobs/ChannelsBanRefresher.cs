@@ -8,25 +8,25 @@ namespace TwitchSoft.Maintenance.Jobs
     public class ChannelsBanRefresher : IInvocable
     {
         private readonly ILogger<ChannelsBanRefresher> logger;
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
 
         public ChannelsBanRefresher(
             ILogger<ChannelsBanRefresher> logger, 
-            IUsersRepository usersRepository)
+            IUserRepository userRepository)
         {
             this.logger = logger;
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
         }
 
         public async Task Invoke()
         {
             logger.LogInformation($"Start executing job: {nameof(ChannelsBanRefresher)}");
 
-            var channels = await usersRepository.GetBannedChannels();
+            var channels = await userRepository.GetBannedChannels();
 
             foreach (var bannedChannel in channels)
             {
-                await usersRepository.SetChannelIsBanned(bannedChannel.Id, false);
+                await userRepository.SetChannelIsBanned(bannedChannel.Id, false);
             }
 
             logger.LogInformation($"End executing job: {nameof(ChannelsBanRefresher)}");

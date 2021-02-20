@@ -13,11 +13,11 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     public class SubscribersCountCommandHandler : AsyncRequestHandler<SubscribersCountCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly ISubscriptionsRepository subscriptionsRepository;
-        public SubscribersCountCommandHandler(ITelegramBotClient telegramBotClient, ISubscriptionsRepository subscriptionsRepository)
+        private readonly ISubscriptionRepository subscriptionRepository;
+        public SubscribersCountCommandHandler(ITelegramBotClient telegramBotClient, ISubscriptionRepository subscriptionRepository)
         {
             this.telegramBotClient = telegramBotClient;
-            this.subscriptionsRepository = subscriptionsRepository;
+            this.subscriptionRepository = subscriptionRepository;
         }
 
         protected override async Task Handle(SubscribersCountCommand request, CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var from = DateTime.UtcNow.AddMonths(-1).ConvertToMyTimezone().ToString(dateFormat);
             var to = DateTime.UtcNow.ConvertToMyTimezone().ToString(dateFormat);
 
-            var subsCount = await subscriptionsRepository.GetMonthlySubscribersCountFor(request.ChannelName);
+            var subsCount = await subscriptionRepository.GetMonthlySubscribersCountFor(request.ChannelName);
 
             var messageHeader = $"Subscriptions count {from} - {to}";
 

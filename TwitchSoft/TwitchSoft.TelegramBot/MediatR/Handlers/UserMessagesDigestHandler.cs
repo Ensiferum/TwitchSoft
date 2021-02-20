@@ -12,25 +12,25 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
     public class UserMessagesDigestHandler : AsyncRequestHandler<UserMessagesDigest>
     {
-        private readonly IUsersRepository usersRepository;
-        private readonly IMessagesRepository messagesRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMessageRepository messageRepository;
         private readonly ITelegramBotClient telegramBotClient;
 
         public UserMessagesDigestHandler(
-            IUsersRepository usersRepository,
-            IMessagesRepository messagesRepository, 
+            IUserRepository userRepository,
+            IMessageRepository messageRepository, 
             ITelegramBotClient telegramBotClient)
         {
-            this.usersRepository = usersRepository;
-            this.messagesRepository = messagesRepository;
+            this.userRepository = userRepository;
+            this.messageRepository = messageRepository;
             this.telegramBotClient = telegramBotClient;
         }
         protected override async Task Handle(UserMessagesDigest request, CancellationToken cancellationToken)
         {
-            var userIds = await usersRepository.GetUserIds(request.Username);
+            var userIds = await userRepository.GetUserIds(request.Username);
 
             var count = 50;
-            var messages = await messagesRepository.GetMessages(userIds.First().Value, DateTime.UtcNow.AddHours(-12), count);
+            var messages = await messageRepository.GetMessages(userIds.First().Value, DateTime.UtcNow.AddHours(-12), count);
 
             var replyMessages = messages.GenerateReplyMessages();
             for (var i = 0; i < replyMessages.Count; i++)

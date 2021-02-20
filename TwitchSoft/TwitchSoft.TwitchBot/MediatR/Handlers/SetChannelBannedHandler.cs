@@ -8,17 +8,17 @@ namespace TwitchSoft.TwitchBot.MediatR.Handlers
 {
     public class SetChannelBannedHandler : AsyncRequestHandler<SetChannelBanned>
     {
-        private readonly IUsersRepository usersRepository;
+        private readonly IUserRepository userRepository;
 
         public SetChannelBannedHandler(
-            IUsersRepository usersRepository)
+            IUserRepository userRepository)
         {
-            this.usersRepository = usersRepository;
+            this.userRepository = userRepository;
         }
 
         protected override async Task Handle(SetChannelBanned request, CancellationToken cancellationToken)
         {
-            await usersRepository.SetChannelIsBanned(request.Channel, request.IsBanned);
+            await userRepository.SetChannelIsBanned(request.Channel, request.IsBanned);
         }
     }
 }

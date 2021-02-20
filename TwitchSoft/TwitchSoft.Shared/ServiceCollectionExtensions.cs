@@ -13,11 +13,11 @@ namespace TwitchSoft.Shared
 
             SqlMapper.AddTypeMap(typeof(uint), System.Data.DbType.Int64);
 
-            services.AddScoped<IUsersRepository, UsersRepository>();
-            services.AddScoped<IUserBansRepository, UserBansRepository>();
-            services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
-            services.AddScoped<ISubscriptionStatisticsRepository, SubscriptionStatisticsRepository>();
-            services.AddScoped<IMessagesRepository, MessagesRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserBanRepository, UserBanRepository>();
+            services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+            services.AddScoped<ISubscriptionStatisticRepository, SubscriptionStatisticRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
         }
     }
 }

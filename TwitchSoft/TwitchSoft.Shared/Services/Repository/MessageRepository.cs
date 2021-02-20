@@ -9,11 +9,11 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class MessagesRepository : IMessagesRepository
+    public class MessageRepository : IMessageRepository
     {
         private readonly IElasticClient elasticClient;
 
-        public MessagesRepository(IElasticClient elasticClient)
+        public MessageRepository(IElasticClient elasticClient)
         {
             this.elasticClient = elasticClient;
         }

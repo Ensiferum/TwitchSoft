@@ -9,9 +9,9 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class UserBansRepository : BaseRepository, IUserBansRepository
+    public class UserBanRepository : BaseRepository, IUserBanRepository
     {
-        public UserBansRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
+        public UserBanRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
         {
         }
 

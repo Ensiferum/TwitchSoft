@@ -11,9 +11,9 @@ using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.Shared.Services.Repository
 {
-    public class SubscriptionStatisticsRepository : BaseRepository, ISubscriptionStatisticsRepository
+    public class SubscriptionStatisticRepository : BaseRepository, ISubscriptionStatisticRepository
     {
-        public SubscriptionStatisticsRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
+        public SubscriptionStatisticRepository(IConfiguration configuration, ILogger<BaseRepository> logger) : base(configuration, logger)
         {
         }
 
