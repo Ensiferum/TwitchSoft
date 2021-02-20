@@ -54,8 +54,6 @@ namespace TwitchSoft.Maintenance
             {
                 options.Address = new Uri(Configuration.GetValue<string>("Services:TwitchBotOrchestrator"));
             });
-
-            services.AddElasticSearch(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

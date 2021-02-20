@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
-using TwitchSoft.Shared.ElasticSearch.Interfaces;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.TelegramBot.MediatR.Models;
 
@@ -14,16 +13,16 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     {
         private readonly ITelegramBotClient telegramBotClient;
         private readonly IUsersRepository usersRepository;
-        private readonly IESService eSService;
+        private readonly IMessagesRepository messagesRepository;
 
         public UserMessagesCommandHandler(
             ITelegramBotClient telegramBotClient, 
             IUsersRepository usersRepository, 
-            IESService eSService)
+            IMessagesRepository messagesRepository)
         {
             this.telegramBotClient = telegramBotClient;
             this.usersRepository = usersRepository;
-            this.eSService = eSService;
+            this.messagesRepository = messagesRepository;
         }
 
         protected override async Task Handle(UserMessagesCommand request, CancellationToken cancellationToken)
@@ -44,7 +43,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             }
 
             var count = 50;
-            var messages = await eSService.GetMessages(userIds.First().Value, skip, count);
+            var messages = await messagesRepository.GetMessages(userIds.First().Value, skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
             if (!replyMessages.Any())

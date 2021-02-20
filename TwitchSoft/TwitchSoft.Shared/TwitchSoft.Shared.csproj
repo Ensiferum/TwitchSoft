@@ -55,4 +55,8 @@
     <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.2-preview-d55e4ea56ffebc89345cf60b60bdbd35d57a0c4b" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ElasticSearch\Interfaces\" />
+  </ItemGroup>
+
 </Project>

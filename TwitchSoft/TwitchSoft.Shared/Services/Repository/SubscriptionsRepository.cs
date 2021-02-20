@@ -52,7 +52,7 @@ FETCH NEXT @count ROWS ONLY
 ", new { count, skip, date = fromDate });
         }
 
-        public async Task<int> GetSubscribersCountFor(string channel)
+        public async Task<int> GetMonthlySubscribersCountFor(string channel)
         {
             using var connection = new SqlConnection(ConnectionString);
             return await connection.ExecuteScalarAsync<int>(@"
@@ -60,6 +60,16 @@ SELECT COUNT(*) FROM Subscriptions sub
 JOIN Users us ON sub.ChannelId = us.Id
 WHERE us.Username = @channel AND sub.SubscribedTime >= @date
 ", new { channel, date = DateTime.UtcNow.AddMonths(-1) });
+        }
+
+        public async Task<int> GetSubscribersCountFor(string channel, DateTime from, DateTime to)
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.ExecuteScalarAsync<int>(@"
+SELECT COUNT(*) FROM Subscriptions sub
+JOIN Users us ON sub.ChannelId = us.Id
+WHERE us.Username = @channel AND sub.SubscribedTime >= @from AND sub.SubscribedTime < @to
+", new { channel, from, to });
         }
 
         public async Task<int> GetSubscribersCountOnDay(uint channelId, DateTime date)

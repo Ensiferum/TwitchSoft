@@ -17,6 +17,7 @@ namespace TwitchSoft.Shared
             services.AddScoped<IUserBansRepository, UserBansRepository>();
             services.AddScoped<ISubscriptionsRepository, SubscriptionsRepository>();
             services.AddScoped<ISubscriptionStatisticsRepository, SubscriptionStatisticsRepository>();
+            services.AddScoped<IMessagesRepository, MessagesRepository>();
         }
     }
 }

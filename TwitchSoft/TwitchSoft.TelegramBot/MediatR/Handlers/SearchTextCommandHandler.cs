@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
-using TwitchSoft.Shared.ElasticSearch.Interfaces;
+using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
@@ -12,12 +12,12 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
     public class SearchTextCommandHandler : AsyncRequestHandler<SearchTextCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
-        private readonly IESService eSService;
+        private readonly IMessagesRepository messagesRepository;
 
-        public SearchTextCommandHandler(ITelegramBotClient telegramBotClient, IESService eSService)
+        public SearchTextCommandHandler(ITelegramBotClient telegramBotClient, IMessagesRepository messagesRepository)
         {
             this.telegramBotClient = telegramBotClient;
-            this.eSService = eSService;
+            this.messagesRepository = messagesRepository;
         }
 
         protected override async Task Handle(SearchTextCommand request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var skip = request.Skip;
 
             var count = 50;
-            var messages = await eSService.SearchMessages(searchText.ToLower(), skip, count);
+            var messages = await messagesRepository.SearchMessages(searchText.ToLower(), skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
             if (!replyMessages.Any())

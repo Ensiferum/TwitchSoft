@@ -1,5 +1,4 @@
 ﻿using MassTransit;
-using Nest;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.Services.Helpers;
@@ -10,18 +9,15 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 {
     public class NewTwitchChannelMessageConsumer : IConsumer<NewTwitchChannelMessage>
     {
-        private readonly IUsersRepository usersRepository;
         private readonly IChannelsCache channelsCache;
-        private readonly IElasticClient elasticClient;
+        private readonly IMessagesRepository messagesRepository;
 
         public NewTwitchChannelMessageConsumer(
-            IUsersRepository usersRepository, 
             IChannelsCache channelsCache,
-            IElasticClient elasticClient)
+            IMessagesRepository messagesRepository)
         {
-            this.usersRepository = usersRepository;
             this.channelsCache = channelsCache;
-            this.elasticClient = elasticClient;
+            this.messagesRepository = messagesRepository;
         }
 
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
@@ -44,7 +40,7 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
                 PostedTime = chatMessage.PostedTime,
             };
 
-            await elasticClient.IndexDocumentAsync(chatMessageES);
+            await messagesRepository.SaveMessage(chatMessageES);
         }
     }
 }

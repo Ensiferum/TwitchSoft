@@ -26,7 +26,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var from = DateTime.UtcNow.AddMonths(-1).ConvertToMyTimezone().ToString(dateFormat);
             var to = DateTime.UtcNow.ConvertToMyTimezone().ToString(dateFormat);
 
-            var subsCount = await subscriptionsRepository.GetSubscribersCountFor(request.ChannelName);
+            var subsCount = await subscriptionsRepository.GetMonthlySubscribersCountFor(request.ChannelName);
 
             var messageHeader = $"Subscriptions count {from} - {to}";
 

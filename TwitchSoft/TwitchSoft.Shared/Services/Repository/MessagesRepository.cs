@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TwitchSoft.Shared.ElasticSearch.Interfaces;
 using TwitchSoft.Shared.ElasticSearch.Models;
-using TwitchSoft.Shared.Models;
 using TwitchSoft.Shared.Services.Models;
+using TwitchSoft.Shared.Services.Repository.Interfaces;
 
-namespace TwitchSoft.Shared.ElasticSearch
+namespace TwitchSoft.Shared.Services.Repository
 {
-    public class ESService : IESService
+    public class MessagesRepository : IMessagesRepository
     {
         private readonly IElasticClient elasticClient;
 
-        public ESService(IElasticClient elasticClient)
+        public MessagesRepository(IElasticClient elasticClient)
         {
             this.elasticClient = elasticClient;
         }
@@ -122,6 +121,11 @@ namespace TwitchSoft.Shared.ElasticSearch
                                     ));
 
             return response;
+        }
+
+        public Task SaveMessage(ChatMessage chatMessage)
+        {
+            return elasticClient.IndexDocumentAsync(chatMessage);
         }
     }
 }

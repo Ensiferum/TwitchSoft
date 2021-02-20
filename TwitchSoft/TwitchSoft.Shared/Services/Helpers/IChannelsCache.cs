@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using TwitchSoft.Shared.Database.Models;
+﻿using System.Threading.Tasks;
 
 namespace TwitchSoft.Shared.Services.Helpers
 {

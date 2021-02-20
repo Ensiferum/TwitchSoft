@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using System;
-using TwitchSoft.Shared.ElasticSearch.Interfaces;
 using TwitchSoft.Shared.ElasticSearch.Models;
 
 namespace TwitchSoft.Shared.ElasticSearch
@@ -23,7 +22,6 @@ namespace TwitchSoft.Shared.ElasticSearch
             var client = new ElasticClient(settings);
 
             services.AddSingleton<IElasticClient>(client);
-            services.AddScoped<IESService, ESService>();
         }
     }
 }
