@@ -30,12 +30,8 @@ BEGIN
 		DECLARE @Date datetime = @StartDate
 		DECLARE @Count int
 
-		PRINT 'Calculation started For Channel ' + CAST(@ChannelId AS NVARCHAR(MAX))
-
 		WHILE @Date < @EndDate
 		BEGIN
-			PRINT 'Calculation for day ' + CAST(@Date AS NVARCHAR(MAX)) 
-
 			SELECT @Count = COUNT(*) FROM Subscriptions 
 			WHERE ChannelId = @ChannelId AND SubscribedTime >= @Date AND SubscribedTime < DATEADD(day, 1, @Date)
 
@@ -45,12 +41,9 @@ BEGIN
 			SET @Date = DATEADD(day, 1, @Date)
 		END
 
-		PRINT 'Calculation finished For Channel ' + CAST(@ChannelId AS NVARCHAR(MAX))
-
 		FETCH NEXT FROM channels_cursor
 		INTO @ChannelId
 	END
-	WAITFOR DELAY '00:00:00:010'
 
 	CLOSE channels_cursor;  
 	DEALLOCATE channels_cursor;  
