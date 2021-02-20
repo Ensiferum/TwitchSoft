@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using TwitchSoft.Shared;
 using TwitchSoft.Shared.ElasticSearch;
+using TwitchSoft.Shared.Services.Models.Twitch;
 
 namespace TwitchSoft.PublicApi
 {
@@ -23,6 +24,10 @@ namespace TwitchSoft.PublicApi
         {
             services.ConfigureShared();
             services.AddElasticSearch(Configuration);
+
+            services
+                .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
+                .AddOptions();
 
             services.AddHealthChecks();
 
