@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared.Services.Repository;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
+using TwitchSoft.Shared.Services.TwitchApi;
 
 namespace TwitchSoft.Shared
 {
@@ -18,6 +19,8 @@ namespace TwitchSoft.Shared
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             services.AddScoped<ISubscriptionStatisticRepository, SubscriptionStatisticRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
+
+            services.AddScoped<ITwitchApiService, TwitchApiService>();
         }
     }
 }

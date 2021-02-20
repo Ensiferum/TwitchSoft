@@ -22,8 +22,6 @@ namespace TwitchSoft.ServiceBusProcessor
         {
             services.ConfigureShared();
 
-            services.AddScoped<ITwitchApiService, TwitchApiService>();
-
             services.AddServiceBusProcessors(Configuration);
 
             services.AddCache(Configuration);

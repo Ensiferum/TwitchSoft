@@ -29,8 +29,6 @@ namespace TwitchSoft.Maintenance
         {
             services.ConfigureShared();
 
-            services.AddScoped<ITwitchApiService, TwitchApiService>();
-
             services
                 .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
                 .AddOptions();

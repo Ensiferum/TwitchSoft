@@ -31,7 +31,6 @@ namespace TwitchSoft.TwitchBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureShared();
-            services.AddScoped<ITwitchApiService, TwitchApiService>();
             services.AddSingleton<TwitchBot>();
 
             services

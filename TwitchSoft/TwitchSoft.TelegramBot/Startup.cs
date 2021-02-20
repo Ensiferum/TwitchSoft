@@ -33,7 +33,6 @@ namespace TwitchSoft.TelegramBot
 
             services.ConfigureShared();
 
-            services.AddScoped<ITwitchApiService, TwitchApiService>();
             services.AddSingleton<TelegramBot>();
             services.AddSingleton<MessageProcessor>();
 

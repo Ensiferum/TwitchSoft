@@ -23,7 +23,7 @@ namespace TwitchSoft.PublicApi.Controllers
 
         [HttpGet]
         [Route("count")]
-        public async Task<CountResult> Count(CountParameters countParameters)
+        public async Task<CountResult> Count([FromQuery] CountParameters countParameters)
         {
             var ( channel, from, to ) = countParameters;
             var count = await subscriptionRepository.GetSubscribersCountFor(channel, from, to);
