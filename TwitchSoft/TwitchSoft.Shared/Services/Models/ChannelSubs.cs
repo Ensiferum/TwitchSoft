@@ -2,7 +2,7 @@
 {
     public record ChannelSubs
     {
-        public string Channel { get; set; }
-        public int SubsCount { get; set; }
+        public string Channel { get; init; }
+        public int SubsCount { get; init; }
     }
 }

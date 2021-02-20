@@ -4,15 +4,15 @@ namespace TwitchSoft.Shared.ElasticSearch.Models
 {
     public record ChatMessage
     {
-        public Guid Id { get; set; }
-        public uint ChannelId { get; set; }
-        public string ChannelName { get; set; }
-        public string Message { get; set; }
-        public DateTime PostedTime { get; set; }
-        public bool IsBroadcaster { get; set; }
-        public bool IsSubscriber { get; set; }
-        public bool IsModerator { get; set; }
-        public uint UserId { get; set; }
-        public string UserName { get; set; }
+        public Guid Id { get; init; }
+        public uint ChannelId { get; init; }
+        public string ChannelName { get; init; }
+        public string Message { get; init; }
+        public DateTime PostedTime { get; init; }
+        public bool IsBroadcaster { get; init; }
+        public bool IsSubscriber { get; init; }
+        public bool IsModerator { get; init; }
+        public uint UserId { get; init; }
+        public string UserName { get; init; }
     }
 }

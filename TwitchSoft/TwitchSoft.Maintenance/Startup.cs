@@ -1,8 +1,6 @@
 ﻿using Coravel;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Maintenance.Jobs;
-using TwitchSoft.Shared.Services.Models.Twitch;
-using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.Shared;
 using Microsoft.Extensions.Logging;
 using Coravel.Scheduling.Schedule.Interfaces;
@@ -12,7 +10,6 @@ using Microsoft.AspNetCore.Builder;
 using static TelegramBotGrpc;
 using System;
 using static TwitchBotOrchestratorGrpc;
-using TwitchSoft.Shared.ElasticSearch;
 
 namespace TwitchSoft.Maintenance
 {
@@ -27,11 +24,7 @@ namespace TwitchSoft.Maintenance
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureShared();
-
-            services
-                .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
-                .AddOptions();
+            services.ConfigureShared(Configuration);
 
             services.AddScheduler();
 

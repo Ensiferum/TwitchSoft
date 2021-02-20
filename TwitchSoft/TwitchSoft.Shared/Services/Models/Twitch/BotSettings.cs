@@ -2,9 +2,9 @@
 {
     public record BotSettings
     {
-        public string BotName { get; set; }
-        public string BotOAuthToken { get; set; }
-        public string ClientId { get; set; }
-        public string AccessToken { get; set; }
+        public string BotName { get; init; }
+        public string BotOAuthToken { get; init; }
+        public string ClientId { get; init; }
+        public string AccessToken { get; init; }
     }
 }

@@ -4,9 +4,9 @@ namespace TwitchSoft.Shared.Services.Models
 {
     public record ChatMessageModelForDisplaying
     {
-        public string UserName { get; set; }
-        public string Message { get; set; }
-        public DateTime PostedTime { get; set; }
-        public string Channel { get; set; }
+        public string UserName { get; init; }
+        public string Message { get; init; }
+        public DateTime PostedTime { get; init; }
+        public string Channel { get; init; }
     }
 }

@@ -5,8 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using TwitchSoft.Shared;
-using TwitchSoft.Shared.ElasticSearch;
-using TwitchSoft.Shared.Services.Models.Twitch;
 
 namespace TwitchSoft.PublicApi
 {
@@ -22,12 +20,7 @@ namespace TwitchSoft.PublicApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureShared();
-            services.AddElasticSearch(Configuration);
-
-            services
-                .Configure<BotSettings>(Configuration.GetSection($"Twitch:{nameof(BotSettings)}"))
-                .AddOptions();
+            services.ConfigureShared(Configuration);
 
             services.AddHealthChecks();
 

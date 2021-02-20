@@ -4,9 +4,9 @@ using TwitchSoft.Shared.Services.Helpers;
 
 namespace TwitchSoft.Shared.Redis
 {
-    public static class CacheExtensions
+    internal static class CacheExtensions
     {
-        public static void AddCache(this IServiceCollection services, IConfiguration configuration)
+        internal static void AddCache(this IServiceCollection services, IConfiguration configuration)
         {
             //var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString");
 

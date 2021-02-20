@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TwitchSoft.Shared.Services.TwitchApi;
 using TwitchSoft.Shared.Services.Models.Telegram;
 using TwitchSoft.TelegramBot.Grpc;
-using TwitchSoft.Shared.Redis;
-using TwitchSoft.Shared.ElasticSearch;
 using TwitchSoft.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +10,6 @@ using System;
 using Telegram.Bot;
 using Microsoft.Extensions.Options;
 using MediatR;
-using AutoMapper;
 using TwitchSoft.TelegramBot.TgCommands;
 
 namespace TwitchSoft.TelegramBot
@@ -31,20 +27,12 @@ namespace TwitchSoft.TelegramBot
         {
             services.AddGrpc();
 
-            services.ConfigureShared();
+            services.ConfigureShared(Configuration);
 
             services.AddSingleton<TelegramBot>();
             services.AddSingleton<MessageProcessor>();
 
-            services
-                .Configure<BotSettings>(Configuration.GetSection($"Telegram:{nameof(BotSettings)}"))
-                .Configure<Shared.Services.Models.Twitch.BotSettings>(Configuration.GetSection($"Twitch:{nameof(Shared.Services.Models.Twitch.BotSettings)}"))
-                .AddOptions();
-
             services.AddHostedService<TelegramBotService>();
-
-            services.AddCache(Configuration);
-            services.AddElasticSearch(Configuration);
 
             services.AddSingleton<ITelegramBotClient>(sp =>
             {

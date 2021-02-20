@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchSoft.Shared;
-using TwitchSoft.Shared.ElasticSearch;
-using TwitchSoft.Shared.Redis;
-using TwitchSoft.Shared.Services.TwitchApi;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -20,12 +17,9 @@ namespace TwitchSoft.ServiceBusProcessor
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureShared();
+            services.ConfigureShared(Configuration);
 
             services.AddServiceBusProcessors(Configuration);
-
-            services.AddCache(Configuration);
-            services.AddElasticSearch(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

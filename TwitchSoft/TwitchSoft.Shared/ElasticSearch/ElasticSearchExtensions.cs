@@ -6,9 +6,9 @@ using TwitchSoft.Shared.ElasticSearch.Models;
 
 namespace TwitchSoft.Shared.ElasticSearch
 {
-    public static class ElasticSearchExtensions
+    internal static class ElasticSearchExtensions
     {
-        public static void AddElasticSearch(this IServiceCollection services, IConfiguration configuration)
+        internal static void AddElasticSearch(this IServiceCollection services, IConfiguration configuration)
         {
             var url = configuration["Elasticsearch:Url"];
             var defaultIndex = configuration["Elasticsearch:Index"];

@@ -2,6 +2,6 @@
 {
     public record BotSettings
     {
-        public string BotOAuthToken { get; set; }
+        public string BotOAuthToken { get; init; }
     }
 }
