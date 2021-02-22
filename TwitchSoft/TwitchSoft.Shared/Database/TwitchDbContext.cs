@@ -54,7 +54,12 @@ namespace TwitchSoft.Shared.Database
                 .ValueGeneratedNever();
 
             modelBuilder.Entity<Subscription>()
-                .HasIndex(u => new { u.UserId, u.ChannelId, u.SubscribedTime });
+                .HasIndex(u => new { u.UserId })
+                .IncludeProperties(u => new { u.SubscribedTime });
+
+            modelBuilder.Entity<Subscription>()
+                .HasIndex(u => new { u.ChannelId })
+                .IncludeProperties(u => new { u.SubscribedTime });
 
             modelBuilder.Entity<UserBan>()
                 .Property(u => u.Reason)

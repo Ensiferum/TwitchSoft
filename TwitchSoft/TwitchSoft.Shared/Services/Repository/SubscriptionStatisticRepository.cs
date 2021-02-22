@@ -24,7 +24,7 @@ namespace TwitchSoft.Shared.Services.Repository
             {
                 StartDate = fromDate,
                 EndDate = toDate,
-            }, commandType: CommandType.StoredProcedure, commandTimeout: 300);
+            }, commandType: CommandType.StoredProcedure, commandTimeout: 15 * 60);
         }
 
         public async Task SaveStatistic(SubscriptionStatistic subStat)
