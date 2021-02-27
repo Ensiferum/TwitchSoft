@@ -21,7 +21,7 @@ namespace TwitchSoft.Maintenance.Jobs
 
             var response = await messageRepository.RemoveOldMessages(30);
 
-            logger.LogInformation($"Removed {response.Total} messages");
+            logger.LogInformation($"Removed {response.Deleted} messages");
 
             logger.LogInformation($"End executing job: {nameof(OldMessagesCleaner)}");
         }
