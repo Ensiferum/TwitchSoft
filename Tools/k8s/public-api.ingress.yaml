@@ -4,7 +4,7 @@ metadata:
   name: publicapi-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /api/$1
     nginx.ingress.kubernetes.io/use-regex: "true"
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
@@ -19,4 +19,4 @@ spec:
       - backend:
           serviceName: twitchsoftpublicapi
           servicePort: 80
-        path: /(.*)
+        path: /api/(.*)
