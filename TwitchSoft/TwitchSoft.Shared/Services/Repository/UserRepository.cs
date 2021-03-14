@@ -52,7 +52,7 @@ WHERE Id IN @ids", new { ids });
             using var connection = new SqlConnection(ConnectionString);
             return await connection.QueryAsync<User>(@"
 SELECT * FROM Users
-WHERE IsBanned = 1");
+WHERE JoinChannel = 1 AND IsBanned = 1");
         }
 
         public async Task CreateOrUpdateUsers(params User[] users)
