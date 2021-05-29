@@ -23,9 +23,11 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
         }
         public async Task ProcessMessage(ChatMessage chatMessage, ITwitchClient twitchClient)
         {
-            if (Regex.IsMatch(chatMessage.Message, "^[!#]\\w+$", RegexOptions.Compiled))
+            var message = chatMessage.Message;
+            if (Regex.IsMatch(message, @"^[!#]\w+$", RegexOptions.Compiled) && Regex.IsMatch(message, @"^\P{IsCyrillic}+$", RegexOptions.Compiled))
             {
-                if (ignoredCommands.Contains(chatMessage.Message.ToLower()))
+                
+                if (ignoredCommands.Contains(message, StringComparer.OrdinalIgnoreCase))
                 {
                     return;
                 }
@@ -33,11 +35,11 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 Random rand = new();
                 if (rand.Next(300) == 1)
                 {
-                    logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {chatMessage.Message}");
+                    logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {message}");
                     await Task.Run(async () =>
                     {
                         await Task.Delay(rand.Next(5000));
-                        twitchClient.SendMessage(chatMessage.Channel, chatMessage.Message);
+                        twitchClient.SendMessage(chatMessage.Channel, message);
                     });
                 }
             }
