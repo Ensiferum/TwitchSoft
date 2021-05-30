@@ -88,7 +88,7 @@ namespace TwitchSoft.TwitchBot
             logger.LogTrace($"OnJoinedChannel: {e.Channel}");
         }
 
-        private void Client_OnLog(object sender, OnLogArgs e)
+        private async void Client_OnLog(object sender, OnLogArgs e)
         {
             EventsCount++;
             logger.LogTrace($"OnLog:\r\nDate: {e.DateTime}\r\nData: {e.Data}");
@@ -100,7 +100,7 @@ namespace TwitchSoft.TwitchBot
 
                 logger.LogWarning($"Channel was suspended: {channelName}");
 
-                _ = mediator.Send(new SetChannelBanned
+                await mediator.Send(new SetChannelBanned
                 {
                     Channel = channelName,
                     IsBanned = true,
@@ -116,7 +116,7 @@ namespace TwitchSoft.TwitchBot
 
                 logger.LogWarning($"Bot was banned from channel: {channelName}");
 
-                _ = mediator.Send(new SetChannelBanned
+                await mediator.Send(new SetChannelBanned
                 {
                     Channel = channelName,
                     IsBanned = true,
