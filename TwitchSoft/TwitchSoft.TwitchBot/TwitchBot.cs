@@ -95,7 +95,7 @@ namespace TwitchSoft.TwitchBot
 
             if (e.Data.StartsWith("Received: @msg-id=msg_channel_suspended"))
             {
-                var regex = Regex.Match(e.Data, @"^Received: @msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #(?<channel>\w*) :This channel has been suspended\.$");
+                var regex = Regex.Match(e.Data, @"^Received: @msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #(?<channel>\w*) .*$");
                 var channelName = regex.Groups["channel"].Value;
 
                 logger.LogWarning($"Channel was suspended: {channelName}");
