@@ -7,12 +7,13 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'TwitchSoft.Bot' " />
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.2.0-develop.3289" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.0-develop.3289" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="6.0.0-preview.1.21102.12" />
@@ -22,8 +23,8 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.1.0" />
-    <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="TwitchLib.Client" Version="3.2.2-preview-fad69ab15afcde6e74c178736b666a6cad9381d3" />
+    <PackageReference Include="Polly" Version="7.2.2" />
+    <PackageReference Include="TwitchLib.Client" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>

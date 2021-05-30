@@ -17,16 +17,15 @@
 
   <ItemGroup>
     <Content Include="appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
     <PackageReference Include="Google.Protobuf" Version="4.0.0-rc2" />
-    <PackageReference Include="Grpc.Core" Version="2.35.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.35.0">
+    <PackageReference Include="Grpc.Core" Version="2.38.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.38.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -44,15 +43,15 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0-preview.1.21102.12" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0-preview.1.21102.12" />
-    <PackageReference Include="NEST" Version="7.11.0" />
-    <PackageReference Include="NLog" Version="4.7.7" />
-    <PackageReference Include="NLog.Extensions.Hosting" Version="1.7.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.0" />
+    <PackageReference Include="NEST" Version="7.13.0" />
+    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="NLog.Extensions.Hosting" Version="1.7.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
     <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.5.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
-    <PackageReference Include="TwitchLib.Api" Version="3.2.2-preview-d55e4ea56ffebc89345cf60b60bdbd35d57a0c4b" />
-    <PackageReference Include="TwitchLib.Api.Core" Version="3.2.2-preview-d55e4ea56ffebc89345cf60b60bdbd35d57a0c4b" />
-    <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.2-preview-d55e4ea56ffebc89345cf60b60bdbd35d57a0c4b" />
+    <PackageReference Include="TwitchLib.Api" Version="3.2.3" />
+    <PackageReference Include="TwitchLib.Api.Core" Version="3.2.3" />
+    <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.3" />
   </ItemGroup>
 
   <ItemGroup>
