@@ -38,7 +38,26 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 
             var channelId = await channelsCache.GetChannelIdByName(chatMessage.Channel);
 
+            //ToDo: extract logic and make configurable via bot
             if (chatMessage.User.UserId == Constants.MadTwitchId)
+            {
+                var messageModel = new ChatMessageModelForDisplaying()
+                {
+                    Channel = chatMessage.Channel,
+                    Message = chatMessage.Message,
+                    PostedTime = chatMessage.PostedTime,
+                    UserName = chatMessage.User.UserName,
+                };
+
+                await telegramBotClient.SendMessageAsync(new SendMessageRequest
+                {
+                    ChatId = rootUserChatId,
+                    MessageText = messageModel.ToDisplayFormat()
+                });
+            }
+
+            //ToDo: notify about mentions
+            if (chatMessage.Message.Contains($"@{Constants.EnsthorTwitchName}", System.StringComparison.OrdinalIgnoreCase))
             {
                 var messageModel = new ChatMessageModelForDisplaying()
                 {
