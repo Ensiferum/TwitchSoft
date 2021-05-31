@@ -40,7 +40,7 @@ namespace TwitchSoft.Tests
             var expectedObject = new UserMessagesDigestCommand()
             {
                 ChatId = "testChatId",
-                Username = "testUsername"
+                UserName = "testUsername"
             };
             resultObject.Should().BeEquivalentTo(expectedObject);
         }

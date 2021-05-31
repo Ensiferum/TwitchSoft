@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using TwitchSoft.Shared;
 using static TelegramBotGrpc;
 
 namespace TwitchSoft.Maintenance.Jobs
@@ -29,7 +30,8 @@ namespace TwitchSoft.Maintenance.Jobs
             await telegramBotClient.SendDayDigestAsync(new DigestInfoRequest
             {
                 ChatId = rootUserChatId,
-                Username = "honeymad",
+                Username = Constants.MadTwitchName,
+                TwitchUserId = Constants.MadTwitchId
             });
             logger.LogInformation($"End executing job: {nameof(SentDailyMessageDigest)}");
         }

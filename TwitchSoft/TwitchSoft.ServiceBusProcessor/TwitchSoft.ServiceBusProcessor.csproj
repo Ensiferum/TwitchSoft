@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.32.0" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.2.0-develop.3289" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.0-develop.3289" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.0-preview.1.21102.12" />
@@ -17,6 +18,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TwitchSoft.Shared\TwitchSoft.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\TwitchSoft.TelegramBot\Protos\TelegramBot.proto" GrpcServices="Client">
+      <Link>Protos\TelegramBot.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
 </Project>

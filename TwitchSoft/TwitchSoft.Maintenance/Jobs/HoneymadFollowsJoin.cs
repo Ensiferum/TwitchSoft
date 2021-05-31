@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchSoft.Shared;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.Shared.Services.TwitchApi;
 using User = TwitchSoft.Shared.Database.Models.User;
@@ -25,7 +26,7 @@ namespace TwitchSoft.Maintenance.Jobs
         }
         public async Task Invoke()
         {
-            string fromId = "40298003"; //honeymad
+            string fromId = Constants.MadTwitchId.ToString(); 
             logger.LogInformation($"Start executing job: {nameof(HoneymadFollowsJoin)}");
             var follows = await twitchApiService.GetFollowsForUser(fromId, null); 
 

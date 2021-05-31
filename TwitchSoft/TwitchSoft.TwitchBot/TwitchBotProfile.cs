@@ -2,8 +2,8 @@
 using System;
 using TwitchLib.Client.Models;
 using TwitchSoft.Shared.Database.Models;
+using TwitchSoft.Shared.Extensions;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.TwitchBot.MediatR.Models;
 using User = TwitchSoft.Shared.ServiceBus.Models.User;
 

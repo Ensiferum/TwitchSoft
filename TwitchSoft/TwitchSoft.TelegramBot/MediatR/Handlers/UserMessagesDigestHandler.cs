@@ -27,10 +27,10 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
         }
         protected override async Task Handle(UserMessagesDigestCommand request, CancellationToken cancellationToken)
         {
-            var userIds = await userRepository.GetUserIds(request.Username);
+            var userId = request.TwitchUserId ?? (await userRepository.GetUserIds(request.UserName)).First().Value;
 
             var count = 50;
-            var messages = await messageRepository.GetMessages(userIds.First().Value, DateTime.UtcNow.AddHours(-12), count);
+            var messages = await messageRepository.GetMessages(userId, DateTime.UtcNow.AddHours(-12), count);
 
             var replyMessages = messages.GenerateReplyMessages();
             for (var i = 0; i < replyMessages.Count; i++)
@@ -42,7 +42,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                     parseMode: ParseMode.Html,
                     disableWebPagePreview: true,
                     replyMarkup: i == replyMessages.Count - 1
-                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.UserMessages, request.Username, count, 0, messages.Count)
+                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.UserMessages, request.UserName, count, 0, messages.Count)
                         : null,
                     cancellationToken: cancellationToken
                 );

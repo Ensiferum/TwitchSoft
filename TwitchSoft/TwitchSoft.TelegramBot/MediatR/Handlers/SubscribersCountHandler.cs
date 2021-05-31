@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using TwitchSoft.Shared.Extensions;
 using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using TwitchSoft.TelegramBot.MediatR.Models;

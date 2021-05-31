@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TwitchSoft.Shared.Services.Helpers
+namespace TwitchSoft.Shared.Extensions
 {
     public static class DateTimeHelper
     {

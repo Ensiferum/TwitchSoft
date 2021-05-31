@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace TwitchSoft.Shared.Services.Extensions
+namespace TwitchSoft.Shared.Extensions
 {
     public static class ScopeFactoryExtensions
     {
