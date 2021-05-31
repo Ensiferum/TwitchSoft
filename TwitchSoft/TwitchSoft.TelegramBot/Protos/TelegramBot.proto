@@ -2,7 +2,7 @@
 import "google/protobuf/empty.proto";
 
 service TelegramBotGrpc {
-  rpc SentDayDigest (DigestInfoRequest) returns (google.protobuf.Empty);
+  rpc SendDayDigest (DigestInfoRequest) returns (google.protobuf.Empty);
 }
 
 message DigestInfoRequest {

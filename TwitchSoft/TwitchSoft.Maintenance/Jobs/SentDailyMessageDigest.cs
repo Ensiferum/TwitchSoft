@@ -26,7 +26,7 @@ namespace TwitchSoft.Maintenance.Jobs
         {
             logger.LogInformation($"Start executing job: {nameof(SentDailyMessageDigest)}");
 
-            await telegramBotClient.SentDayDigestAsync(new DigestInfoRequest
+            await telegramBotClient.SendDayDigestAsync(new DigestInfoRequest
             {
                 ChatId = rootUserChatId,
                 Username = "honeymad",

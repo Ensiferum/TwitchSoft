@@ -20,7 +20,7 @@ namespace TwitchSoft.TelegramBot.Grpc
             this.mapper = mapper;
         }
 
-        public override async Task<Empty> SentDayDigest(DigestInfoRequest request, ServerCallContext context)
+        public override async Task<Empty> SendDayDigest(DigestInfoRequest request, ServerCallContext context)
         {
             var umd = mapper.Map<UserMessagesDigest>(request);
             await mediator.Send(umd);
