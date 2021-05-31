@@ -9,12 +9,12 @@ using TwitchSoft.TelegramBot.TgCommands;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class UnknownCommandHandler : AsyncRequestHandler<UnknownCommand>
+    public class UnknownHandler : AsyncRequestHandler<UnknownCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
         private readonly IEnumerable<BaseTgCommand> tgCommands;
 
-        public UnknownCommandHandler(
+        public UnknownHandler(
             ITelegramBotClient telegramBotClient, 
             IEnumerable<BaseTgCommand> tgCommands)
         {

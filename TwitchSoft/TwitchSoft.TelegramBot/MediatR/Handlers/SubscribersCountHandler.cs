@@ -10,11 +10,11 @@ using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class SubscribersCountCommandHandler : AsyncRequestHandler<SubscribersCountCommand>
+    public class SubscribersCountHandler : AsyncRequestHandler<SubscribersCountCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
         private readonly ISubscriptionRepository subscriptionRepository;
-        public SubscribersCountCommandHandler(ITelegramBotClient telegramBotClient, ISubscriptionRepository subscriptionRepository)
+        public SubscribersCountHandler(ITelegramBotClient telegramBotClient, ISubscriptionRepository subscriptionRepository)
         {
             this.telegramBotClient = telegramBotClient;
             this.subscriptionRepository = subscriptionRepository;

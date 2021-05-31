@@ -79,7 +79,7 @@ namespace TwitchSoft.TelegramBot
             {
                 logger.LogInformation($"ProcessInlineQuery: {inlineQuery.Query}");
 
-                var ius = mapper.Map<InlineUsersSearch>(inlineQuery);
+                var ius = mapper.Map<InlineUsersSearchCommand>(inlineQuery);
                 await mediator.Send(ius);
 
             }

@@ -11,7 +11,7 @@ using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class InlineUsersSearchHandler : AsyncRequestHandler<InlineUsersSearch>
+    public class InlineUsersSearchHandler : AsyncRequestHandler<InlineUsersSearchCommand>
     {
         private readonly ITwitchApiService twitchApiService;
         private readonly ITelegramBotClient telegramBotClient;
@@ -24,7 +24,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             this.telegramBotClient = telegramBotClient;
         }
 
-        protected override async Task Handle(InlineUsersSearch request, CancellationToken cancellationToken)
+        protected override async Task Handle(InlineUsersSearchCommand request, CancellationToken cancellationToken)
         {
             var searchUserText = request.SearchUserText.ToLower();
             var channels = await twitchApiService.SearchChannels(searchUserText);

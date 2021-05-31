@@ -9,25 +9,41 @@ using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class SearchTextCommandHandler : AsyncRequestHandler<SearchTextCommand>
+    public class UserMessagesHandler : AsyncRequestHandler<UserMessagesCommand>
     {
         private readonly ITelegramBotClient telegramBotClient;
+        private readonly IUserRepository userRepository;
         private readonly IMessageRepository messageRepository;
 
-        public SearchTextCommandHandler(ITelegramBotClient telegramBotClient, IMessageRepository messageRepository)
+        public UserMessagesHandler(
+            ITelegramBotClient telegramBotClient, 
+            IUserRepository userRepository, 
+            IMessageRepository messageRepository)
         {
             this.telegramBotClient = telegramBotClient;
+            this.userRepository = userRepository;
             this.messageRepository = messageRepository;
         }
 
-        protected override async Task Handle(SearchTextCommand request, CancellationToken cancellationToken)
+        protected override async Task Handle(UserMessagesCommand request, CancellationToken cancellationToken)
         {
             var chatId = request.ChatId;
-            var searchText = request.SearchText;
+            var userName = request.Username;
             var skip = request.Skip;
+            var userIds = await userRepository.GetUserIds(userName);
+            if (!userIds.Any())
+            {
+                await telegramBotClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: $"User '{userName}' not found.",
+                    parseMode: ParseMode.Html,
+                    cancellationToken: cancellationToken
+                );
+                return;
+            }
 
             var count = 50;
-            var messages = await messageRepository.SearchMessages(searchText.ToLower(), skip, count);
+            var messages = await messageRepository.GetMessages(userIds.First().Value, skip, count);
 
             var replyMessages = messages.GenerateReplyMessages();
             if (!replyMessages.Any())
@@ -47,7 +63,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                     parseMode: ParseMode.Html,
                     disableWebPagePreview: true,
                     replyMarkup: i == replyMessages.Count - 1
-                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.SearchText, searchText, count, skip, messages.Count)
+                        ? InlineUtils.GenerateNavigationMarkup(BotCommands.UserMessages, userName, count, skip, messages.Count)
                         : null,
                     cancellationToken: cancellationToken
                 );

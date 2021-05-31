@@ -10,7 +10,7 @@ using TwitchSoft.TelegramBot.MediatR.Models;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class UserMessagesDigestHandler : AsyncRequestHandler<UserMessagesDigest>
+    public class UserMessagesDigestHandler : AsyncRequestHandler<UserMessagesDigestCommand>
     {
         private readonly IUserRepository userRepository;
         private readonly IMessageRepository messageRepository;
@@ -25,7 +25,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             this.messageRepository = messageRepository;
             this.telegramBotClient = telegramBotClient;
         }
-        protected override async Task Handle(UserMessagesDigest request, CancellationToken cancellationToken)
+        protected override async Task Handle(UserMessagesDigestCommand request, CancellationToken cancellationToken)
         {
             var userIds = await userRepository.GetUserIds(request.Username);
 

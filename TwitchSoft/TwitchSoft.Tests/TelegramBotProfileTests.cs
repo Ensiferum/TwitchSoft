@@ -35,9 +35,9 @@ namespace TwitchSoft.Tests
                 Username = "testUsername"
             };
 
-            var resultObject = mapper.Map<UserMessagesDigest>(sourceObject);
+            var resultObject = mapper.Map<UserMessagesDigestCommand>(sourceObject);
 
-            var expectedObject = new UserMessagesDigest()
+            var expectedObject = new UserMessagesDigestCommand()
             {
                 ChatId = "testChatId",
                 Username = "testUsername"
@@ -57,9 +57,9 @@ namespace TwitchSoft.Tests
                 Query = "testQuery"
             };
 
-            var resultObject = mapper.Map<InlineUsersSearch>(sourceObject);
+            var resultObject = mapper.Map<InlineUsersSearchCommand>(sourceObject);
 
-            var expectedObject = new InlineUsersSearch()
+            var expectedObject = new InlineUsersSearchCommand()
             {
                 InlineQueryId = "testId",
                 SearchUserText = "testQuery"

@@ -3,9 +3,15 @@ import "google/protobuf/empty.proto";
 
 service TelegramBotGrpc {
   rpc SendDayDigest (DigestInfoRequest) returns (google.protobuf.Empty);
+  rpc SendMessage (SendMessageRequest) returns (google.protobuf.Empty);
 }
 
 message DigestInfoRequest {
   string chatId = 1;
   string username = 2;
+}
+
+message SendMessageRequest {
+  string chatId = 1;
+  string messageText = 2;
 }

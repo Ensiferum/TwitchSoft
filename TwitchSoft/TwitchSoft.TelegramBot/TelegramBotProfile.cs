@@ -8,9 +8,11 @@ namespace TwitchSoft.TelegramBot
     {
         public TelegramBotProfile()
         {
-            CreateMap<DigestInfoRequest, UserMessagesDigest>();
+            CreateMap<DigestInfoRequest, UserMessagesDigestCommand>();
 
-            CreateMap<InlineQuery, InlineUsersSearch>()
+            CreateMap<SendMessageRequest, SendMessageCommand>();
+
+            CreateMap<InlineQuery, InlineUsersSearchCommand>()
                 .ForMember(dest => dest.SearchUserText, opt => opt.MapFrom(_ => _.Query))
                 .ForMember(dest => dest.InlineQueryId, opt => opt.MapFrom(_ => _.Id));
         }

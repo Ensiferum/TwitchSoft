@@ -2,7 +2,7 @@
 
 namespace TwitchSoft.TelegramBot.MediatR.Models
 {
-    public class UserMessagesDigest : IRequest
+    public class UserMessagesDigestCommand : IRequest
     {
         public string ChatId { get; init; }
         public string Username { get; init; }

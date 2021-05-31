@@ -10,14 +10,14 @@ using static TwitchBotOrchestratorGrpc;
 
 namespace TwitchSoft.TelegramBot.MediatR.Handlers
 {
-    public class NewChannelCommandHandler : AsyncRequestHandler<NewChannelCommand>
+    public class NewChannelHandler : AsyncRequestHandler<NewChannelCommand>
     {
         private readonly ITwitchApiService twitchApiService;
         private readonly ITelegramBotClient telegramBotClient;
         private readonly IUserRepository userRepository;
         private readonly TwitchBotOrchestratorGrpcClient twitchBotOrchestratorClient;
 
-        public NewChannelCommandHandler(
+        public NewChannelHandler(
             ITwitchApiService twitchApiService,
             ITelegramBotClient telegramBotClient,
             IUserRepository userRepository, 
