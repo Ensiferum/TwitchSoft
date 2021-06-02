@@ -30,7 +30,7 @@ namespace TwitchSoft.Maintenance
 
             services.AddTransient<HoneymadFollowsJoin>();
             services.AddTransient<EnsthorFollowsJoin>();
-            services.AddTransient<SentDailyMessageDigest>();
+            //services.AddTransient<SentDailyMessageDigest>();
             services.AddTransient<ChannelsRefresher>();
             services.AddTransient<OldMessagesCleaner>();
             services.AddTransient<ChannelsBanRefresher>();
@@ -67,9 +67,9 @@ namespace TwitchSoft.Maintenance
                     .Schedule<OldMessagesCleaner>()
                     .Hourly();
 
-                scheduler
-                    .Schedule<SentDailyMessageDigest>()
-                    .Cron("0 7,13,19 * * *"); // every day at 7,13,19 utc 
+                //scheduler
+                //    .Schedule<SentDailyMessageDigest>()
+                //    .Cron("0 7,13,19 * * *"); // every day at 7,13,19 utc 
 
                 scheduler
                     .Schedule<ChannelsBanRefresher>()
