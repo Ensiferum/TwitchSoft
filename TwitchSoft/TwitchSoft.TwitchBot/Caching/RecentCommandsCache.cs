@@ -6,7 +6,7 @@ namespace TwitchSoft.TwitchBot.Caching
 {
     public class RecentCommandsCache : IRecentCommandsCache
     {
-        private const int CacheTimeInSeconds = 60;
+        private const int CacheTimeInSeconds = 20;
 
         private readonly ILogger<RecentCommandsCache> logger;
         private readonly IMemoryCache memoryCache;
@@ -42,7 +42,7 @@ namespace TwitchSoft.TwitchBot.Caching
             memoryCache.Remove(command);
         }
 
-        MemoryCacheEntryOptions MemoryCacheEntryOptions => new MemoryCacheEntryOptions()
+        static MemoryCacheEntryOptions MemoryCacheEntryOptions => new MemoryCacheEntryOptions()
             // Keep in cache for this time, reset time if accessed.
             .SetSlidingExpiration(TimeSpan.FromSeconds(CacheTimeInSeconds));
     }
