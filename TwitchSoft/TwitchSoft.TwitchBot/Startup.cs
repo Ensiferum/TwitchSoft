@@ -13,6 +13,7 @@ using TwitchLib.Client;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System;
+using TwitchSoft.TwitchBot.Caching;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -27,6 +28,8 @@ namespace TwitchSoft.TwitchBot
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCache(Configuration);
+
             services.ConfigureShared(Configuration);
             services.AddSingleton<TwitchBot>();
 

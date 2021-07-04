@@ -6,17 +6,24 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
+using TwitchSoft.TwitchBot.Caching;
 
 namespace TwitchSoft.TwitchBot.ChatPlugins
 {
     public class RaffleParticipantBotChatPlugin : IChatPlugin
     {
+        private const int NumberOfOccurencesToMessage = 5;
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
+        private readonly IRecentCommandsCache recentCommandsCache;
         private readonly string[] ignoredCommands;
 
-        public RaffleParticipantBotChatPlugin(ILogger<RaffleParticipantBotChatPlugin> logger, IConfiguration configuration)
+        public RaffleParticipantBotChatPlugin(
+            ILogger<RaffleParticipantBotChatPlugin> logger, 
+            IConfiguration configuration, 
+            IRecentCommandsCache recentCommandsCache)
         {
             this.logger = logger;
+            this.recentCommandsCache = recentCommandsCache;
             this.ignoredCommands = configuration
                 .GetValue<string>("ChatPlugins:RaffleParticipantBotChatPlugin:IgnoredCommands")?
                 .Split(";", StringSplitOptions.RemoveEmptyEntries).Select(_ => $"!{_}".ToLower()).ToArray();
@@ -33,14 +40,21 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 }
 
                 Random rand = new();
-                if (rand.Next(300) == 1)
+                if (rand.Next(10) == 1)
                 {
-                    logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {message}");
-                    await Task.Run(async () =>
+                    var occurenceNumber = recentCommandsCache.GetAndUpdateCommandOccurences(message);
+
+                    if (occurenceNumber >= NumberOfOccurencesToMessage)
                     {
-                        await Task.Delay(rand.Next(5000));
-                        twitchClient.SendMessage(chatMessage.Channel, message);
-                    });
+                        recentCommandsCache.DeleteCommand(message);
+
+                        logger.LogWarning($"Participate in raffle on channel {chatMessage.Channel} with command {message}");
+                        await Task.Run(async () =>
+                        {
+                            await Task.Delay(rand.Next(5000));
+                            twitchClient.SendMessage(chatMessage.Channel, message);
+                        });
+                    }
                 }
             }
         }
