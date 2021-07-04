@@ -12,7 +12,8 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
 {
     public class RaffleParticipantBotChatPlugin : IChatPlugin
     {
-        private const int NumberOfOccurencesToMessage = 5;
+        private const int NumberOfOccurencesToTrigger = 5;
+        private const int RandomizerChance = 40;
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
         private readonly IRecentCommandsCache recentCommandsCache;
         private readonly string[] ignoredCommands;
@@ -40,11 +41,11 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 }
 
                 Random rand = new();
-                if (rand.Next(10) == 1)
+                if (rand.Next(100) <= RandomizerChance)
                 {
                     var occurenceNumber = recentCommandsCache.GetAndUpdateCommandOccurences(message);
 
-                    if (occurenceNumber >= NumberOfOccurencesToMessage)
+                    if (occurenceNumber >= NumberOfOccurencesToTrigger)
                     {
                         recentCommandsCache.DeleteCommand(message);
 
