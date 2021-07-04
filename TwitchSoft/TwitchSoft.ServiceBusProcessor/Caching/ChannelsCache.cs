@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 
-namespace TwitchSoft.Shared.Services.Helpers
+namespace TwitchSoft.ServiceBusProcessor.Caching
 {
     public class ChannelsCache : IChannelsCache
     {

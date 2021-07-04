@@ -1,10 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using TwitchSoft.ServiceBusProcessor.Caching;
 using TwitchSoft.Shared;
 using TwitchSoft.Shared.Extensions;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using static TelegramBotGrpc;

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace TwitchSoft.Shared.Services.Helpers
+namespace TwitchSoft.ServiceBusProcessor.Caching
 {
     public interface IChannelsCache
     {

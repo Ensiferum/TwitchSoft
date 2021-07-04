@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using TwitchSoft.ServiceBusProcessor.Caching;
 using TwitchSoft.Shared;
 using static TelegramBotGrpc;
 
@@ -19,6 +20,8 @@ namespace TwitchSoft.ServiceBusProcessor
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCache(Configuration);
+
             services.ConfigureShared(Configuration);
 
             services.AddServiceBusProcessors(Configuration);

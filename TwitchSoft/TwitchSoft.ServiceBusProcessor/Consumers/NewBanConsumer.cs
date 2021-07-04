@@ -6,7 +6,6 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers

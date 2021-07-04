@@ -1,9 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using TwitchSoft.ServiceBusProcessor.Caching;
 using TwitchSoft.Shared.Database.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.Shared.Services.Helpers;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
 using User = TwitchSoft.Shared.Database.Models.User;
 
