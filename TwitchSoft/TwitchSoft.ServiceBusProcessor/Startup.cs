@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,8 @@ namespace TwitchSoft.ServiceBusProcessor
             services.ConfigureShared(Configuration);
 
             services.AddServiceBusProcessors(Configuration);
+
+            services.AddMediatR(typeof(Startup));
 
             services.AddGrpcClient<TelegramBotGrpcClient>(options =>
             {

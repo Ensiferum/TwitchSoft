@@ -1,13 +1,10 @@
 ﻿using MassTransit;
-using Microsoft.Extensions.Configuration;
+using MediatR;
 using System.Threading.Tasks;
 using TwitchSoft.ServiceBusProcessor.Caching;
-using TwitchSoft.Shared;
-using TwitchSoft.Shared.Extensions;
+using TwitchSoft.ServiceBusProcessor.MediatR.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.Shared.Services.Models;
 using TwitchSoft.Shared.Services.Repository.Interfaces;
-using static TelegramBotGrpc;
 using ChatMessageES = TwitchSoft.Shared.ElasticSearch.Models.ChatMessage;
 
 namespace TwitchSoft.ServiceBusProcessor.Consumers
@@ -16,20 +13,16 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
     {
         private readonly IChannelsCache channelsCache;
         private readonly IMessageRepository messageRepository;
-        private readonly TelegramBotGrpcClient telegramBotClient;
-        private readonly string rootUserChatId;
+        private readonly IMediator mediator;
 
         public NewTwitchChannelMessageConsumer(
             IChannelsCache channelsCache,
             IMessageRepository messageRepository,
-            TelegramBotGrpcClient telegramBotClient,
-            IConfiguration config)
+            IMediator mediator)
         {
             this.channelsCache = channelsCache;
             this.messageRepository = messageRepository;
-            this.telegramBotClient = telegramBotClient;
-
-            rootUserChatId = config.GetValue<string>("JobConfigs:RootUserChatId");
+            this.mediator = mediator;
         }
 
         public async Task Consume(ConsumeContext<NewTwitchChannelMessage> context)
@@ -38,41 +31,10 @@ namespace TwitchSoft.ServiceBusProcessor.Consumers
 
             var channelId = await channelsCache.GetChannelIdByName(chatMessage.Channel);
 
-            //ToDo: extract logic and make configurable via bot
-            if (chatMessage.User.UserId == Constants.MadTwitchId)
+            await mediator.Send(new SendTelegramMessage
             {
-                var messageModel = new ChatMessageModelForDisplaying()
-                {
-                    Channel = chatMessage.Channel,
-                    Message = chatMessage.Message,
-                    PostedTime = chatMessage.PostedTime,
-                    UserName = chatMessage.User.UserName,
-                };
-
-                await telegramBotClient.SendMessageAsync(new SendMessageRequest
-                {
-                    ChatId = rootUserChatId,
-                    MessageText = messageModel.ToDisplayFormat()
-                });
-            }
-
-            //ToDo: notify about mentions
-            if (chatMessage.Message.Contains($"@{Constants.EnsthorTwitchName}", System.StringComparison.OrdinalIgnoreCase))
-            {
-                var messageModel = new ChatMessageModelForDisplaying()
-                {
-                    Channel = chatMessage.Channel,
-                    Message = chatMessage.Message,
-                    PostedTime = chatMessage.PostedTime,
-                    UserName = chatMessage.User.UserName,
-                };
-
-                await telegramBotClient.SendMessageAsync(new SendMessageRequest
-                {
-                    ChatId = rootUserChatId,
-                    MessageText = messageModel.ToDisplayFormat()
-                });
-            }
+                Message = chatMessage,
+            });
 
             var chatMessageES = new ChatMessageES
             {
