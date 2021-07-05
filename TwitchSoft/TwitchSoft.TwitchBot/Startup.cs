@@ -2,7 +2,6 @@
 using TwitchSoft.Shared.Services.Models.Twitch;
 using TwitchSoft.TwitchBot.ChatPlugins;
 using TwitchSoft.Shared;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using MediatR;
@@ -14,6 +13,7 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System;
 using TwitchSoft.TwitchBot.Caching;
+using static TelegramBotGrpc;
 
 namespace TwitchSoft.TwitchBot
 {
@@ -28,7 +28,7 @@ namespace TwitchSoft.TwitchBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCache(Configuration);
+            services.AddCache();
 
             services.ConfigureShared(Configuration);
             services.AddSingleton<TwitchBot>();
@@ -45,7 +45,7 @@ namespace TwitchSoft.TwitchBot
             {
                 var botSettings = sp.GetService<IOptions<BotSettings>>();
 
-                ConnectionCredentials credentials = new ConnectionCredentials(botSettings.Value.BotName, botSettings.Value.BotOAuthToken);
+                ConnectionCredentials credentials = new(botSettings.Value.BotName, botSettings.Value.BotOAuthToken);
 
                 var clientOptions = new ClientOptions
                 {
@@ -61,9 +61,14 @@ namespace TwitchSoft.TwitchBot
             services.AddMediatR(typeof(Startup));
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddGrpcClient<TelegramBotGrpcClient>(options =>
+            {
+                options.Address = new Uri(Configuration.GetValue<string>("Services:TelegramBot"));
+            });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
         }

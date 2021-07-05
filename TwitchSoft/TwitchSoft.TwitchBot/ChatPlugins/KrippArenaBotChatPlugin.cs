@@ -21,7 +21,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
                 chatMessage.Message.Equals("BETTING HAS OPENED Pog USE !bet <under | x | over> <1-100> TO BET", StringComparison.OrdinalIgnoreCase))
             {
                 logger.LogWarning("Betting started");
-                Random rand = new Random();
+                Random rand = new();
                 if (rand.Next(3) == 1)
                 {
                     logger.LogWarning("Bet under");

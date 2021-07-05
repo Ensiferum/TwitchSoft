@@ -1,15 +1,18 @@
-﻿using AutoMapper;
+﻿extern alias TelegramBot;
+
+using AutoMapper;
 using FluentAssertions;
 using Telegram.Bot.Types;
-using TwitchSoft.TelegramBot;
-using TwitchSoft.TelegramBot.MediatR.Models;
+using TelegramBot::TwitchSoft.TelegramBot;
+using TelegramBot::TwitchSoft.TelegramBot.MediatR.Models;
 using Xunit;
+using DigestInfoRequest = TelegramBot::DigestInfoRequest;
 
 namespace TwitchSoft.Tests
 {
     public class TelegramBotProfileTests
     {
-        private MapperConfiguration Configuration;
+        private readonly MapperConfiguration Configuration;
 
         public TelegramBotProfileTests()
         {
@@ -30,9 +33,11 @@ namespace TwitchSoft.Tests
             var mapper = Configuration.CreateMapper();
 
 
-            var sourceObject = new DigestInfoRequest {
+            var sourceObject = new DigestInfoRequest
+            {
                 ChatId = "testChatId",
-                Username = "testUsername"
+                Username = "testUsername",
+                TwitchUserId = 0
             };
 
             var resultObject = mapper.Map<UserMessagesDigestCommand>(sourceObject);
@@ -40,7 +45,32 @@ namespace TwitchSoft.Tests
             var expectedObject = new UserMessagesDigestCommand()
             {
                 ChatId = "testChatId",
-                UserName = "testUsername"
+                UserName = "testUsername",
+                TwitchUserId = null
+            };
+            resultObject.Should().BeEquivalentTo(expectedObject);
+        }
+
+        [Fact]
+        public void AutoMapper_ConvertFrom_DigestInfoRequest_To_UserMessagesDigest_With_TwitchUserId_IsValid()
+        {
+            var mapper = Configuration.CreateMapper();
+
+
+            var sourceObject = new DigestInfoRequest
+            {
+                ChatId = "testChatId",
+                Username = "testUsername",
+                TwitchUserId = 12345,
+            };
+
+            var resultObject = mapper.Map<UserMessagesDigestCommand>(sourceObject);
+
+            var expectedObject = new UserMessagesDigestCommand()
+            {
+                ChatId = "testChatId",
+                UserName = "testUsername",
+                TwitchUserId = 12345
             };
             resultObject.Should().BeEquivalentTo(expectedObject);
         }

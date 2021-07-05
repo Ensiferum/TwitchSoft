@@ -1,17 +1,19 @@
+extern alias TwitchBot;
+
 using AutoMapper;
 using FluentAssertions;
 using System;
+using TwitchBot::TwitchSoft.TwitchBot;
+using TwitchBot::TwitchSoft.TwitchBot.MediatR.Models;
 using TwitchLib.Client.Models;
 using TwitchSoft.Shared.ServiceBus.Models;
-using TwitchSoft.TwitchBot;
-using TwitchSoft.TwitchBot.MediatR.Models;
 using Xunit;
 
 namespace TwitchSoft.Tests
 {
     public class TwitchBotProfileTests
     {
-        private MapperConfiguration Configuration;
+        private readonly MapperConfiguration Configuration;
 
         public TwitchBotProfileTests()
         {
@@ -284,7 +286,7 @@ namespace TwitchSoft.Tests
 
             var ircMessage = new TwitchLib.Client.Models.Internal.IrcMessage(
                 new TwitchLib.Client.Enums.Internal.IrcCommand(),
-                new string[] { },
+                Array.Empty<string>(),
                 "",
                 new System.Collections.Generic.Dictionary<string, string>());
 

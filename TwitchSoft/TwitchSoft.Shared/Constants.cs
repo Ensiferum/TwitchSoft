@@ -2,9 +2,9 @@
 {
     public static class Constants
     {
-        public static uint MadTwitchId = 40298003;
-        public static string MadTwitchName = "honeymad";
-        public static uint EnsthorTwitchId = 74812507;
-        public static string EnsthorTwitchName = "ensthor";
+        public const uint MadTwitchId = 40298003;
+        public const string MadTwitchName = "honeymad";
+        public const uint EnsthorTwitchId = 74812507;
+        public const string EnsthorTwitchName = "ensthor";
     }
 }

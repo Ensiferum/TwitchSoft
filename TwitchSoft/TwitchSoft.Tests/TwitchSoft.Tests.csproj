@@ -17,8 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TwitchSoft.TelegramBot\TwitchSoft.TelegramBot.csproj" />
-    <ProjectReference Include="..\TwitchSoft.TwitchBot\TwitchSoft.TwitchBot.csproj" />
+    <ProjectReference Include="..\TwitchSoft.TelegramBot\TwitchSoft.TelegramBot.csproj">
+      <Aliases>TelegramBot</Aliases>
+    </ProjectReference>
+    <ProjectReference Include="..\TwitchSoft.TwitchBot\TwitchSoft.TwitchBot.csproj">
+      <Aliases>TwitchBot</Aliases>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

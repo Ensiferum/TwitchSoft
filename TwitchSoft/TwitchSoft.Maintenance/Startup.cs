@@ -47,7 +47,7 @@ namespace TwitchSoft.Maintenance
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.UseScheduler(scheduler =>
             {

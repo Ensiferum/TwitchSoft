@@ -44,6 +44,7 @@ namespace TwitchSoft.TwitchBot
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             _channelsJoinedCheckerTimer?.Dispose();
             _connectionCheckerTimer?.Dispose();
         }

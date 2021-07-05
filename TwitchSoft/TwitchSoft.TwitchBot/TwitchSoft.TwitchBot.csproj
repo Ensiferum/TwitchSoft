@@ -10,6 +10,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'TwitchSoft.Bot' " />
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.38.0" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.2.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
@@ -29,5 +30,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TwitchSoft.Shared\TwitchSoft.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\TwitchSoft.TelegramBot\Protos\TelegramBot.proto" GrpcServices="Client" Access="Public">
+      <Link>Protos\TelegramBot.proto</Link>
+    </Protobuf>
   </ItemGroup>
 </Project>

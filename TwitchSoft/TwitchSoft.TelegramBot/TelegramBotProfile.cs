@@ -8,7 +8,11 @@ namespace TwitchSoft.TelegramBot
     {
         public TelegramBotProfile()
         {
-            CreateMap<DigestInfoRequest, UserMessagesDigestCommand>();
+            CreateMap<DigestInfoRequest, UserMessagesDigestCommand>()
+                .ForMember(dest => dest.TwitchUserId, opt => {
+                    opt.Condition(src => src.TwitchUserId != 0);
+                    opt.MapFrom(src => src.TwitchUserId);
+                });
 
             CreateMap<SendMessageRequest, SendMessageCommand>();
 

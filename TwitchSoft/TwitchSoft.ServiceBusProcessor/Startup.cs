@@ -20,7 +20,7 @@ namespace TwitchSoft.ServiceBusProcessor
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCache(Configuration);
+            services.AddCache();
 
             services.ConfigureShared(Configuration);
 

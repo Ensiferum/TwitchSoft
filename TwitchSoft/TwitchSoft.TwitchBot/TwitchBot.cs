@@ -21,7 +21,7 @@ namespace TwitchSoft.TwitchBot
 
         private int EventsCount;
 
-        private readonly List<string> JoinedChannels = new List<string>();
+        private readonly List<string> JoinedChannels = new();
 
         public TwitchBot(
             ILogger<TwitchBot> logger, 
@@ -64,6 +64,8 @@ namespace TwitchSoft.TwitchBot
             twitchClient.OnJoinedChannel += Client_OnJoinedChannel;
             twitchClient.OnLeftChannel += Client_OnLeftChannel;
 
+            twitchClient.OnWhisperReceived += Client_OnWhisperReceived;
+
             twitchClient.OnConnectionError += Client_OnConnectionError;
             twitchClient.OnError += Client_OnError;
             twitchClient.OnReconnected += Client_OnReconnected;
@@ -76,6 +78,14 @@ namespace TwitchSoft.TwitchBot
 
             twitchClient.OnUserBanned += Client_OnUserBanned;
             twitchClient.OnUserTimedout += Client_OnUserTimedout;
+        }
+
+        private async void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
+        {
+            await mediator.Send(new NewWhisperMessageDto
+            {
+                WhisperMessage = e.WhisperMessage,
+            });
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)

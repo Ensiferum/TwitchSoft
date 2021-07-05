@@ -5,7 +5,7 @@ namespace TwitchSoft.ServiceBusProcessor.Caching
 {
     internal static class CacheExtensions
     {
-        internal static void AddCache(this IServiceCollection services, IConfiguration configuration)
+        internal static void AddCache(this IServiceCollection services)
         {
             services.AddMemoryCache();
             services.AddSingleton<IChannelsCache, ChannelsCache>();
