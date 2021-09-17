@@ -20,4 +20,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\TwitchSoft.Shared\nlog.config" Link="nlog.config" />
+  </ItemGroup>
+
 </Project>
