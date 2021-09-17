@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'TwitchSoft.Bot' " />
-
-  <ItemGroup>
-    <None Include="..\TwitchSoft.Shared\nlog.config" Link="nlog.config" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0-pre1" />

@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\TwitchSoft.Shared\nlog.config" Link="nlog.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TwitchSoft.Shared\TwitchSoft.Shared.csproj" />
   </ItemGroup>
 
