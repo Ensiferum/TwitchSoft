@@ -82,6 +82,7 @@ namespace TwitchSoft.TwitchBot
 
         private async void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
         {
+            logger.LogWarning($"OnWhisperReceived: {e.WhisperMessage.Username} - {e.WhisperMessage.Message}");
             await mediator.Send(new NewWhisperMessageDto
             {
                 WhisperMessage = e.WhisperMessage,
