@@ -1,6 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace TwitchSoft.TelegramBot
 {
@@ -9,6 +14,7 @@ namespace TwitchSoft.TelegramBot
         private readonly ILogger<TelegramBot> logger;
         private readonly ITelegramBotClient telegramBotClient;
         private readonly MessageProcessor messageProcessor;
+        private CancellationTokenSource _cts;
 
         public TelegramBot(
             ILogger<TelegramBot> logger,
@@ -22,51 +28,51 @@ namespace TwitchSoft.TelegramBot
 
         public void Start()
         {
+            _cts?.Cancel();
             Connect();
         }
 
         public void Stop()
         {
-            Disconnect();
+            _cts?.Cancel();
         }
+
         private void Connect()
         {
-            InitTelegramBotEvents();
-            telegramBotClient.StartReceiving();
+            _cts = new CancellationTokenSource();
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = { }, // receive all update types
+                
+            };
+
+            telegramBotClient.StartReceiving(
+                HandleUpdateAsync,
+                HandleErrorAsync,
+                receiverOptions,
+                _cts.Token);
         }
 
-        private void Disconnect()
+        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            telegramBotClient.StopReceiving();
-        }
-        
-        private void InitTelegramBotEvents()
-        {
-            telegramBotClient.OnMessage += Bot_OnMessage;
-            telegramBotClient.OnMessageEdited += Bot_OnMessage;
-            telegramBotClient.OnCallbackQuery += Bot_OnCallbackQuery;
-            telegramBotClient.OnInlineQuery += Bot_OnInlineQuery;
-            telegramBotClient.OnReceiveError += Bot_OnReceiveError;
-        }
-
-        private void Bot_OnReceiveError(object sender, ReceiveErrorEventArgs e)
-        {
-            logger.LogError(e.ApiRequestException, $"Bot_OnReceiveError");
+            if (update.Type == UpdateType.Message || update.Type == UpdateType.EditedMessage)
+            {
+                await messageProcessor.ProcessMessage(update.Message);
+            }
+            else if (update.Type == UpdateType.CallbackQuery)
+            {
+                await messageProcessor.ProcessCallbackQuery(update.CallbackQuery);
+            }
+            else if (update.Type == UpdateType.InlineQuery)
+            {
+                await messageProcessor.ProcessInlineQuery(update.InlineQuery);
+            }
         }
 
-        private async void Bot_OnInlineQuery(object sender, InlineQueryEventArgs e)
+        private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            await messageProcessor.ProcessInlineQuery(e.InlineQuery);
-        }
-
-        private async void Bot_OnCallbackQuery(object sender, CallbackQueryEventArgs e)
-        {
-            await messageProcessor.ProcessCallbackQuery(e.CallbackQuery);
-        }
-
-        private async void Bot_OnMessage(object sender, MessageEventArgs e)
-        {
-            await messageProcessor.ProcessMessage(e.Message);
+            logger.LogError(exception, "TelegramBot error occured");
+            return Task.CompletedTask;
         }
     }
 }
