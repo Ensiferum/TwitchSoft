@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: publicapi-ingress
@@ -16,7 +16,10 @@ spec:
   - host: twitchsoft.northeurope.cloudapp.azure.com
     http:
       paths:
-      - backend:
-          serviceName: twitchsoftpublicapi
-          servicePort: 80
-        path: /api/(.*)
+      - path: /api/(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: twitchsoftpublicapi
+            port:
+              number: 80
