@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace TwitchSoft.PublicApi.Controllers
 
         public MessagesController(
             ILogger<MessagesController> logger,
-            IMessageRepository messageRepository, 
+            IMessageRepository messageRepository,
             ITwitchApiService twitchApiService)
         {
             _logger = logger;
@@ -31,6 +32,11 @@ namespace TwitchSoft.PublicApi.Controllers
         public async Task<UserMessagesResult> UserMessages(string user, int skip = 0, int count = 25)
         {
             var userInfo = await twitchApiService.GetChannelByName(user);
+            if (userInfo == null)
+            {
+                throw new ArgumentException($"User {user} not found");
+            }
+
             var messages = await messageRepository.GetMessages(uint.Parse(userInfo.Id), skip, count + 1);
 
             var messagesToReturn = messages.Take(count);
