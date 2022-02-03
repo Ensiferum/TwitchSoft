@@ -13,19 +13,21 @@ spec:
         app: elasticsearch
     spec:
       nodeSelector: 
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       securityContext:
         runAsUser: 1000
         runAsGroup: 3000
         fsGroup: 2000
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
         resources:
           limits:
-            memory: 2.5Gi
+            cpu: "1000m"
+            memory: "2.5Gi"
           requests:
-            memory: 1.5Gi
+            cpu: "100m"
+            memory: "512M"
         volumeMounts:
         - mountPath: "/usr/share/elasticsearch/data"
           subPath: "es-data"
@@ -69,15 +71,15 @@ spec:
         app: kibana
     spec:
       nodeSelector: 
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       containers:
       - name: elasticsearch
-        image: docker.elastic.co/kibana/kibana:7.13.2
+        image: docker.elastic.co/kibana/kibana:7.17.0
         resources:
           limits:
-            memory: 700Mi
+            memory: 1000Mi
           requests:
-            memory: 300Mi
+            memory: 500Mi
         ports:
         - containerPort: 5601
 ---
