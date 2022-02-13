@@ -12,15 +12,15 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
 {
     public class RaffleParticipantBotChatPlugin : IChatPlugin
     {
-        private const int NumberOfOccurencesToTrigger = 10;
+        private const int NumberOfOccurencesToTrigger = 30;
         private const int RandomizerChance = 25;
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
         private readonly IRecentCommandsCache recentCommandsCache;
         private readonly string[] ignoredCommands;
 
         public RaffleParticipantBotChatPlugin(
-            ILogger<RaffleParticipantBotChatPlugin> logger, 
-            IConfiguration configuration, 
+            ILogger<RaffleParticipantBotChatPlugin> logger,
+            IConfiguration configuration,
             IRecentCommandsCache recentCommandsCache)
         {
             this.logger = logger;
@@ -34,7 +34,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
             var message = chatMessage.Message;
             if (Regex.IsMatch(message, @"^[!#]\w+$", RegexOptions.Compiled) && Regex.IsMatch(message, @"^\P{IsCyrillic}+$", RegexOptions.Compiled))
             {
-                
+
                 if (ignoredCommands.Contains(message, StringComparer.OrdinalIgnoreCase))
                 {
                     return;
