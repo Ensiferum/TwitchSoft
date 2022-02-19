@@ -13,7 +13,7 @@ namespace TwitchSoft.TwitchBot.ChatPlugins
     public class RaffleParticipantBotChatPlugin : IChatPlugin
     {
         private const int NumberOfOccurencesToTrigger = 30;
-        private const int RandomizerChance = 25;
+        private const int RandomizerChance = 20;
         private readonly ILogger<RaffleParticipantBotChatPlugin> logger;
         private readonly IRecentCommandsCache recentCommandsCache;
         private readonly string[] ignoredCommands;
