@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchLib.Api;
+using TwitchLib.Api.Helix.Models.Search;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
@@ -26,10 +27,9 @@ namespace TwitchSoft.Shared.Services.TwitchApi
             return users.Users.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<TwitchLib.Api.V5.Models.Channels.Channel>> SearchChannels(string namePart)
+        public async Task<SearchChannelsResponse> SearchChannels(string namePart)
         {
-            var channels = await api.V5.Search.SearchChannelsAsync(namePart, 10);
-            return channels.Channels.OrderByDescending(_ => _.Followers);
+            return await api.Helix.Search.SearchChannelsAsync(namePart, first: 10);
         }
 
         public async Task<List<Follow>> GetFollowsForUser(string fromId, string toId)

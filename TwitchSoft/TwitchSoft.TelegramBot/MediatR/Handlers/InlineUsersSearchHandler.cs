@@ -30,7 +30,7 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
             var channels = await twitchApiService.SearchChannels(searchUserText);
 
             var results = new List<InlineQueryResultArticle>();
-            foreach (var user in channels)
+            foreach (var user in channels.Channels)
             {
                 var article = new InlineQueryResultArticle(
                     id: user.Id,
@@ -42,16 +42,16 @@ namespace TwitchSoft.TelegramBot.MediatR.Handlers
                                 new[] {
                                     InlineKeyboardButton.WithCallbackData(
                                         "Show messages",
-                                        $"{BotCommands.UserMessages} {user.Name}")
+                                        $"{BotCommands.UserMessages} {user.BroadcasterLogin}")
                                 },
                                 new[] {
                                     InlineKeyboardButton.WithCallbackData(
                                         "Show subs count",
-                                        $"{BotCommands.SubscribersCount} {user.Name}")
+                                        $"{BotCommands.SubscribersCount} {user.BroadcasterLogin}")
                                 }
                         }),
-                    ThumbUrl = user.Logo,
-                    Description = $"Followers: {user.Followers}"
+                    ThumbUrl = user.ThumbnailUrl,
+                    Description = $"IsLive: {user.IsLive}"
                 };
                 results.Add(article);
             }

@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using MassTransit;
 using TwitchSoft.ServiceBusProcessor.Consumers;
-using GreenPipes;
 using TwitchSoft.Shared.ServiceBus.Models;
 using TwitchSoft.Shared.ServiceBus.Configuration;
+using System;
 
 namespace TwitchSoft.ServiceBusProcessor
 {
@@ -70,7 +70,12 @@ namespace TwitchSoft.ServiceBusProcessor
                 }));
             });
 
-            services.AddMassTransitHostedService();
+            services.Configure<MassTransitHostOptions>(options =>
+            {
+                options.WaitUntilStarted = true;
+                options.StartTimeout = TimeSpan.FromSeconds(30);
+                options.StopTimeout = TimeSpan.FromMinutes(1);
+            });
         }
     }
 }
