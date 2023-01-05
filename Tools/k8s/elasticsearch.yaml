@@ -23,11 +23,9 @@ spec:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.3.1
         resources:
           limits:
-            cpu: "1000m"
             memory: "2.5Gi"
           requests:
-            cpu: "100m"
-            memory: "512M"
+            memory: "1Gi"
         volumeMounts:
         - mountPath: "/usr/share/elasticsearch/data"
           subPath: "es-data"
@@ -79,7 +77,7 @@ spec:
         image: docker.elastic.co/kibana/kibana:8.3.1
         resources:
           limits:
-            memory: 1600Mi
+            memory: 1200Mi
           requests:
             memory: 800Mi
         ports:
